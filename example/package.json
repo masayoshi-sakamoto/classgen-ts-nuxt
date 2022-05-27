@@ -1,0 +1,9 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "class-gen": "node ../lib/bin/cli.js --namespace example"
+  }
+}
