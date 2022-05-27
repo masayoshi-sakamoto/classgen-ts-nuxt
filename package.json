@@ -1,0 +1,37 @@
+{
+  "name": "classgen-ts-nuxt",
+  "version": "0.0.1",
+  "description": "Class generator to implement clean architecture for nuxt.js.",
+  "bin": {
+    "openapi-ts-gen": "./bin/classgen-ts-nuxt.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masayoshi-sakamoto/classgen-ts-nuxt"
+  },
+  "author": "Masayoshi Sakamoto <masayoshi0222@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/masayoshi-sakamoto/classgen-ts-nuxt/issues"
+  },
+  "homepage": "https://github.com/masayoshi-sakamoto/classgen-ts-nuxt#readme",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "tsc"
+  },
+  "devDependencies": {
+    "@types/ejs": "^2.6.3",
+    "@types/js-yaml": "^3.12.0",
+    "@types/node": "^11.11.3",
+    "@types/prettier": "^1.16.4",
+    "openapi3-ts": "^1.2.0",
+    "typescript": "~3.6.2"
+  },
+  "dependencies": {
+    "commander": "^2.19.0",
+    "ejs": "^2.6.1",
+    "js-yaml": "3.13.1",
+    "prettier": "^1.17.1"
+  }
+}
