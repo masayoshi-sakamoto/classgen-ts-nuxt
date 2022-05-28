@@ -2,6 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as ejs from 'ejs'
 import * as YAML from 'js-yaml'
+import { toCamelCase } from './lib/snake-camel'
+
 import Parser from './parser'
 
 const inflector = require('./lib/inflector')
@@ -41,6 +43,10 @@ export default class Generator {
     this.generator('initialize')
   }
 
+  injector() {
+    this.generator('injector')
+  }
+
   swagger(model: string) {
     this.model(model)
     this.generator('swagger')
@@ -48,12 +54,12 @@ export default class Generator {
 
   schema(target: string, options: any) {
     const yamls = new Parser(target).parse(options)
-    console.log(yamls)
     for (const yaml of yamls) {
       const filepath = this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), yaml.name)
       fs.writeFileSync(path.resolve(filepath, 'index.yaml'), yaml.index, { encoding: 'utf-8', flag: 'w+' })
       fs.writeFileSync(path.resolve(filepath, 'seed.yaml'), yaml.seed, { encoding: 'utf-8', flag: 'w+' })
     }
+    this.generator('injector')
   }
 
   typegen() {
@@ -88,6 +94,7 @@ export default class Generator {
       className: this.className,
       classNames: this.classNames,
       classname: this.classname,
+      toCamelCase,
       repositories: fs.readdirSync(this.makeDir(this._app, 'repositories')),
       gateways: fs.readdirSync(this.makeDir(this._app, 'gateways')),
       gatewayFiles: fs.readdirSync(this.makeDir(this.makeDir(this._app, 'gateways'), this.options.namespace)),

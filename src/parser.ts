@@ -1,5 +1,6 @@
 import { Create, Parser as sqlparser } from 'node-sql-parser'
 var YAML = require('json2yaml')
+const inflector = require('./lib/inflector')
 
 export default class Parser {
   private sqlData: string[]
@@ -32,7 +33,7 @@ export default class Parser {
         }
 
         yamls.push({
-          name: table.table,
+          name: inflector.singularize(table.table),
           index: YAML.stringify({
             required: table.columns?.flatMap((prop) => (!this.options.excludes.includes(prop.property) ? prop.property : [])),
             properties: this.properties(table.columns, 'index')

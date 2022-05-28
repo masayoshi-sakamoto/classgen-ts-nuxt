@@ -40,6 +40,12 @@ try {
     })
 
   /**
+   * インデックス作成
+   */
+  commander.command('index').action(() => {
+    new Generator(commander.opts()).injector()
+  })
+  /**
    * swaggerからentityなどを作成
    */
   commander.command('typegen').action(() => {

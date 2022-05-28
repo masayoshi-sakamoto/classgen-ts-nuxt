@@ -1,0 +1,20 @@
+<%_ pathsFiles.forEach((prop) => {
+  const ClassName = prop.key.charAt(0).toUpperCase() + prop.key.slice(1)
+_%>
+#<%= ClassName %>
+<%_ prop.values.forEach((file) => {
+    const fileName = file.split('.')[0]
+_%>
+<%_ if (fileName === 'path') {_%>
+/<%= prop.key %>/{id}:
+  $ref: './<%= prop.key %>/path.yml'
+<%_ } else if (fileName === 'paths') {_%>
+/<%= prop.key %>:
+  $ref: './<%= prop.key %>/paths.yml'
+<%_ } else {_%>
+/<%= prop.key %>/<%= fileName %>:
+  $ref: './<%= prop.key %>/<%= fileName %>.yml'
+<%_ } _%>
+<%_ }); _%>
+
+<%_ }); _%>

@@ -1,0 +1,21 @@
+<%_ schemasFiles.forEach((prop) => {
+  const ClassName = toCamelCase(prop.key)
+_%>
+<%_ prop.values.forEach((file) => {
+    const fileName = file.split('.')[0]
+    const names = fileName.split('_')
+    let FileName = ''
+    names.forEach((name) => {
+      FileName += toCamelCase(name)
+    })
+_%>
+<%_ if (fileName === 'index') {_%>
+<%= ClassName %>:
+  $ref: './<%= prop.key %>/index.yml'
+<%_ } else {_%>
+<%= ClassName %><%= FileName %>:
+  $ref: './<%= prop.key %>/<%= fileName %>.yml'
+<%_ } _%>
+<%_ }); _%>
+
+<%_ }); _%>
