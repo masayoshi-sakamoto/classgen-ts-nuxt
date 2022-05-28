@@ -1,0 +1,77 @@
+get:
+  tags:
+    - <%= className %>
+  operationId: get<%= className %>
+  description: Get <%= className %>
+  parameters:
+    - in: path
+      className: id
+      schema:
+        type: string
+      required: true
+      description: <%= className %> ID
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= classname %>
+            type: object
+            properties:
+              <%= classname %>:
+                $ref: '#/components/schemas/<%= className %>'
+put:
+  tags:
+    - <%= className %>
+  operationId: put<%= className %>
+  description: Put <%= className %>
+  parameters:
+    - in: path
+      className: id
+      schema:
+        type: string
+      required: true
+      description: <%= className %> ID
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/<%= className %>Seed'
+  responses:
+    '201':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= classname %>
+            type: object
+            properties:
+              <%= classname %>:
+                $ref: '#/components/schemas/<%= className %>'
+delete:
+  tags:
+    - <%= className %>
+  operationId: delete<%= className %>
+  description: Delete <%= className %>
+  parameters:
+    - in: path
+      className: id
+      schema:
+        type: string
+      required: true
+      description: <%= className %> ID
+  responses:
+    '201':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= classname %>
+            type: object
+            properties:
+              <%= classname %>:
+                $ref: '#/components/schemas/<%= className %>'

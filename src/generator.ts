@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as ejs from 'ejs'
+import * as YAML from 'js-yaml'
+import Parser from './parser'
 
 const inflector = require('./lib/inflector')
 const rimraf = require('rimraf')
@@ -36,16 +38,23 @@ export default class Generator {
   }
 
   initialize() {
-    console.log('initialize')
     this.generator('initialize')
   }
 
-  swagger() {
-    console.log('swagger')
+  swagger(model: string) {
+    this.model(model)
+    this.generator('swagger')
+  }
+
+  schema(target: any) {
+    new Parser(target).parse()
+  }
+
+  typegen() {
+    console.log('typegen')
   }
 
   entity(model: string) {
-    console.log('entity')
     this.model(model)
     this.generator('entity')
   }
@@ -72,6 +81,7 @@ export default class Generator {
       appName: this.options.namespace,
       className: this.className,
       classNames: this.classNames,
+      classname: this.classname,
       repositories: fs.readdirSync(this.makeDir(this._app, 'repositories')),
       gateways: fs.readdirSync(this.makeDir(this._app, 'gateways')),
       gatewayFiles: fs.readdirSync(this.makeDir(this.makeDir(this._app, 'gateways'), this.options.namespace)),
