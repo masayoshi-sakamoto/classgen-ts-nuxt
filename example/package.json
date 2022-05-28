@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "class-gen": "node ../lib/bin/cli.js --namespace example"
+    "class-gen": "node ../lib/bin/cli.js --namespace example -d dist"
   }
 }

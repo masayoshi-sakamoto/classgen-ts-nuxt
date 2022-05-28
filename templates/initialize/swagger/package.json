@@ -1,0 +1,19 @@
+{
+  "name": "swagger",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "sw": "yarn sw:stop; yarn typegen; yarn openapi:build; yarn openapi; yarn sw:up",
+    "sw:up": "docker-compose build; docker-compose up -d",
+    "sw:stop": "docker-compose stop",
+    "openapi": "cd ../openapi; gradle wrapper; ./gradlew check assemble",
+    "openapi:build": "rm -rf ../openapi; openapi-generator generate -c config.json -i swagger.yml -g kotlin-server -o ../openapi; ./sed.sh",
+    "swagpack": "swagpack build src/index.yml -o swagger.yml",
+    "typegen": "rm -rf ../app/infrastructure/network/<%= appName %>/schema; npm run swagpack && openapi-ts-gen generate swagger.yml --namespace <%= appName %> --dist ../app/infrastructure/network/<%= appName %>/schema"
+  },
+  "dependencies": {
+    "openapi-ts-gen": "^0.0.23",
+    "swagpack": "^0.0.5"
+  }
+}
