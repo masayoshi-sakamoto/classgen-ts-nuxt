@@ -28,12 +28,15 @@ try {
   commander
     .command('schema')
     .argument('<file>', 'mysql dump file')
-    .action((file: string) => {
+    .option('-m, --model <model>', 'model name')
+    .option('-e, --excludes <excludes>', 'excludes column', (items) => items.split(','))
+    .action((file: string, options: { model: string; excludes: string }) => {
+      console.log(options)
       if (!fs.existsSync(path.resolve(process.cwd(), file))) {
         throw new Error('File does not exist.')
       }
       const target = fs.readFileSync(path.resolve(process.cwd(), file), 'utf-8')
-      new Generator(commander.opts()).schema(target)
+      new Generator(commander.opts()).schema(target, options)
     })
 
   /**

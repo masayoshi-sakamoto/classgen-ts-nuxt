@@ -46,8 +46,14 @@ export default class Generator {
     this.generator('swagger')
   }
 
-  schema(target: any) {
-    new Parser(target).parse()
+  schema(target: string, options: any) {
+    const yamls = new Parser(target).parse(options)
+    console.log(yamls)
+    for (const yaml of yamls) {
+      const filepath = this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), yaml.name)
+      fs.writeFileSync(path.resolve(filepath, 'index.yaml'), yaml.index, { encoding: 'utf-8', flag: 'w+' })
+      fs.writeFileSync(path.resolve(filepath, 'seed.yaml'), yaml.seed, { encoding: 'utf-8', flag: 'w+' })
+    }
   }
 
   typegen() {
