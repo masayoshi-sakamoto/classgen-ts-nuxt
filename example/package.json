@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "class-gen": "node ../lib/bin/cli.js --namespace example -d dist"
+    "class-gen": "node ../lib/bin/cli.js --namespace example -d dist",
+    "schema-gen": "cd ../; yarn swagpack build ./example/dist/swagger/src/index.yaml -o ./example/dist/swagger/swagger.yaml"
   }
 }

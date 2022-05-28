@@ -11,10 +11,10 @@ _%>
 _%>
 <%_ if (fileName === 'index') {_%>
 <%= ClassName %>:
-  $ref: './<%= prop.key %>/index.yml'
+  $ref: './<%= prop.key %>/index.yaml'
 <%_ } else {_%>
 <%= ClassName %><%= FileName %>:
-  $ref: './<%= prop.key %>/<%= fileName %>.yml'
+  $ref: './<%= prop.key %>/<%= fileName %>.yaml'
 <%_ } _%>
 <%_ }); _%>
 

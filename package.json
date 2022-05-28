@@ -36,6 +36,7 @@
     "json2yaml": "^1.1.0",
     "node-sql-parser": "^4.3.0",
     "prettier": "^2.6.2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "swagpack": "^0.0.6"
   }
 }
