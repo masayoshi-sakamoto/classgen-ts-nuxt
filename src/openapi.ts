@@ -40,6 +40,7 @@ export type ITsSchema = {
   required?: boolean
   nullable?: boolean
   default?: any
+  format?: string
 }
 export type IRef = {
   name: string
@@ -85,7 +86,8 @@ export default class OpenAPIParser {
       title: value.title,
       required,
       nullable: value.nullable,
-      default: value.default || 'null'
+      default: value.default || 'null',
+      format: value.format
     }
 
     if (value.$ref !== undefined) {

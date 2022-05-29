@@ -74,7 +74,6 @@ export default class Generator {
     }
     const config: IConfig = fs.existsSync(configpath) ? JSON.parse(fs.readFileSync(configpath, 'utf-8')) : {}
     this.config = { ...this.config, ...config }
-    console.log(this.config)
 
     // SQLファイルが指定されている場合、ファイルを読み込んでくる
     if (this.options.sqldump) {
@@ -94,7 +93,8 @@ export default class Generator {
     this.options.table = this.options.model ? inflector.pluralize(this.options.model) : undefined
 
     // 除外したいカラム名を取得
-    this.options.excludes = this.options.excludes ? this.config.columns!.excludes!.concat(this.options.excludes) : []
+    this.options.excludes = this.options.excludes || []
+    this.options.excludes = this.config.columns!.excludes!.concat(this.options.excludes)
 
     this._injector = false
     this.options.namespace = toCamelCase(this.options.namespace)
@@ -113,16 +113,18 @@ export default class Generator {
   schema() {
     this.dump()
     for (const model of this.models) {
+      const seed = this.models.find((prop) => prop.name === model.name + 'Seed')?.schema
       this.opts = {
         ...this.opts,
         schemas: model.schema,
         refs: model.refs,
+        seed: seed || {},
         classes: this.models
       }
       this.model(model.name)
       console.log('typegen:', chalk.yellow(model.name))
       this.generator('typegen')
-      if (!this.options.model || model.table === this.options.table) {
+      if (!model.seed && (!this.options.model || model.table === this.options.table)) {
         this.generate(model.name)
       }
     }
@@ -135,11 +137,11 @@ export default class Generator {
       this.opts = {
         ...this.opts,
         schemas: model.schema,
+        seed: this.models.find((prop) => prop.name === model.name + 'Seed')?.schema,
         refs: model.refs,
         classes: this.models
       }
       this.model(model.name)
-      console.log(model.name)
       if (!this.options.model || model.table === this.options.table) {
         this.generator('translator')
       }
@@ -205,7 +207,6 @@ export default class Generator {
     const dist = path.resolve(this.makeDir('./', this._swagger), 'swagger.yaml')
     swagpack(src, dist)
     this.models = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse(this.config)
-    console.log(this.models)
   }
 
   /**
@@ -260,12 +261,14 @@ export default class Generator {
     this.opts = {
       schema: {},
       refs: {},
+      seed: {},
       ...this.opts,
       appName: this.options.namespace,
       className: this.className,
       classNames: this.classNames,
       classname: this.classname,
       toCamelCase,
+      toUnderscoreCase,
       repositories: fs.readdirSync(this.makeDir(this._app, 'repositories')),
       gateways: fs.readdirSync(this.makeDir(this._app, 'gateways')),
       gatewayFiles: fs.readdirSync(this.makeDir(this.makeDir(this._app, 'gateways'), this.options.namespace)),

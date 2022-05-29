@@ -1,29 +1,33 @@
 /* eslint camelcase: 0 */
-import { toOrganizationProps } from './organization'
-import { toShopProps } from './shop'
-import { toRoleProps } from './role'
-import { Admin, AdminSeed } from '@/infrastructure/network/Bambooo/schema'
-import { IAdminProps, EmptyAdminPropsFactory } from '@/entities/Admin'
+<%_ for (const ref of refs) { _%>
+import { to<%= ref.name %>Props } from './<%= toUnderscoreCase(ref.name) %>'
+<%_ } _%>
+import { <%= className %>, <%= className %>Seed } from '@/infrastructure/network/<%= appName %>/schema'
+import { I<%= className %>Props, Empty<%= className %>PropsFactory } from '@/entities/<%= className %>'
 
-export const toAdminProps = (props: Admin | null): IAdminProps => {
+export const to<%= className %>Props = (props: <%= className %> | null): I<%= className %>Props => {
   if (!props) {
-    return EmptyAdminPropsFactory()
+    return Empty<%= className %>PropsFactory()
   }
 
-  const { id, role, role_id, name, username, organization, shop } = props
+  const { <%= Object.values(schemas).map((prop) => prop.key).join(', ') %> } = props
   return {
-<%_ for (const schema of Object.values(schemas)) { _%>
-  <%= schema.required && schema.key !== 'id' ? toCamelCase(schema.key, false) : toCamelCase(schema.key, false)+'?' %>: <% if(schema.ref) { %>I<%= schema.tstype %>Props<% } else { %><%= schema.tstype %><% } %>
-<%_ } _%>
+    <%= Object.values(schemas).map((prop) => {
+      const camel = toCamelCase(prop.key, false)
+      const model = toCamelCase(prop.key)
+      const src = prop.ref ? `to${model}Props(${prop.key})` : prop.key
+      return camel === src ? camel : camel + ': ' + src
+    }).join(',\n    ') %>
   }
 }
 
-export const toAdminSeed = (props: IAdminProps): AdminSeed => {
-  const { id, name, username, roleId } = props
+export const to<%= className %>Seed = (props: I<%= className %>Props): <%= className %>Seed => {
+  const { <%= Object.values(seed).map((prop) => toCamelCase(prop.key, false)).join(', ') %> } = props
   return {
-    id,
-    name,
-    username,
-    role_id: roleId
+    <%= Object.values(seed).map((prop) => {
+      const camel = toCamelCase(prop.key, false)
+      const src = prop.key
+      return camel === src ? src : src + ': ' + camel
+    }).join(',\n    ') %>
   }
 }

@@ -120,7 +120,7 @@ export default class SQLParser {
       case 'CHAR':
         return { ...property, type: 'string' }
       case 'LONGTEXT':
-        return { ...property, type: 'string' }
+        return { ...property, type: 'string', format: 'json' }
       case 'DATETIME':
         return { ...property, type: 'string', format: 'date-time' }
       case 'DATE':

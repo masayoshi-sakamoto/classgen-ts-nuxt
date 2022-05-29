@@ -1,6 +1,7 @@
 {
   "tables": {
     "excludes": [
+      "migration",
       "personal_access_tokens",
       "jobs",
       "job_batches",
