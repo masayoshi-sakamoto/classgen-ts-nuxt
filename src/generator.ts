@@ -2,8 +2,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as ejs from 'ejs'
 import * as chalk from 'chalk'
-import { toCamelCase } from './lib/snake-camel'
+import * as YAML from 'js-yaml'
+import swagpack from 'swagpack/lib/build'
 
+import { toCamelCase } from './lib/snake-camel'
 import SQLParser from './sql'
 import OpenAPIParser from './openapi'
 
@@ -20,22 +22,38 @@ export interface Options {
   model?: string
   excludes?: string[]
   without?: boolean
+  injector?: boolean
 }
 
 export default class Generator {
   private root: string
   private _app: string = 'app'
   private _swagger: string = 'swagger'
-  private className: string = 'Model'
-  private classNames: string = 'Models'
-  private classname: string = 'model'
+  private className: string = 'User'
+  private classNames: string = 'Users'
+  private classname: string = 'user'
   private opts: any = {}
   private sqldump: any | null
   private config: any = {}
+  private models: {
+    [key: string]: {
+      name: string
+      models: string
+      refs: any[]
+      schema: any
+      seed: boolean
+    }
+  } = {}
 
   constructor(protected options: Options) {
     if (!options.namespace) {
       throw new Error('Namespace is required. Please specify with --namespace option.')
+    }
+
+    if (this.options.schema) {
+      this.options.model = this.options.model || undefined
+    } else {
+      this.options.model = this.options.model || 'usee'
     }
 
     this.options.model = this.options.model ? inflector.pluralize(this.options.model.toLowerCase()) : undefined
@@ -48,37 +66,68 @@ export default class Generator {
       this.sqldump = schema ? fs.readFileSync(path.resolve(process.cwd(), options.schema), 'utf-8') : null
     }
 
+    this.options.injector = false
     this.options.namespace = toCamelCase(this.options.namespace)
     this.root = path.resolve(__dirname, '../templates/')
     this.options.dist = options.dist ? path.resolve(options.dist + '/') : './'
     this.makeDir('./', this._app)
     this.makeDir('./', this._swagger)
+    console.log('application:', chalk.red(this.options.namespace))
   }
 
   initialize() {
-    console.log('application:', chalk.red(this.options.namespace))
     this.generator('initialize')
-    if (this.sqldump) {
-      const yamls = new SQLParser(this.sqldump, this.options).parse(this.config)
-      for (const yaml of yamls) {
-        this.swagger(yaml)
-        this.generate(yaml.name)
-      }
-    }
+    this.schema()
   }
 
   schema() {
+    this.dump()
+    for (const model of Object.values(this.models)) {
+      this.opts = {
+        ...this.opts,
+        schema: model.schema,
+        refs: model.refs,
+        classes: this.models
+      }
+      this.model(model.name, false)
+      console.log('typegen:', chalk.yellow(model.name))
+      this.generator('typegen')
+      if (model.models === this.options.model || !this.options.model) {
+        this.generate(model.name)
+      }
+    }
+    this.injector()
+  }
+
+  generate(modelName: string) {
+    console.log('model:', chalk.red.bold(modelName))
+    this.model(modelName)
+    this.generator('entity')
+    this.generator('store')
+    this.generator('repository')
+    this.generator('gateway')
+    this.generator('infrastructure')
+    this.generator('usecase')
+    this.injector()
+  }
+
+  private dump() {
     if (this.sqldump) {
       const yamls = new SQLParser(this.sqldump, this.options).parse(this.config)
       for (const yaml of yamls) {
         this.swagger(yaml)
       }
+    } else {
+      console.log('swagger:', chalk.cyan(this.options.model!))
+      this.model(this.options.model!)
+      this.generator('swagger')
     }
-    this.generator('injector')
+    this.injector()
+    this.swagpack()
   }
 
   private swagger(yaml: any) {
-    console.log('swagger:', chalk.cyan(yaml.name))
+    console.log('swagger:', chalk.cyan.bold(yaml.name))
     const schemas = this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), yaml.name)
     console.log('-', 'schemas')
     this.write(path.resolve(schemas, 'index.yaml'), yaml.index)
@@ -89,75 +138,17 @@ export default class Generator {
     }
   }
 
-  injector() {
+  private injector() {
+    this.options.injector = true
     this.generator('injector')
+    this.options.injector = false
   }
 
-  generate(model: string) {
-    console.log('model:', chalk.yellow(model))
-    this.model(model)
-    if (!this.sqldump) {
-      this.generator('swagger')
-    }
-    this.generator('entity')
-    this.generator('store')
-    this.generator('repository')
-    this.generator('gateway')
-    this.generator('infrastructure')
-    this.generator('usecase')
-    this.generator('injector')
-  }
-
-  entity(model: string) {
-    this.model(model)
-    if (!this.sqldump) {
-      this.generator('swagger')
-    }
-    this.generator('entity')
-  }
-
-  store(model: string) {
-    this.model(model)
-    this.generator('store')
-    this.generator('repository')
-    this.generator('injector')
-  }
-
-  gateway(model: string) {
-    this.model(model)
-    this.generator('gateway')
-    this.generator('infrastructure')
-    this.generator('usecase')
-    this.generator('swagger')
-    this.generator('injector')
-  }
-
-  infrastructure(model: string) {
-    this.model(model)
-    this.generator('infrastructure')
-  }
-
-  test(yaml: any) {
-    this.typegen(yaml)
-  }
-
-  private typegen(yaml: any) {
-    const models = new OpenAPIParser(yaml).parse()
-    for (const model of models) {
-      console.log(model)
-      this.model(model.name, false)
-      this.opts = {
-        ...this.opts,
-        schema: model.schema,
-        refs: model.refs,
-        classes: models
-      }
-      this.generator('typegen')
-
-      if (!model.seed) {
-        this.generator('entity')
-      }
-    }
+  private swagpack() {
+    const src = path.resolve(this.makeDir(this._swagger, 'src'), 'index.yaml')
+    const dist = path.resolve(this.makeDir('./', this._swagger), 'swagger.yaml')
+    swagpack(src, dist)
+    this.models = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
   }
 
   private model(model: string, toCame: boolean = true) {
@@ -178,7 +169,9 @@ export default class Generator {
   }
 
   private generator(type: string) {
-    console.log('-', type)
+    if (type !== 'injector') {
+      console.log('-', type)
+    }
     this.opts = {
       schema: {},
       refs: {},
@@ -244,10 +237,12 @@ export default class Generator {
   private write(filepath: string, content: string) {
     const exist = fs.existsSync(filepath)
 
-    if (!exist || this.options.force) {
+    if (!exist || this.options.force || this.options.injector) {
       fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
-      const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
-      console.log(msg, filepath)
+      if (!this.options.injector) {
+        const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
+        console.log(msg, filepath)
+      }
     }
   }
 }

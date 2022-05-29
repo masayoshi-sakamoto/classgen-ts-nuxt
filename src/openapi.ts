@@ -1,7 +1,7 @@
 import { OpenAPIObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
 
 import Inflector from './lib/inflector'
-import { toCamelCase } from './lib/snake-camel'
+import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
 const inflector = new Inflector()
 const rimraf = require('rimraf')
 
@@ -48,14 +48,16 @@ export default class OpenAPIParser {
     const components = this.ymlData.components || {}
     const schemas = components.schemas || {}
 
-    const definitions = Object.keys(schemas).map((key) => {
-      return {
+    const definitions = Object.keys(schemas).reduce((props: { [key: string]: any }, key) => {
+      props[key] = {
+        models: inflector.pluralize(toUnderscoreCase(key)),
         name: key,
         refs: this.refs(key, schemas[key]),
         schema: this.schema(key, schemas[key]),
         seed: !!key.match(/.+(Seed)$/)
       }
-    })
+      return props
+    }, {})
     return definitions
   }
 
@@ -87,14 +89,14 @@ export default class OpenAPIParser {
     if (value.$ref !== undefined) {
       schema = {
         ...schema,
-        key: key,
+        key,
         tstype: toCamelCase(key),
         ref: true
       }
     } else if (value.type !== undefined) {
       schema = {
         ...schema,
-        key: key + (required ? '' : '?'),
+        key,
         tstype: types[value.type.toLowerCase()] + (value.nullable ? ' | null' : '')
       }
     } else if (value.properties !== undefined) {

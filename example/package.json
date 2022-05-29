@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "gen": "node ../lib/bin/cli.js --namespace example -d dist -s mysql-schema.sql",
+    "gen": "node ../lib/bin/cli.js --namespace example -d dist",
+    "gen-sql": "node ../lib/bin/cli.js --namespace example -d dist -s mysql-schema.sql",
     "class-gen": "rm -rf ./dist; yarn gen",
-    "swagpack": "cd ../; yarn swagpack build ./example/dist/swagger/src/index.yaml -o ./example/dist/swagger/swagger.yaml",
-    "typegen": "yarn swagpack; cd ./dist; yarn gen typegen dist/swagger/swagger.yaml"
+    "class-gen-sql": "rm -rf ./dist; yarn gen-sql"
   }
 }
