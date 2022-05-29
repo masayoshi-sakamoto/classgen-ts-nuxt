@@ -7,8 +7,8 @@ const commander = new Command()
 commander
   .version(pkg.version)
   .option('--namespace <namespace>', 'application namespace')
-  .option('-f, --force', 'output directory')
-  .option('-s, --schema <file>', 'mysql dump file')
+  .option('-f, --force', 'override output file')
+  .option('-s, --sqldump <file>', 'mysql dump file')
   .option('-d, --dist <dist>', 'output directory')
   .option('-t, --type <type>', 'template type choices (web, admin)')
   .option('--auth [model]', 'authenticate flag', 'users')
@@ -29,6 +29,13 @@ try {
    */
   commander.command('schema').action((options: any) => {
     new Generator(commander.opts()).schema()
+  })
+
+  /**
+   * swaggerからentityなどを作成
+   */
+  commander.command('translator').action((options: any) => {
+    new Generator(commander.opts()).translator()
   })
 
   commander.parse(process.argv)

@@ -1,10 +1,10 @@
-<%_ for (const key of Object.keys(refs)) { _%>
-import <%= refs[key].name %>Entity, { I<%= refs[key].name %>Props } from '@/entities/<%= refs[key].name %>'
+<%_ for (const ref of refs) { _%>
+import <%= ref.name %>Entity, { I<%= ref.name %>Props } from '@/entities/<%= ref.name %>'
 <%_ } _%>
   
 export interface I<%= className %>Props {
-<%_ for (const key of Object.keys(schema)) { _%>
-  <%= schema[key].required && schema[key].key !== 'id' ? toCamelCase(schema[key].key, false) : toCamelCase(schema[key].key, false)+'?' %>: <% if(schema[key].ref) { %>I<%= schema[key].tstype %>Props<% } else { %><%= schema[key].tstype %><% } %>
+<%_ for (const schema of Object.values(schemas)) { _%>
+  <%= schema.required && schema.key !== 'id' ? toCamelCase(schema.key, false) : toCamelCase(schema.key, false)+'?' %>: <% if(schema.ref) { %>I<%= schema.tstype %>Props<% } else { %><%= schema.tstype %><% } %>
 <%_ } _%>
 }
 
@@ -22,13 +22,13 @@ export default class <%= className %>Entity {
   get clone(): I<%= className %>Props {
     return JSON.parse(JSON.stringify(this._props))
   }
-<%_ for (const key of Object.keys(schema)) { _%>
+<%_ for (const schema of Object.values(schemas)) { _%>
   
-  get <%= toCamelCase(schema[key].key, false) %>(): <% if (schema[key].ref) { %><%= schema[key].tstype %>Entity<%} else { %><%= schema[key].tstype %><% } %> {
-  <%_ if (schema[key].ref) { _%>
-    return new <%= schema[key].tstype %>Entity(this._props.<%= toCamelCase(schema[key].key, false) %>)
+  get <%= toCamelCase(schema.key, false) %>(): <% if (schema.ref) { %><%= schema.tstype %>Entity<%} else { %><%= schema.tstype %><% } %> {
+  <%_ if (schema.ref) { _%>
+    return new <%= schema.tstype %>Entity(this._props.<%= toCamelCase(schema.key, false) %>)
   <%_} else { _%>
-    return this._props.<%= toCamelCase(schema[key].key, false) %>
+    return this._props.<%= toCamelCase(schema.key, false) %>
   <%_ } _%>
   }
 <%_ } _%>
@@ -36,17 +36,17 @@ export default class <%= className %>Entity {
 
 export const headers = [
   { text: 'ID', value: 'id' },
-<%_ for (const key of Object.keys(schema)) { _%>
-  <%_ if (schema[key].title) { _%>
-  { text: '<%= schema[key].title %>', value: '<%= toCamelCase(schema[key].key, false) %>' },
+<%_ for (const schema of Object.values(schemas)) { _%>
+  <%_ if (schema.title) { _%>
+  { text: '<%= schema.title %>', value: '<%= toCamelCase(schema.key, false) %>' },
   <%_ } _%>
 <%_ } _%>
 ]
 
 export const Empty<%= className %>PropsFactory = (props?: Partial<I<%= className %>Props> | null): I<%= className %>Props => ({
-<%_ for (const key of Object.keys(schema)) { _%>
-  <%_ if (schema[key].required && schema[key].key !== 'id') {_%>
-  <%= toCamelCase(schema[key].key, false) %>: <% if(schema[key].ref) { %>Empty<%= schema[key].tstype %>PropsFactory<% } else { %><%= schema[key].default %><% } %>,
+<%_ for (const schema of Object.values(schemas)) { _%>
+  <%_ if (schema.required && schema.key !== 'id') {_%>
+  <%= toCamelCase(schema.key, false) %>: <% if(schema.ref) { %>Empty<%= schema.tstype %>PropsFactory<% } else { %><%= schema.default %><% } %>,
   <%_ } _%>
 <%_ } _%>
   ...props

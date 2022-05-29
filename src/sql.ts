@@ -1,55 +1,83 @@
 import { Create, Parser } from 'node-sql-parser'
 const YAML = require('json2yaml')
 
-import { Options } from './generator'
+import { IOptions, IConfig } from './generator'
 import { toCamelCase } from './lib/snake-camel'
 import Inflector from './lib/inflector'
 const inflector = new Inflector()
 
+export interface IColumn {
+  property: string // カラム名
+  definition: {
+    dataType: string // カラムのタイプ(INT, CHAR, etc..,)
+  }
+  comment: {
+    value: { value: string } // カラムのコメント
+  }
+}
+
+export interface IYAML {
+  table: string // テーブル名
+  model: string // モデル名
+  index: string // 通常モデルのYAML文
+  seed: string // StoreモデルのYAML文
+}
+
 export default class SQLParser {
   private sqlData: string[]
 
-  constructor(sql: string, protected options: Options) {
-    this.sqlData = sql.replace(/\r\n/g, '\n').replace(/\n/g, '').replace(/;/g, ';\n').split('\n')
+  constructor(sql: string, protected options: IOptions) {
+    // 取得してきたSQL文を1行ずつに変更してCREATE TABLE文のみ取得
+    this.sqlData = sql
+      .replace(/\r\n/g, '\n')
+      .replace(/\n/g, '')
+      .replace(/;/g, ';\n')
+      .split('\n')
+      .filter((sql) => /^(CREATE TABLE|create table)/.test(sql))
   }
 
-  parse(config: any) {
-    this.options.excludes = config ? config.models.excludes : []
-    const excludes = config ? config.schemas.excludes : []
+  parse(config: IConfig) {
+    const tableExcludes = config && config.tables && config.tables.excludes ? config.tables.excludes : []
     const parser = new Parser()
-    const sqls = this.sqlData.filter((sql) => /^(CREATE TABLE|create table)/.test(sql))
-    let yamls = []
+    let yamls: IYAML[] = []
 
-    for (const sql of sqls) {
+    for (const sql of this.sqlData) {
       const ast = parser.astify(sql, { database: 'MySQL' }) as Create[]
-      const model = ast[0].table ? ast[0].table[0].table : undefined
+      const table = ast[0].table ? ast[0].table[0].table : undefined
+      const definitions = ast[0].create_definitions || []
 
+      // SQLのCREAT TABLEにあるテーブル名からswaggerを作成するためのデータを取得
       if (
-        model &&
-        !excludes.includes(model) &&
-        inflector.plural(model) &&
-        ((this.options.model && this.options.model === model) || !this.options.model)
+        table && //テーブル名が取得できて
+        !tableExcludes.includes(table) && // 除外するテーブル名に含まれていなくて
+        inflector.plural(table) && // テーブル名が複数形のときで
+        (!this.options.model || this.options.table === table) && // モデル名が設定されていないか、されていたら同じときに
+        definitions.length > 0
       ) {
-        const table = {
-          table: model,
-          columns: ast[0].create_definitions
-            ? ast[0].create_definitions.flatMap((prop) =>
-                prop.column ? { property: prop.column.column as string, definition: prop.definition, comment: prop.comment } : []
-              )
-            : []
-        }
+        // カラムのデータを生成
+        const columns: IColumn[] = definitions
+          .flatMap((prop) => {
+            if (prop.column) {
+              return {
+                property: prop.column.column as string,
+                definition: prop.definition,
+                comment: prop.comment
+              }
+            }
+            return []
+          })
+          .flatMap((prop) => (!this.options.excludes!.includes(prop.property) ? prop : []))
 
         yamls.push({
-          name: inflector.singularize(table.table),
+          table,
+          model: inflector.singularize(table),
           index: YAML.stringify({
-            required: table.columns?.flatMap((prop) => (!this.options.excludes!.includes(prop.property) ? prop.property : [])),
-            properties: this.properties(table.columns, 'index')
+            required: columns.map((prop) => prop.property),
+            properties: this.properties(columns, 'index')
           }),
           seed: YAML.stringify({
-            required: table.columns?.flatMap((prop) =>
-              prop.property !== 'id' && !this.options.excludes!.includes(prop.property) ? prop.property : []
-            ),
-            properties: this.properties(table.columns, 'seed')
+            required: columns.flatMap((prop) => (prop.property !== 'id' ? prop.property : [])),
+            properties: this.properties(columns, 'seed')
           })
         })
       }
@@ -58,19 +86,19 @@ export default class SQLParser {
     return yamls
   }
 
-  private properties(columns: { property: string; definition: any; comment: any }[], type: string) {
+  private properties(columns: IColumn[], type: string) {
     const properties: { [id: string]: any } = {}
 
     for (const column of columns) {
-      if (!this.options.excludes!.includes(column.property)) {
-        if (type === 'index' && column.property.match(/.+_id$/)) {
-          const relation = column.property.replace(/(.+)_id$/, '$1')
-          properties[relation] = {
-            $ref: '#/components/schemas/' + toCamelCase(relation)
-          }
+      // 通常タイプの時に_idが付くカラムがあった場合はリレーションされているので$refを作成する
+      if (type === 'index' && column.property.match(/.+_id$/)) {
+        const relation = column.property.replace(/(.+)_id$/, '$1')
+        properties[relation] = {
+          $ref: '#/components/schemas/' + toCamelCase(relation)
         }
-        properties[column.property] = this.property(column.property, column.definition.dataType, column.comment, type)
       }
+      // それ以外のカラムはdataTypeをもとにプロパティを作成する
+      properties[column.property] = this.property(column.property, column.definition.dataType, column.comment, type)
     }
     return properties
   }

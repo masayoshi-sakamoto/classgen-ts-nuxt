@@ -1,5 +1,5 @@
 {
-  "schemas": {
+  "tables": {
     "excludes": [
       "personal_access_tokens",
       "jobs",
@@ -8,7 +8,10 @@
       "sessions"
     ]
   },
-  "models": {
+  "columns": {
     "excludes": ["password", "created_at", "updated_at", "deleted_at"]
+  },
+  "schemas": {
+    "excludes": ["Query"]
   }
 }

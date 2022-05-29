@@ -1,4 +1,5 @@
 import { OpenAPIObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
+import { IModel } from './generator'
 
 import Inflector from './lib/inflector'
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
@@ -30,7 +31,7 @@ export const types: { [key: string]: string } = {
   error: 'Error'
 }
 
-type ITsSchema = {
+export type ITsSchema = {
   key?: string
   tstype?: string
   title?: string
@@ -40,41 +41,42 @@ type ITsSchema = {
   nullable?: boolean
   default?: any
 }
+export type IRef = {
+  name: string
+}
 
 export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
-  parse(options?: any) {
+  parse(config?: any) {
     const components = this.ymlData.components || {}
     const schemas = components.schemas || {}
 
-    const definitions = Object.keys(schemas).reduce((props: { [key: string]: any }, key) => {
-      props[key] = {
-        models: inflector.pluralize(toUnderscoreCase(key)),
+    const definitions: IModel[] = Object.keys(schemas).flatMap((key) => {
+      return {
+        table: inflector.pluralize(toUnderscoreCase(key)),
         name: key,
         refs: this.refs(key, schemas[key]),
         schema: this.schema(key, schemas[key]),
         seed: !!key.match(/.+(Seed)$/)
       }
-      return props
-    }, {})
+    })
     return definitions
   }
 
-  private refs(key: string, value: SchemaObject) {
+  private refs(key: string, value: SchemaObject): IRef[] {
     if (value.$ref !== undefined) {
-      return {
-        name: toCamelCase(key)
-      }
+      return [{ name: toCamelCase(key) }]
     } else if (value.properties !== undefined) {
-      const refs = Object.keys(value.properties).reduce((props: { [key: string]: any }, key) => {
+      const refs = Object.keys(value.properties).flatMap((key) => {
         if (value.properties![key].$ref !== undefined) {
-          props[key] = this.refs(key, value.properties![key])
+          return this.refs(key, value.properties![key])
         }
-        return props
-      }, {})
+        return []
+      })
       return refs
     }
+    return []
   }
 
   private schema(key: string, value: SchemaObject, required: boolean = false) {
