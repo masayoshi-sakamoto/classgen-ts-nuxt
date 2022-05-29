@@ -1,4 +1,4 @@
-export function toCamelCase(str: string) {
+export function toCamelCase(str: string, first: boolean = true) {
   const word = str
     .split('_')
     .map(function (word, index) {
@@ -9,5 +9,5 @@ export function toCamelCase(str: string) {
     })
     .join('')
 
-  return word.charAt(0).toUpperCase() + word.slice(1)
+  return first ? word.charAt(0).toUpperCase() + word.slice(1) : word
 }

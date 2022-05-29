@@ -1,0 +1,14 @@
+{
+  "schemas": {
+    "excludes": [
+      "personal_access_tokens",
+      "jobs",
+      "job_batches",
+      "failed_jobs",
+      "sessions"
+    ]
+  },
+  "models": {
+    "excludes": ["password", "created_at", "updated_at", "deleted_at"]
+  }
+}

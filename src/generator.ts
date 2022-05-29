@@ -1,19 +1,25 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as ejs from 'ejs'
-import * as YAML from 'js-yaml'
+import * as chalk from 'chalk'
 import { toCamelCase } from './lib/snake-camel'
 
-import Parser from './parser'
+import SQLParser from './sql'
+import OpenAPIParser from './openapi'
 
-const inflector = require('./lib/inflector')
+import Inflector from './lib/inflector'
+const inflector = new Inflector()
 const rimraf = require('rimraf')
 
 export interface Options {
   namespace: string
+  force?: boolean
+  schema?: string
   dist: string
-  type: string
-  force: boolean
+  type?: string
+  model?: string
+  excludes?: string[]
+  without?: boolean
 }
 
 export default class Generator {
@@ -23,56 +29,139 @@ export default class Generator {
   private className: string = 'Model'
   private classNames: string = 'Models'
   private classname: string = 'model'
-  private opts: any
+  private opts: any = {}
+  private sqldump: any | null
+  private config: any = {}
 
   constructor(protected options: Options) {
     if (!options.namespace) {
       throw new Error('Namespace is required. Please specify with --namespace option.')
     }
 
-    if (options.force) {
+    this.options.model = this.options.model ? inflector.pluralize(this.options.model.toLowerCase()) : undefined
+
+    const configpath = path.resolve(process.cwd(), 'classgen-ts-nuxt.json')
+    this.config = fs.existsSync(configpath) ? JSON.parse(fs.readFileSync(configpath, 'utf-8')) : {}
+
+    if (options.schema) {
+      const schema = fs.existsSync(path.resolve(process.cwd(), options.schema))
+      this.sqldump = schema ? fs.readFileSync(path.resolve(process.cwd(), options.schema), 'utf-8') : null
     }
 
+    this.options.namespace = toCamelCase(this.options.namespace)
     this.root = path.resolve(__dirname, '../templates/')
-    options.dist = options.dist ? path.resolve(options.dist + '/') : './'
+    this.options.dist = options.dist ? path.resolve(options.dist + '/') : './'
     this.makeDir('./', this._app)
     this.makeDir('./', this._swagger)
   }
 
   initialize() {
+    console.log('application:', chalk.red(this.options.namespace))
     this.generator('initialize')
+    if (this.sqldump) {
+      const yamls = new SQLParser(this.sqldump, this.options).parse(this.config)
+      for (const yaml of yamls) {
+        this.swagger(yaml)
+        this.generate(yaml.name)
+      }
+    }
+  }
+
+  schema() {
+    if (this.sqldump) {
+      const yamls = new SQLParser(this.sqldump, this.options).parse(this.config)
+      for (const yaml of yamls) {
+        this.swagger(yaml)
+      }
+    }
+    this.generator('injector')
+  }
+
+  private swagger(yaml: any) {
+    console.log('swagger:', chalk.cyan(yaml.name))
+    const schemas = this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), yaml.name)
+    console.log('-', 'schemas')
+    this.write(path.resolve(schemas, 'index.yaml'), yaml.index)
+    this.write(path.resolve(schemas, 'seed.yaml'), yaml.seed)
+    if (!this.options.without) {
+      this.model(yaml.name)
+      this.generator('paths')
+    }
   }
 
   injector() {
     this.generator('injector')
   }
 
-  swagger(model: string) {
+  generate(model: string) {
+    console.log('model:', chalk.yellow(model))
     this.model(model)
-    this.generator('swagger')
-  }
-
-  schema(target: string, options: any) {
-    const yamls = new Parser(target).parse(options)
-    for (const yaml of yamls) {
-      const filepath = this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), yaml.name)
-      fs.writeFileSync(path.resolve(filepath, 'index.yaml'), yaml.index, { encoding: 'utf-8', flag: 'w+' })
-      fs.writeFileSync(path.resolve(filepath, 'seed.yaml'), yaml.seed, { encoding: 'utf-8', flag: 'w+' })
+    if (!this.sqldump) {
+      this.generator('swagger')
     }
+    this.generator('entity')
+    this.generator('store')
+    this.generator('repository')
+    this.generator('gateway')
+    this.generator('infrastructure')
+    this.generator('usecase')
     this.generator('injector')
-  }
-
-  typegen() {
-    console.log('typegen')
   }
 
   entity(model: string) {
     this.model(model)
+    if (!this.sqldump) {
+      this.generator('swagger')
+    }
     this.generator('entity')
   }
 
-  private model(model: string) {
-    this.className = model
+  store(model: string) {
+    this.model(model)
+    this.generator('store')
+    this.generator('repository')
+    this.generator('injector')
+  }
+
+  gateway(model: string) {
+    this.model(model)
+    this.generator('gateway')
+    this.generator('infrastructure')
+    this.generator('usecase')
+    this.generator('swagger')
+    this.generator('injector')
+  }
+
+  infrastructure(model: string) {
+    this.model(model)
+    this.generator('infrastructure')
+  }
+
+  test(yaml: any) {
+    this.typegen(yaml)
+  }
+
+  private typegen(yaml: any) {
+    const models = new OpenAPIParser(yaml).parse()
+    for (const model of models) {
+      console.log(model)
+      this.model(model.name, false)
+      this.opts = {
+        ...this.opts,
+        schema: model.schema,
+        refs: model.refs,
+        classes: models
+      }
+      this.generator('typegen')
+
+      if (!model.seed) {
+        this.generator('entity')
+      }
+    }
+  }
+
+  private model(model: string, toCame: boolean = true) {
+    this.className = toCame ? toCamelCase(model) : model
     this.classNames = inflector.pluralize(model)
     this.classname = this.className.toLowerCase()
   }
@@ -89,7 +178,11 @@ export default class Generator {
   }
 
   private generator(type: string) {
+    console.log('-', type)
     this.opts = {
+      schema: {},
+      refs: {},
+      ...this.opts,
       appName: this.options.namespace,
       className: this.className,
       classNames: this.classNames,
@@ -120,15 +213,13 @@ export default class Generator {
           }
         })
     }
-
     this.readdir(path.join(this.root, type), './', './')
   }
 
   private render(base: string, src: string, dist: string) {
     const content = ejs.render(fs.readFileSync(path.resolve(base, src), 'utf-8'), this.opts)
     const filepath = path.resolve(this.options.dist, dist)
-    fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
-    console.log('Generated:', filepath)
+    this.write(filepath, content)
   }
 
   private readdir(base: string, src: string, dist: string) {
@@ -147,6 +238,16 @@ export default class Generator {
       } else {
         this.render(base, path.join(src, file.name), path.join(dist, filename))
       }
+    }
+  }
+
+  private write(filepath: string, content: string) {
+    const exist = fs.existsSync(filepath)
+
+    if (!exist || this.options.force) {
+      fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
+      const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
+      console.log(msg, filepath)
     }
   }
 }
