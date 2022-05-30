@@ -37,8 +37,8 @@ post:
         application/json:
           schema:
             required:
-              - <%= className.toLowerCase() %>
+              - <%= classname %>
             type: object
             properties:
-              <%= className.toLowerCase() %>:
+              <%= classname %>:
                 $ref: '#/components/schemas/<%= className %>'

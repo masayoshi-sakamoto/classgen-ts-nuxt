@@ -31,13 +31,6 @@ try {
     new Generator(commander.opts()).schema()
   })
 
-  /**
-   * swaggerからentityなどを作成
-   */
-  commander.command('translator').action((options: any) => {
-    new Generator(commander.opts()).translator()
-  })
-
   commander.parse(process.argv)
 } catch (e) {
   console.error(e)

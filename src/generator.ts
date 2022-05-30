@@ -7,7 +7,7 @@ import swagpack from 'swagpack/lib/build'
 
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
 import SQLParser, { IYAML } from './sql'
-import OpenAPIParser, { IRef, ITsSchema } from './openapi'
+import OpenAPIParser, { ITsSchema } from './openapi'
 
 import Inflector from './lib/inflector'
 const inflector = new Inflector()
@@ -58,6 +58,7 @@ export default class Generator {
   private sqldump: any | null
   private config: IConfig = {}
   private models: IModel[] = []
+  private paths: any[] = []
 
   constructor(protected options: IOptions) {
     if (!options.namespace) {
@@ -116,36 +117,20 @@ export default class Generator {
       const seed = this.models.find((prop) => prop.name === model.name + 'Seed')?.schema
       this.opts = {
         ...this.opts,
+        paths: this.paths,
         schemas: model.schema,
         refs: model.refs,
         seed: seed || {},
         classes: this.models
       }
       this.model(model.name)
-      console.log('typegen:', chalk.yellow(model.name))
+      // console.log('typegen:', chalk.yellow(model.name))
       this.generator('typegen')
       if (!model.seed && (!this.options.model || model.table === this.options.table)) {
         this.generate(model.name)
       }
     }
     this.injector()
-  }
-
-  translator() {
-    this.dump()
-    for (const model of this.models) {
-      this.opts = {
-        ...this.opts,
-        schemas: model.schema,
-        seed: this.models.find((prop) => prop.name === model.name + 'Seed')?.schema,
-        refs: model.refs,
-        classes: this.models
-      }
-      this.model(model.name)
-      if (!this.options.model || model.table === this.options.table) {
-        this.generator('translator')
-      }
-    }
   }
 
   generate(modelName: string) {
@@ -206,7 +191,9 @@ export default class Generator {
     const src = path.resolve(this.makeDir(this._swagger, 'src'), 'index.yaml')
     const dist = path.resolve(this.makeDir('./', this._swagger), 'swagger.yaml')
     swagpack(src, dist)
-    this.models = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse(this.config)
+    const { paths, definitions } = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse(this.config)
+    this.paths = paths
+    this.models = definitions
   }
 
   /**
@@ -256,12 +243,13 @@ export default class Generator {
    */
   private generator(type: string) {
     if (type !== 'injector') {
-      console.log('-', type)
+      // console.log('-', type)
     }
     this.opts = {
       schema: {},
       refs: {},
       seed: {},
+      paths: [],
       ...this.opts,
       appName: this.options.namespace,
       className: this.className,
@@ -338,7 +326,7 @@ export default class Generator {
       fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
       if (!this._injector) {
         const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
-        console.log(msg, filepath)
+        // console.log(msg, filepath)
       }
     }
   }

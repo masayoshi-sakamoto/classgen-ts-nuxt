@@ -1,4 +1,4 @@
-import { OpenAPIObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
+import { OpenAPIObject, PathObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
 import { IModel } from './generator'
 
 import Inflector from './lib/inflector'
@@ -39,6 +39,7 @@ export type ITsSchema = {
   ref?: boolean
   required?: boolean
   nullable?: boolean
+  array?: boolean
   default?: any
   format?: string
 }
@@ -50,8 +51,9 @@ export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
   parse(config?: any) {
-    const components = this.ymlData.components || {}
-    const schemas = components.schemas || {}
+    const schemas = this.ymlData.components!.schemas || {}
+    const paths = this.ymlData.paths || {}
+    const tags = this.parsePaths(paths)
 
     const definitions: IModel[] = Object.keys(schemas).flatMap((key) => {
       return {
@@ -62,7 +64,10 @@ export default class OpenAPIParser {
         seed: !!key.match(/.+(Seed)$/)
       }
     })
-    return definitions
+    return {
+      paths: tags,
+      definitions
+    }
   }
 
   private refs(key: string, value: SchemaObject): IRef[] {
@@ -83,21 +88,28 @@ export default class OpenAPIParser {
   private schema(key: string, value: SchemaObject, required: boolean = false) {
     let schema: ITsSchema = {
       ref: false,
+      array: false,
       title: value.title,
       required,
       nullable: value.nullable,
       default: value.default || 'null',
       format: value.format
     }
-
     if (value.$ref !== undefined) {
+      const name = value.$ref.split('/').pop()
       schema = {
         ...schema,
-        key,
-        tstype: toCamelCase(key),
+        key: toUnderscoreCase(name),
+        tstype: name,
         ref: true
       }
-    } else if (value.type !== undefined) {
+    } else if (value.type !== undefined && value.type === 'array') {
+      const data = this.schema(key, value.items as SchemaObject)
+      schema = {
+        ...data,
+        array: true
+      }
+    } else if (value.type !== undefined && value.type !== 'object') {
       schema = {
         ...schema,
         key,
@@ -111,5 +123,47 @@ export default class OpenAPIParser {
       schema = properties
     }
     return schema
+  }
+
+  parsePaths(paths: PathObject) {
+    return Object.values(paths)
+      .map((prop) => {
+        const item = Object.keys(prop).map((key) => {
+          return prop[key]
+        })
+        const items = item.reduce((result, prop) => {
+          const tags = prop.tags[0]
+          result.push({
+            ...prop,
+            tags
+          })
+          return result
+        }, [])
+        return items
+      })
+      .flat()
+      .reduce((result: { [key: string]: any }, prop) => {
+        result[prop.tags] = {
+          ...result[prop.tags],
+          [prop.operationId]: {
+            ...prop,
+            requestBody: prop.requestBody ? this.parseRequestBody(prop.requestBody) : undefined,
+            responses: this.parseResponse(prop.responses)
+          }
+        }
+        return result
+      }, {})
+  }
+
+  parseRequestBody(body: any) {
+    return this.schema('responses', body.content['application/json'].schema)
+  }
+
+  parseResponse(responses: any) {
+    return Object.values(responses)
+      .map((prop: any) => {
+        return Object.values(this.schema('responses', prop.content['application/json'].schema))
+      })
+      .flat()
   }
 }

@@ -18,7 +18,6 @@ export const to<%= className %>Props = (props: <%= className %> | null): I<%= cl
     <%- Object.values(schemas).map((prop) => {
       const camel = toCamelCase(prop.key, false)
       const model = toCamelCase(prop.key)
-      console.log(prop)
       let src = prop.key
       if (prop.ref) {
         src = `to${model}Props(${prop.key})`
