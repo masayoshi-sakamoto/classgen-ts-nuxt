@@ -1,0 +1,10 @@
+api   http://localhost:10010
+pma   http://localhost:10011
+
+admin http://localhost:10020
+sb    http://localhost:10021
+
+web   http://localhost:10030
+sb    http://localhost:10031
+
+

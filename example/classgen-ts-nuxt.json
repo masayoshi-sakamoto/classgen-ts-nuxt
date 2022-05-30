@@ -1,0 +1,18 @@
+{
+  "tables": {
+    "excludes": [
+      "migration",
+      "personal_access_tokens",
+      "jobs",
+      "job_batches",
+      "failed_jobs",
+      "sessions"
+    ]
+  },
+  "columns": {
+    "excludes": ["password", "created_at", "updated_at", "deleted_at"]
+  },
+  "schemas": {
+    "excludes": ["Query"]
+  }
+}
