@@ -58,7 +58,7 @@ export default class Generator {
   private sqldump: any | null
   private config: IConfig = {}
   private models: IModel[] = []
-  private paths: any[] = []
+  private paths: any = {}
 
   constructor(protected options: IOptions) {
     if (!options.namespace) {
