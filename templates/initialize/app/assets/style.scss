@@ -1,0 +1,24 @@
+@import '@/assets/variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap');
+
+.logo {
+  font-size: 1.25rem !important;
+  line-height: 2rem;
+  letter-spacing: 0.0125em !important;
+  font-family: 'Oswald', sans-serif !important;
+  a {
+    color: inherit !important;
+    text-decoration: none;
+  }
+}
+
+.logo-lg {
+  font-size: 2rem !important;
+  line-height: 2rem;
+  letter-spacing: 0.0125em !important;
+  font-family: 'Oswald', sans-serif !important;
+  a {
+    color: inherit !important;
+    text-decoration: none;
+  }
+}

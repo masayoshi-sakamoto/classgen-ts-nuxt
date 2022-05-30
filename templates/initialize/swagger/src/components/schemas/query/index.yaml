@@ -1,0 +1,28 @@
+required:
+  - total
+  - page
+  - take
+  - count
+  - sort
+  - desc
+properties:
+  total:
+    type: integer
+    format: int32
+  page:
+    type: integer
+    format: int32
+  take:
+    type: integer
+    format: int32
+  count:
+    type: integer
+    format: int32
+  sort:
+    type: string
+    example: '検索'
+    nullable: true
+  desc:
+    type: integer
+    format: int32
+    nullable: true
