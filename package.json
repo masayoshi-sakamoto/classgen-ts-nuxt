@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Class generator to implement clean architecture for nuxt.js.",
   "bin": {
-    "openapi-ts-gen": "./bin/classgen-ts-nuxt.js"
+    "classgen-ts-nuxt": "./bin/classgen-ts-nuxt.js"
   },
   "repository": {
     "type": "git",
