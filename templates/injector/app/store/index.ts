@@ -1,7 +1,7 @@
 import Vuex from 'vuex'
 <%_ storeFiles.forEach((file) => {
   const store = file.split('.')[0]
-  const Store = store.charAt(0).toUpperCase() + store.slice(1)
+  const Store = toCamelCase(store)
   if (store !== 'index' && store !== 'README') {
 _%>
 import * as <%= store %> from '@/store/<%= store %>'
@@ -10,7 +10,7 @@ import * as <%= store %> from '@/store/<%= store %>'
 export interface RootState {
   <%_ storeFiles.forEach((file) => {
     const store = file.split('.')[0]
-    const Store = store.charAt(0).toUpperCase() + store.slice(1)
+    const Store = toCamelCase(store)
     if (store !== 'index' && store !== 'README') {
   _%>
   <%= store %>: <%= store %>.I<%= Store %>State
@@ -22,7 +22,7 @@ const createStore = () => {
     modules: {
       <%_ storeFiles.forEach((file) => {
         const store = file.split('.')[0]
-        const Store = store.charAt(0).toUpperCase() + store.slice(1)
+        const Store = toCamelCase(store)
         if (store !== 'index' && store !== 'app' && store !== 'README') {
       _%>
       <%= store %>: <%= store %>.store,

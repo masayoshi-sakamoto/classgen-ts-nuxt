@@ -1,6 +1,6 @@
 <%_ gatewayFiles.forEach((file) => {
     const gateway = file.split('.')[0]
-    const Gateway = gateway.charAt(0).toUpperCase() + gateway.slice(1)
+    const Gateway = toCamelCase(gateway) 
     if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') {
   _%>
   import <%= Gateway %> from './<%= gateway %>'
@@ -11,7 +11,7 @@
     apiClient: APIClient
     <%_ gatewayFiles.forEach((file) => {
       const gateway = file.split('.')[0]
-      const Gateway = gateway.charAt(0).toUpperCase() + gateway.slice(1)
+      const Gateway = toCamelCase(gateway)
       if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') {
     _%>
     <%= Gateway %>: <%= Gateway %>
@@ -21,7 +21,7 @@
       this.apiClient = apiClient
       <%_ gatewayFiles.forEach((file) => {
         const gateway = file.split('.')[0]
-        const Gateway = gateway.charAt(0).toUpperCase() + gateway.slice(1)
+        const Gateway = toCamelCase(gateway)
         if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') {
       _%>
       this.<%= Gateway %> = new <%= Gateway %>(apiClient)
