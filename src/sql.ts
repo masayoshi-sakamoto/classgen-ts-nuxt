@@ -1,27 +1,10 @@
 import { Create, Parser } from 'node-sql-parser'
-const YAML = require('json2yaml')
-
-import { IOptions, IConfig } from './generator'
 import { toCamelCase } from './lib/snake-camel'
 import Inflector from './lib/inflector'
+import { IColumn, IConfig, IOptions, IYAML } from './types'
+
+const YAML = require('json2yaml')
 const inflector = new Inflector()
-
-export interface IColumn {
-  property: string // カラム名
-  definition: {
-    dataType: string // カラムのタイプ(INT, CHAR, etc..,)
-  }
-  comment: {
-    value: { value: string } // カラムのコメント
-  }
-}
-
-export interface IYAML {
-  table: string // テーブル名
-  model: string // モデル名
-  index: string // 通常モデルのYAML文
-  seed: string // StoreモデルのYAML文
-}
 
 export default class SQLParser {
   private sqlData: string[]

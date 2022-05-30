@@ -1,16 +1,7 @@
 <template>
-  <LayoutApp>
-    <v-container>トップページ</v-container>
-  </LayoutApp>
+  <v-app>
+    <v-main>
+      <v-container>トップページ</v-container>
+    </v-main>
+  </v-app>
 </template>
-
-<script lang="ts">
-import Vue from 'vue'
-import LayoutApp from '@/components/organisms/Layout/App'
-
-export default Vue.extend({
-  components: {
-    LayoutApp
-  }
-})
-</script>

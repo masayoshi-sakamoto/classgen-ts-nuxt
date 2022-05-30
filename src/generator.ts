@@ -6,45 +6,13 @@ import * as YAML from 'js-yaml'
 import swagpack from 'swagpack/lib/build'
 
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
-import SQLParser, { IYAML } from './sql'
-import OpenAPIParser, { ITsSchema } from './openapi'
+import SQLParser from './sql'
+import OpenAPIParser from './openapi'
 
 import Inflector from './lib/inflector'
+import { IConfig, IModel, IOptions, IYAML } from './types'
 const inflector = new Inflector()
 const rimraf = require('rimraf')
-
-export interface IOptions {
-  namespace: string // アプリケーション名
-  force?: boolean // ファイルの上書きフラグ
-  sqldump?: string // SQLDUMPファイル
-  dist: string // 出力先
-  model?: string // モデル名
-  table?: string // テーブル名
-  excludes?: string[] // 除外したいカラム名
-  without?: boolean
-  auth?: string
-  type?: string
-}
-
-export interface IConfig {
-  tables?: {
-    excludes?: string[]
-  }
-  columns?: {
-    excludes?: string[]
-  }
-  schemas?: {
-    excludes?: string[]
-  }
-}
-
-export interface IModel {
-  table: string
-  name: string
-  refs: any
-  schema: ITsSchema
-  seed: boolean
-}
 
 export default class Generator {
   private root: string
@@ -53,6 +21,7 @@ export default class Generator {
   private className: string = 'User'
   private classNames: string = 'Users'
   private classname: string = 'user'
+  private classnames: string = 'users'
   private opts: any = {}
   private _injector: boolean = false
   private sqldump: any | null
@@ -209,6 +178,7 @@ export default class Generator {
    */
   private model(model: string) {
     this.classname = inflector.singularize(toUnderscoreCase(model))
+    this.classnames = inflector.pluralize(this.classnames)
     this.className = toCamelCase(this.classname)
     this.classNames = inflector.pluralize(this.className)
   }
@@ -263,6 +233,7 @@ export default class Generator {
       className: this.className,
       classNames: this.classNames,
       classname: this.classname,
+      classnames: this.classnames,
       toCamelCase,
       toUnderscoreCase,
       inflector,
@@ -276,9 +247,7 @@ export default class Generator {
         .map((prop: any) => {
           return {
             key: prop.name,
-            values: fs.readdirSync(
-              this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), prop.name)
-            )
+            values: fs.readdirSync(this.makeDir(this.makeDir(this.makeDir(this.makeDir(this._swagger, 'src'), 'components'), 'schemas'), prop.name))
           }
         }),
       pathsFiles: fs
@@ -309,12 +278,13 @@ export default class Generator {
   private readdir(base: string, src: string, dist: string) {
     const files = fs.readdirSync(path.resolve(base, src), { withFileTypes: true })
     for (const file of files) {
-      const name = file.name.split(/(?=\.[^.]+$)/)
-      name[0] = name[0].replace(/appName/, this.options.namespace)
-      name[0] = name[0].replace(/classNames/, this.classNames)
-      name[0] = name[0].replace(/className/, this.className)
-      name[0] = name[0].replace(/classname/, this.classname)
-      const filename = name.join('')
+      let filename = file.name
+      filename = filename.replace(/(.*)appName(.*)/, '$1' + this.options.namespace + '$2')
+      filename = filename.replace(/(.*)classNames(.*)/, '$1' + this.classNames + '$2')
+      filename = filename.replace(/(.*)className(.*)/, '$1' + this.className + '$2')
+      filename = filename.replace(/(.*)classname(.*)/, '$1' + this.classname + '$2')
+      filename = filename.replace(/(.*)classnames(.*)/, '$1' + this.classnames + '$2')
+      filename = filename.replace(/(.*).ejsx$/, '$1')
 
       if (file.isDirectory()) {
         this.makeDir(dist, filename)
