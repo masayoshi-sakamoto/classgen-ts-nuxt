@@ -1,0 +1,17 @@
+get:
+  tags:
+    - Auth
+  operationId: authRefresh
+  description: Auth Refresh
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - auth
+            type: object
+            properties:
+              auth:
+                $ref: '#/components/schemas/Auth'

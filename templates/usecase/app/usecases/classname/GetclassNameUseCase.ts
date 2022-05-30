@@ -9,7 +9,7 @@ export default class Get<%= className %>UseCase implements BaseUseCase {
 
   async execute(id: string) {
     await refresh(this.App)
-    const response = await this.App.bamboooGateway.<%= className %>.Get<%= className %>(id)
+    const response = await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Get<%= className %>(id)
     this.App.<%= classname %>.fetched = [response]
   }
 }

@@ -107,7 +107,8 @@ export default class Inflector {
       'tuna',
       'whiting',
       'wildebeest',
-      'Yengeese'
+      'Yengeese',
+      'media'
     ],
     pluralIrregular: {
       atlas: 'atlases',

@@ -4,9 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "gen": "node ../lib/bin/cli.js --namespace example -d dist",
-    "gen-sql": "node ../lib/bin/cli.js --namespace example -d dist -s mysql-schema.sql",
-    "class-gen": "rm -rf ./dist; yarn gen",
-    "class-gen-sql": "rm -rf ./dist; yarn gen-sql"
+    "class-gen": "node ../lib/bin/cli.js --namespace example -d ../../nuxt-example-app",
+    "class-gen-sql": "node ../lib/bin/cli.js --namespace example -d ../../nuxt-example-app -s mysql-schema.sql"
   }
 }

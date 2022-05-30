@@ -11,7 +11,7 @@ export default class Save<%= className %>UseCase implements BaseUseCase {
   async execute(props: I<%= className %>Props) {
     try {
       await refresh(this.App)
-      await this.App.bamboooGateway.<%= className %>.Save<%= className %>(props)
+      await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Save<%= className %>(props)
     } catch (exception: any) {
       if (exception.statusCode === 422 || exception.statusCode === 429) {
         this.App.state.errors = exception.errors

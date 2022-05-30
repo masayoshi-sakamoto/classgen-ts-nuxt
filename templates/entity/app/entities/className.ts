@@ -24,9 +24,9 @@ export default class <%= className %>Entity {
   }
 <%_ for (const schema of Object.values(schemas)) { _%>
   
-  get <%= toCamelCase(schema.key, false) %>(): <% if (schema.ref) { %><%= schema.tstype %>Entity<%} else { %><%= schema.tstype %><% } %> {
+  get <%= toCamelCase(schema.key, false) %>(): <% if (schema.ref) { %><%= schema.tstype %>Entity<%} else { %><%= schema.tstype %><% } %><%= !schema.required || schema.key === 'id' ? ' | undefined' : '' %> {
   <%_ if (schema.ref) { _%>
-    return new <%= schema.tstype %>Entity(this._props.<%= toCamelCase(schema.key, false) %>)
+    return this._props.<%= toCamelCase(schema.key, false) %> ? new <%= schema.tstype %>Entity(this._props.<%= toCamelCase(schema.key, false) %>) : undefined
   <%_} else { _%>
     return this._props.<%= toCamelCase(schema.key, false) %>
   <%_ } _%>

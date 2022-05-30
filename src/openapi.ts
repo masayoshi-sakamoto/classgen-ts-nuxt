@@ -1,5 +1,5 @@
 import { OpenAPIObject, PathObject, ReferenceObject, SchemaObject } from 'openapi3-ts'
-import { IModel } from './generator'
+import { IConfig, IModel } from './generator'
 
 import Inflector from './lib/inflector'
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
@@ -50,7 +50,7 @@ export type IRef = {
 export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
-  parse(config?: any) {
+  parse(config: IConfig) {
     const schemas = this.ymlData.components!.schemas || {}
     const paths = this.ymlData.paths || {}
     const tags = this.parsePaths(paths)
@@ -63,6 +63,7 @@ export default class OpenAPIParser {
         schema: this.schema(key, schemas[key]),
         seed: !!key.match(/.+(Seed)$/)
       }
+      return []
     })
     return {
       paths: tags,

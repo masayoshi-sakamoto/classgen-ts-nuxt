@@ -1,21 +1,22 @@
-import { BamboooGatewayBase } from './base'
+/* eslint camelcase: 0 */
+import { <%= appName %>GatewayBase } from './base'
 import { to<%= className %>Props, to<%= className %>Seed } from './translator/<%= classname %>'
 import { optionsToQuery, toQueryProps } from './translator/query'
 import { toOptionsProps } from './translator/options'
-import { Get<%= className %>, Fetch<%= className %>s, Post<%= className %>, Put<%= className %>, Delete<%= className %> } from '@/infrastructure/network/Bambooo/requests/<%= classname %>'
+import { Get<%= className %>, Fetch<%= classNames %>, Post<%= className %>, Put<%= className %>, Delete<%= className %> } from '@/infrastructure/network/<%= appName %>/requests/<%= classname %>'
 import { I<%= className %>Props, Empty<%= className %>PropsFactory } from '@/entities/<%= className %>'
 import { IOptionsProps } from '@/entities/Options'
 
-export default class <%= className %> extends BamboooGatewayBase {
+export default class <%= className %> extends <%= appName %>GatewayBase {
   async Get<%= className %>(id: string): Promise<I<%= className %>Props> {
     const { <%= classname %> } = await this.apiClient.request(new Get<%= className %>(id))
     return <%= classname %> ? to<%= className %>Props(<%= classname %>) : Empty<%= className %>PropsFactory()
   }
 
-  async Fetch<%= className %>s(options?: IOptionsProps) {
-    const response = await this.apiClient.request(new Fetch<%= className %>s(optionsToQuery(options)))
+  async Fetch<%= classNames %>(options?: IOptionsProps) {
+    const response = await this.apiClient.request(new Fetch<%= classNames %>(optionsToQuery(options)))
     return {
-      items: response.<%= classname %>s.map((prop) => to<%= className %>Props(prop)),
+      items: response.<%= toUnderscoreCase(classNames) %>.map((prop) => to<%= className %>Props(prop)),
       query: toQueryProps(response.query),
       options: toOptionsProps(response.query)
     }

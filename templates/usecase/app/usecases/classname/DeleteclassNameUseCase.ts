@@ -10,6 +10,6 @@ export default class Delete<%= className %>UseCase implements BaseUseCase {
 
   async execute(props: I<%= className %>Props) {
     await refresh(this.App)
-    await this.App.bamboooGateway.<%= className %>.Delete<%= className %>(props)
+    await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Delete<%= className %>(props)
   }
 }

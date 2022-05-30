@@ -1,7 +1,7 @@
 {
   "tables": {
     "excludes": [
-      "migration",
+      "migrations",
       "personal_access_tokens",
       "jobs",
       "job_batches",
@@ -10,9 +10,15 @@
     ]
   },
   "columns": {
-    "excludes": ["password", "created_at", "updated_at", "deleted_at"]
+    "excludes": [
+      "parent_id",
+      "password",
+      "created_at",
+      "updated_at",
+      "deleted_at"
+    ]
   },
   "schemas": {
-    "excludes": ["Query"]
+    "excludes": ["Account", "Auth", "Menu", "Query", "Options"]
   }
 }

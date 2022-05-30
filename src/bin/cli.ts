@@ -20,15 +20,22 @@ try {
   /**
    * 初期化処理
    */
-  commander.command('initialize').action((options: any) => {
+  commander.command('initialize').action(() => {
     new Generator(commander.opts()).initialize()
   })
 
   /**
    * swaggerからentityなどを作成
    */
-  commander.command('schema').action((options: any) => {
+  commander.command('schema').action(() => {
     new Generator(commander.opts()).schema()
+  })
+
+  /**
+   * config系のファイルを先にロードする
+   */
+  commander.command('config').action(() => {
+    new Generator(commander.opts()).settings()
   })
 
   commander.parse(process.argv)

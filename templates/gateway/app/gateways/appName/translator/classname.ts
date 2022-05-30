@@ -8,7 +8,7 @@ import { to<%= ref.name %>Props } from './<%= toUnderscoreCase(ref.name) %>'
 import { <%= className %>, <%= className %>Seed } from '@/infrastructure/network/<%= appName %>/schema'
 import { I<%= className %>Props, Empty<%= className %>PropsFactory } from '@/entities/<%= className %>'
 
-export const to<%= className %>Props = (props: <%= className %> | null): I<%= className %>Props => {
+export const to<%= className %>Props = (props: <%= className %> | null | undefined): I<%= className %>Props => {
   if (!props) {
     return Empty<%= className %>PropsFactory()
   }
@@ -35,8 +35,11 @@ export const to<%= className %>Seed = (props: I<%= className %>Props): <%= class
   const { <%= Object.values(seed).map((prop) => toCamelCase(prop.key, false)).join(', ') %> } = props
   return {
     <%= Object.values(seed).map((prop) => {
-      const camel = toCamelCase(prop.key, false)
+      let camel = toCamelCase(prop.key, false)
       const src = prop.key
+      if (prop.format === 'json') {
+        camel = `JSON.stringify({ ${prop.key} })`
+      }
       return camel === src ? src : src + ': ' + camel
     }).join(',\n    ') %>
   }

@@ -108,6 +108,8 @@ export default class Generator {
 
   initialize() {
     this.generator('initialize')
+    this.generator('web')
+    this.generator('auth')
     this.schema()
   }
 
@@ -126,11 +128,17 @@ export default class Generator {
       this.model(model.name)
       console.log('typegen:', chalk.yellow(model.name))
       this.generator('typegen')
-      if (!model.seed && (!this.options.model || model.table === this.options.table)) {
-        this.generate(model.name)
+      if (!this.config.schemas!.excludes!.includes(model.name)) {
+        if (!model.seed && (!this.options.model || model.table === this.options.table)) {
+          this.generate(model.name)
+        }
       }
     }
     this.injector()
+  }
+
+  settings() {
+    this.generator('config')
   }
 
   generate(modelName: string) {
@@ -257,6 +265,7 @@ export default class Generator {
       classname: this.classname,
       toCamelCase,
       toUnderscoreCase,
+      inflector,
       repositories: fs.readdirSync(this.makeDir(this._app, 'repositories')),
       gateways: fs.readdirSync(this.makeDir(this._app, 'gateways')),
       gatewayFiles: fs.readdirSync(this.makeDir(this.makeDir(this._app, 'gateways'), this.options.namespace)),

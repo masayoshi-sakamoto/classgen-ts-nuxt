@@ -8,13 +8,13 @@ export class Get<%= className %> implements APIRequest<<%= appName %>.<%= classN
   path: string
   contentType = 'application/json'
   method = HTTPMethod.GET
-  constructor(<%= classname %>Id: string) {
-    this.path = `/<%= classname %>s/${<%= classname %>Id}`
+  constructor(<%= toCamelCase(classname, false) %>Id: string) {
+    this.path = `/<%= classname %>s/${<%= toCamelCase(classname, false) %>Id}`
   }
 }
 
-export class Fetch<%= className %>s implements APIRequest<<%= appName %>.<%= className %>.get<%= className %>sResponse> {
-  response: <%= appName %>.<%= className %>.get<%= className %>sResponse
+export class Fetch<%= classNames %> implements APIRequest<<%= appName %>.<%= className %>.fetch<%= classNames %>Response> {
+  response: <%= appName %>.<%= className %>.fetch<%= classNames %>Response
   path: string
   contentType = 'application/json'
   method = HTTPMethod.GET
@@ -44,9 +44,9 @@ export class Put<%= className %> implements APIRequest<<%= appName %>.<%= classN
   method = HTTPMethod.PUT
   params: <%= appName %>.<%= className %>.put<%= className %>Request
   constructor(params: <%= className %>Seed) {
-    const <%= classname %>Id = params.id
+    const <%= toCamelCase(classname, false) %>Id = params.id
     this.params = params
-    this.path = `/<%= classname %>s/${<%= classname %>Id}`
+    this.path = `/<%= classname %>s/${<%= toCamelCase(classname, false) %>Id}`
   }
 }
 
@@ -55,7 +55,7 @@ export class Delete<%= className %> implements APIRequest<<%= appName %>.<%= cla
   path: string
   contentType = 'application/json'
   method = HTTPMethod.DELETE
-  constructor(<%= classname %>Id: string) {
-    this.path = `/<%= classname %>s/${<%= classname %>Id}`
+  constructor(<%= toCamelCase(classname, false) %>Id: string) {
+    this.path = `/<%= classname %>s/${<%= toCamelCase(classname, false) %>Id}`
   }
 }

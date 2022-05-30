@@ -17,7 +17,7 @@ export namespace <%= appName %> {
         `    export interface ${i.operationId}Request {}\n`
         const response = `    export interface ${i.operationId}Response {\n`+
             Object.values(i.responses).map((j) => {
-                return '      '+j.key + ': ' + j.tstype + (j.array ? '[]':'')
+                return '      '+(j.array ? inflector.pluralize(j.key) : j.key) + ': ' + j.tstype + (j.array ? '[]':'')
             }).join('\n')
         +`\n    }`
         return request + response
