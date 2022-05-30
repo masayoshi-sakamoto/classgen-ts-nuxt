@@ -124,7 +124,7 @@ export default class Generator {
         classes: this.models
       }
       this.model(model.name)
-      // console.log('typegen:', chalk.yellow(model.name))
+      console.log('typegen:', chalk.yellow(model.name))
       this.generator('typegen')
       if (!model.seed && (!this.options.model || model.table === this.options.table)) {
         this.generate(model.name)
@@ -243,7 +243,7 @@ export default class Generator {
    */
   private generator(type: string) {
     if (type !== 'injector') {
-      // console.log('-', type)
+      console.log('-', type)
     }
     this.opts = {
       schema: {},
@@ -326,7 +326,7 @@ export default class Generator {
       fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
       if (!this._injector) {
         const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
-        // console.log(msg, filepath)
+        console.log(msg, filepath)
       }
     }
   }
