@@ -23,7 +23,7 @@ import <%= gateway %>Gateway from '@/gateways/<%= gateway %>'
 export default (ctx: Context) => {
   const { store, app } = ctx
   <%_ gateways.forEach((gateway) => { _%>
-  const <%= gateway.toLowerCase() %>APIClient = new <%= gateway %>APIClient(ctx)
+  const <%= toUnderscoreCase(gateway) %>APIClient = new <%= gateway %>APIClient(ctx)
   <%_ }); _%>
 
   Vue.prototype.App = {
@@ -31,12 +31,12 @@ export default (ctx: Context) => {
     <%_ repositories.forEach((file) => {
       const repository = file.split('.')[0]
       if (repository !== 'AppRepository') {
-        const word = repository.split('Repository')[0].toLowerCase()
+        const word = toUnderscoreCase(repository.split('Repository')[0])
     _%>
     <%= word %>: new <%= repository %>(app.$cookies, store),
     <%_ }}); _%>
     <%_ gateways.forEach((gateway) => { _%>
-    <%= gateway.toLowerCase() %>Gateway: new <%= gateway %>Gateway(<%= gateway.toLowerCase() %>APIClient),
+    <%= toUnderscoreCase(gateway) %>Gateway: new <%= gateway %>Gateway(<%= toUnderscoreCase(gateway) %>APIClient),
     <%_ }); _%>
   }
 
@@ -45,12 +45,12 @@ export default (ctx: Context) => {
     <%_ repositories.forEach((file) => {
       const repository = file.split('.')[0]
       if (repository !== 'AppRepository') {
-        const word = repository.split('Repository')[0].toLowerCase()
+        const word = toUnderscoreCase(repository.split('Repository')[0])
     _%>
     <%= word %>: new <%= repository %>(app.$cookies, store),
     <%_ }}); _%>
     <%_ gateways.forEach((gateway) => { _%>
-    <%= gateway.toLowerCase() %>Gateway: new <%= gateway %>Gateway(<%= gateway.toLowerCase() %>APIClient),
+    <%= toUnderscoreCase(gateway) %>Gateway: new <%= gateway %>Gateway(<%= toUnderscoreCase(gateway) %>APIClient),
     <%_ }); _%>
   }
 }

@@ -28,14 +28,14 @@ export interface IApp {
   <%_ repositories.forEach((file) => {
     const repository = file.split('.')[0]
     if (repository !== 'AppRepository') {
-      const word = repository.split('Repository')[0].toLowerCase()
+      const word =  toUnderscoreCase(repository.split('Repository')[0])
   _%>
   <%= word %>: <%= repository %>
   <%_ }}); _%>
 
   // Gateways
   <%_ gateways.forEach((gateway) => { _%>
-  <%= gateway.toLowerCase() %>Gateway: <%= gateway %>Gateway
+  <%= toUnderscoreCase(gateway) %>Gateway: <%= gateway %>Gateway
   <%_ }); _%>
 }
 
