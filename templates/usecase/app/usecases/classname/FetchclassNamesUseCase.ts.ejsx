@@ -1,5 +1,5 @@
 import { IApp } from '@/types/nuxt'
-import refresh from '@/utils/refresh'
+<%_ if (auth) { _%>}import refresh from '@/utils/refresh'<%_ } _%>
 
 export default class Fetch<%= classNames %>UseCase implements BaseUseCase {
   App: IApp
@@ -9,7 +9,7 @@ export default class Fetch<%= classNames %>UseCase implements BaseUseCase {
 
   async execute() {
     try {
-      await refresh(this.App)
+      <%_ if (auth) { _%>}await refresh(this.App)<%_ } _%>
       const response = await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Fetch<%= classNames %>(this.App.<%= classname %>.options)
       this.App.<%= classname %>.fetched = response.items
       this.App.<%= classname %>.query = response.query

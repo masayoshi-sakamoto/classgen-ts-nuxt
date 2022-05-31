@@ -34,7 +34,3 @@ export const EmptyAuthPropsFactory = (props?: Partial<IAuthProps>): IAuthProps =
   expired: null,
   ...props
 })
-
-export const EmptyAuthEntityFactory = (props?: Partial<IAuthProps>): AuthEntity => {
-  return new AuthEntity(EmptyAuthPropsFactory(props))
-}

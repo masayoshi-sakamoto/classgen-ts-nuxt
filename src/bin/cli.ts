@@ -1,28 +1,30 @@
 import { Command } from 'commander'
 import Generator from '../generator'
 
-const pkg = require('../../package.json')
-const commander = new Command()
-
-commander
-  .version(pkg.version)
-  .option('--namespace <namespace>', 'application namespace')
-  .option('-f, --force', 'override output file')
-  .option('-s, --sqldump <file>', 'mysql dump file')
-  .option('-d, --dist <dist>', 'output directory')
-  .option('-t, --type <type>', 'template type choices (web, admin)')
-  .option('--auth [model]', 'authenticate flag', 'users')
-  .option('-m, --model <model>', 'model name')
-  .option('-e, --excludes <excludes>', 'excludes column', (items) => items.split(','))
-  .option('--without', 'without paths')
-
 try {
+  const pkg = require('../../package.json')
+  const commander = new Command()
+
+  commander
+    .version(pkg.version)
+    .option('--namespace <namespace>', 'application namespace')
+    .option('-f, --force', 'override output file')
+    .option('-r, --remove', 'remove flag')
+    .option('-s, --sqldump <file>', 'mysql dump file')
+    .option('-d, --dist <dist>', 'output directory')
+    .option('-t, --type <type>', 'template type choices (web, admin)')
+    .option('-m, --model <model>', 'model name')
+    .option('-e, --excludes <excludes>', 'excludes column', (items) => items.split(','))
+    .option('--without', 'without paths')
   /**
    * 初期化処理
    */
-  commander.command('initialize').action(() => {
-    new Generator(commander.opts()).initialize()
-  })
+  commander
+    .command('initialize')
+    .option('-a, --auth <model>', 'authenticate flag')
+    .action((options: any) => {
+      new Generator(commander.opts()).initialize(options)
+    })
 
   /**
    * swaggerからentityなどを作成

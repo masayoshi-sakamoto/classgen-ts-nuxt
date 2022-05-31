@@ -2,7 +2,7 @@ import { NuxtCookies } from 'cookie-universal-nuxt'
 import { Store } from 'vuex'
 import { RootState } from '@/store'
 import * as types from '@/store/app/types'
-import MenuEntity from '@/entities/Menu'
+import { IMenuProps } from '@/entities/Menu'
 
 export default class AppRepository {
   private cookies: NuxtCookies
@@ -41,11 +41,11 @@ export default class AppRepository {
     return this.store.state.app.drawer
   }
 
-  set menus(value: MenuEntity[] | null) {
+  set menus(value: IMenuProps[] | null) {
     this.store.commit(new types.Menus(value))
   }
 
-  get menus(): MenuEntity[] | null {
+  get menus(): IMenuProps[] | null {
     return this.store.state.app.menus
   }
 }

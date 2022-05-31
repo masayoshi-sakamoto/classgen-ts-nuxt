@@ -1,4 +1,4 @@
-import MenuEntity from '@/entities/Menu'
+import { IMenuProps } from '@/entities/Menu'
 
 export const Types = {
   clear: 'clear',
@@ -36,7 +36,7 @@ export class Drawer implements FluxStandardAction<boolean | null> {
   constructor(public payload: boolean | null) {}
 }
 
-export class Menus implements FluxStandardAction<MenuEntity[] | null> {
+export class Menus implements FluxStandardAction<IMenuProps[] | null> {
   type = path + Types.menus
-  constructor(public payload: MenuEntity[] | null) {}
+  constructor(public payload: IMenuProps[] | null) {}
 }

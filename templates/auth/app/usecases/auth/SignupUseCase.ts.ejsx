@@ -1,15 +1,13 @@
 import { IApp } from '@/types/nuxt'
-import AccountEntity from '@/entities/Account'
+import { IAccountProps } from '@/entities/Account'
 
 export default class AccountUseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
+  constructor(protected App: IApp) {
   }
 
-  async execute(entity: AccountEntity) {
+  async execute(props: IAccountProps) {
     try {
-      this.App.auth.auth = await this.App.<%= appName.toLowerCase() %>Gateway.Auth.Signup(entity)
+      this.App.auth.auth = await this.App.<%= toUnderscoreCase(appName) %>Gateway.Auth.Signup(props)
     } catch (exception: any) {
       if (exception.statusCode === 422) {
         this.App.state.errors = exception.errors

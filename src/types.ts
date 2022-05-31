@@ -9,6 +9,7 @@ export interface IOptions {
   without?: boolean
   auth?: string
   type?: string
+  remove?: boolean
 }
 
 export interface IConfig {

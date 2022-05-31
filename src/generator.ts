@@ -8,11 +8,11 @@ import swagpack from 'swagpack/lib/build'
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
 import SQLParser from './sql'
 import OpenAPIParser from './openapi'
+const readlineSync = require('readline-sync')
 
 import Inflector from './lib/inflector'
 import { IConfig, IModel, IOptions, IYAML } from './types'
 const inflector = new Inflector()
-const rimraf = require('rimraf')
 
 export default class Generator {
   private root: string
@@ -70,15 +70,18 @@ export default class Generator {
     this.options.namespace = toCamelCase(this.options.namespace)
     this.root = path.resolve(__dirname, '../templates/')
     this.options.dist = options.dist ? path.resolve(options.dist + '/') : './'
-    this.makeDir('./', this._app)
-    this.makeDir('./', this._swagger)
     console.log('application:', chalk.red(this.options.namespace))
   }
 
-  initialize() {
+  initialize(options: any) {
+    console.log(options)
+    this.makeDir('./', this._app)
+    this.makeDir('./', this._swagger)
     this.generator('initialize')
-    this.generator('web')
-    this.generator('auth')
+    if (options.auth) {
+      this.options.auth = inflector.singularize(toUnderscoreCase(options.auth))
+      this.generator('auth')
+    }
     this.schema()
   }
 
@@ -107,7 +110,11 @@ export default class Generator {
   }
 
   settings() {
-    this.generator('config')
+    if (this.options.remove) {
+      this.readdir(path.join(this.root, 'config'), './', './', this.remove.bind(this))
+    } else {
+      this.readdir(path.join(this.root, 'config'), './', './', this.render.bind(this))
+    }
   }
 
   generate(modelName: string) {
@@ -167,7 +174,9 @@ export default class Generator {
   private swagpack() {
     const src = path.resolve(this.makeDir(this._swagger, 'src'), 'index.yaml')
     const dist = path.resolve(this.makeDir('./', this._swagger), 'swagger.yaml')
-    swagpack(src, dist)
+    if (!this.options.remove) {
+      swagpack(src, dist)
+    }
     const { paths, definitions } = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse(this.config)
     this.paths = paths
     this.models = definitions
@@ -229,6 +238,7 @@ export default class Generator {
       seed: {},
       paths: [],
       ...this.opts,
+      auth: this.options.auth,
       appName: this.options.namespace,
       className: this.className,
       classNames: this.classNames,
@@ -260,7 +270,11 @@ export default class Generator {
           }
         })
     }
-    this.readdir(path.join(this.root, type), './', './')
+    if (this.options.remove) {
+      this.readdir(path.join(this.root, type), './', './', this.remove.bind(this))
+    } else {
+      this.readdir(path.join(this.root, type), './', './', this.render.bind(this))
+    }
   }
 
   /**
@@ -275,7 +289,7 @@ export default class Generator {
   /**
    * 各フォルダの階層をおって生成するよう再帰的にフォルダの読み込みを行っている
    */
-  private readdir(base: string, src: string, dist: string) {
+  private readdir(base: string, src: string, dist: string, callback: Function) {
     const files = fs.readdirSync(path.resolve(base, src), { withFileTypes: true })
     for (const file of files) {
       let filename = file.name
@@ -287,10 +301,18 @@ export default class Generator {
       filename = filename.replace(/(.*).ejsx$/, '$1')
 
       if (file.isDirectory()) {
-        this.makeDir(dist, filename)
-        this.readdir(base, path.join(src, file.name), path.join(dist, filename))
+        if (!this.options.remove) {
+          this.makeDir(dist, filename)
+        }
+        this.readdir(base, path.join(src, file.name), path.join(dist, filename), callback)
+
+        // フォルダの削除
+        const rmpath = path.resolve(this.options.dist, path.join(dist, filename))
+        if (this.options.remove && fs.existsSync(rmpath) && fs.readdirSync(rmpath, { withFileTypes: true }).length === 0) {
+          fs.rmdirSync(rmpath)
+        }
       } else {
-        this.render(base, path.join(src, file.name), path.join(dist, filename))
+        callback(base, path.join(src, file.name), path.join(dist, filename))
       }
     }
   }
@@ -304,8 +326,26 @@ export default class Generator {
     if (!exist || this.options.force || this._injector) {
       fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
       if (!this._injector) {
-        const msg = this.options.force && exist ? chalk.red(' Override:') : chalk.green(' Generated:')
+        const msg = this.options.force && exist ? chalk.yellow(' Override:') : chalk.green(' Generated:')
         console.log(msg, filepath)
+      }
+    }
+  }
+
+  /**
+   * 生成されたファイルの削除
+   */
+  private remove(base: string, src: string, dist: string) {
+    const filepath = path.resolve(this.options.dist, dist)
+    if (fs.existsSync(filepath)) {
+      if (!this.options.force) {
+        if (readlineSync.keyInYN(`${chalk.red('remove')} ${dist}?`) !== true) {
+          return
+        }
+      }
+      fs.rmSync(filepath)
+      if (this.options.force) {
+        console.log(chalk.red('removed:'), dist)
       }
     }
   }

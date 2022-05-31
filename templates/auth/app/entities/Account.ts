@@ -14,8 +14,8 @@ export default class AccountEntity {
     return this._props
   }
 
-  get clone(): AccountEntity {
-    return new AccountEntity({ ...this._props })
+  get clone(): IAccountProps {
+    return JSON.parse(JSON.stringify(this._props))
   }
 
   get username(): string | null {
@@ -32,7 +32,3 @@ export const EmptyAccountPropsFactory = (props?: Partial<IAccountProps>): IAccou
   password: null,
   ...props
 })
-
-export const EmptyAccountEntityFactory = (props?: Partial<IAccountProps>): AccountEntity => {
-  return new AccountEntity(EmptyAccountPropsFactory(props))
-}

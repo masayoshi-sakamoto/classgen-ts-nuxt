@@ -1,6 +1,6 @@
 import { IApp } from '@/types/nuxt'
 import { I<%= className %>Props } from '@/entities/<%= className %>'
-import refresh from '@/utils/refresh'
+<%_ if (auth) { _%>}import refresh from '@/utils/refresh'<%_ } _%>
 
 export default class Save<%= className %>UseCase implements BaseUseCase {
   App: IApp
@@ -10,7 +10,7 @@ export default class Save<%= className %>UseCase implements BaseUseCase {
 
   async execute(props: I<%= className %>Props) {
     try {
-      await refresh(this.App)
+      <%_ if (auth) { _%>}await refresh(this.App)<%_ } _%>
       await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Save<%= className %>(props)
     } catch (exception: any) {
       if (exception.statusCode === 422 || exception.statusCode === 429) {

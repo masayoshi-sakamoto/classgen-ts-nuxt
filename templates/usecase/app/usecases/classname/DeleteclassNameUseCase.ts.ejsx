@@ -1,6 +1,6 @@
 import { IApp } from '@/types/nuxt'
 import { I<%= className %>Props } from '@/entities/<%= className %>'
-import refresh from '@/utils/refresh'
+<%_ if (auth) { _%>}import refresh from '@/utils/refresh'<%_ } _%>
 
 export default class Delete<%= className %>UseCase implements BaseUseCase {
   App: IApp
@@ -9,7 +9,7 @@ export default class Delete<%= className %>UseCase implements BaseUseCase {
   }
 
   async execute(props: I<%= className %>Props) {
-    await refresh(this.App)
+    <%_ if (auth) { _%>}await refresh(this.App)<%_ } _%>
     await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Delete<%= className %>(props)
   }
 }
