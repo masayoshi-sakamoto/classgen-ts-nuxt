@@ -10,9 +10,8 @@ try {
     .option('--namespace <namespace>', 'application namespace')
     .option('-f, --force', 'override output file')
     .option('-r, --remove', 'remove flag')
-    .option('-s, --sqldump <file>', 'mysql dump file')
-    .option('-d, --dist <dist>', 'output directory')
-    .option('-t, --type <type>', 'template type choices (web, admin)')
+    .option('--sqldump <file>', 'mysql dump file')
+    .option('--dist <dist>', 'output directory')
     .option('-m, --model <model>', 'model name')
     .option('-e, --excludes <excludes>', 'excludes column', (items) => items.split(','))
     .option('--without', 'without paths')
@@ -21,7 +20,8 @@ try {
    */
   commander
     .command('initialize')
-    .option('-a, --auth <model>', 'authenticate flag')
+    .option('--admin', 'template type admin')
+    .option('-a, --auth [model]', 'authenticate flag')
     .action((options: any) => {
       new Generator(commander.opts()).initialize(options)
     })

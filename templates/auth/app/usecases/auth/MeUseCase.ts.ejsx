@@ -8,7 +8,7 @@ export default class MeUseCase implements BaseUseCase {
   async execute() {
     try {
       await refresh(this.App)
-      this.App.admin.current = await this.App.<%= toUnderscoreCase(appName) %>Gateway.Auth.Me()
+      this.App.<%= classname %>.current = await this.App.<%= toUnderscoreCase(appName) %>Gateway.Auth.Me()
     } catch (exception: any) {
       if (exception.statusCode === 401) {
         return false

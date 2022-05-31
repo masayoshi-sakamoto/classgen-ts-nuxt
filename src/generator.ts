@@ -78,9 +78,15 @@ export default class Generator {
     this.makeDir('./', this._app)
     this.makeDir('./', this._swagger)
     this.generator('initialize')
+
     if (options.auth) {
-      this.options.auth = inflector.singularize(toUnderscoreCase(options.auth))
+      this.options.auth = options.auth
+      this.options.model = options.auth === true ? 'user' : options.auth
+      this.options.model = inflector.singularize(toUnderscoreCase(this.options.model!))
+      this.options.table = this.options.model ? inflector.pluralize(this.options.model) : undefined
+      this.model(this.options.model)
       this.generator('auth')
+      this.generator('auth_swagger')
     }
     this.schema()
   }
@@ -89,17 +95,12 @@ export default class Generator {
     this.dump()
     for (const model of this.models) {
       const seed = this.models.find((prop) => prop.name === model.name + 'Seed')?.schema
-      this.opts = {
-        ...this.opts,
-        paths: this.paths,
-        schemas: model.schema,
-        refs: model.refs,
-        seed: seed || {},
-        classes: this.models
-      }
+      this.setOps(model, seed)
       this.model(model.name)
-      console.log('typegen:', chalk.yellow(model.name))
-      this.generator('typegen')
+      if (!this.options.auth) {
+        console.log('typegen:', chalk.yellow(model.name))
+        this.generator('typegen')
+      }
       if (!this.config.schemas!.excludes!.includes(model.name)) {
         if (!model.seed && (!this.options.model || model.table === this.options.table)) {
           this.generate(model.name)
@@ -107,6 +108,17 @@ export default class Generator {
       }
     }
     this.injector()
+  }
+
+  setOps(model: IModel, seed: any) {
+    this.opts = {
+      ...this.opts,
+      paths: this.paths,
+      schemas: model.schema,
+      refs: model.refs,
+      seed: seed || {},
+      classes: this.models
+    }
   }
 
   settings() {
@@ -234,7 +246,7 @@ export default class Generator {
     }
     this.opts = {
       schema: {},
-      refs: {},
+      refs: [],
       seed: {},
       paths: [],
       ...this.opts,

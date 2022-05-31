@@ -1,7 +1,8 @@
 import { <%= appName %>GatewayBase } from './base'
 import { toAccountSeed } from './translator/account'
 import { toAuthProps } from './translator/auth'
-import { Refresh, Signup, Login, Logout } from '@/infrastructure/network/<%= appName %>/requests/auth'
+import { to<%= className %>Props } from './translator/<%= classname %>'
+import { Refresh, Signup, Login, Logout, Me } from '@/infrastructure/network/<%= appName %>/requests/auth'
 import { IAccountProps } from '@/entities/Account'
 
 export default class Auth extends <%= appName %>GatewayBase {
@@ -23,5 +24,10 @@ export default class Auth extends <%= appName %>GatewayBase {
   async Logout() {
     const { logout } = await this.apiClient.request(new Logout())
     return logout
-  }  
+  }
+
+  async Me() {
+    const { <%= classname %> } = await this.apiClient.request(new Me())
+    return to<%= className %>Props(<%= classname %>)
+  }
 }

@@ -1,5 +1,7 @@
 import { IApp } from '@/types/nuxt'
-<%_ if (auth) { _%>}import refresh from '@/utils/refresh'<%_ } _%>
+<%_ if (auth) { _%>
+import refresh from '@/utils/refresh'
+<%_ } _%>
 
 export default class Get<%= className %>UseCase implements BaseUseCase {
   App: IApp
@@ -8,7 +10,9 @@ export default class Get<%= className %>UseCase implements BaseUseCase {
   }
 
   async execute(id: string) {
-    <%_ if (auth) { _%>}await refresh(this.App)<%_ } _%>
+    <%_ if (auth) { _%>
+    await refresh(this.App)
+    <%_ } _%>
     const response = await this.App.<%= toUnderscoreCase(appName) %>Gateway.<%= className %>.Get<%= className %>(id)
     this.App.<%= classname %>.fetched = [response]
   }
