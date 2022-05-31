@@ -1,6 +1,6 @@
 {
   "name": "classgen-ts-nuxt",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Class generator to implement clean architecture for nuxt.js.",
   "bin": {
     "classgen-ts-nuxt": "./bin/classgen-ts-nuxt.js"
