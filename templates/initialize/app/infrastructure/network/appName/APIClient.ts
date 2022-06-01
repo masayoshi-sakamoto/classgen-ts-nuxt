@@ -8,8 +8,8 @@ export class APIClient {
   baseURL: string = ''
   timeout: number = 60 * 1000 * 10
 
-  constructor(private ctx?: Context) {
-    const host = process.env.APPLICATION_API
+  constructor(private ctx: Context) {
+    const host = process.server ? process.env.LOCALHOST : process.env.APPLICATION_API
     this.baseURL = `${host}`
   }
 
@@ -60,8 +60,8 @@ export class APIClient {
   private normalizeError(error: any): APIError {
     return {
       statusCode: error.response && error.response.status,
-      message: error.response.data.message,
-      errors: error.response.data.errors ? error.response.data.errors : [],
+      message: error.response && error.response.data.message,
+      errors: (error.response && error.response.data.errors) || [],
       raw: error
     }
   }
@@ -94,10 +94,14 @@ export class APIClient {
     const crypto = require('crypto')
     const clientId = process.env.AUTH_CLIENT_ID
     const secret = process.env.AUTH_SECRET
-    const timestamp = Date.now()
+    const timestamp = String(Date.now())
     const nonce = crypto.createHmac('sha256', secret).update(timestamp).digest('hex')
     const sign = `${clientId}.${timestamp}.${nonce}`
     const signature = crypto.createHmac('sha256', secret).update(sign).digest('hex')
+
+    const tokenType = ctx.app.$cookies.get('tokenType')
+    const accessToken = ctx.app.$cookies.get('accessToken')
+    const Authorization = tokenType ? tokenType + ' ' + accessToken : null
 
     let header = {
       'Content-Type': request.contentType,
@@ -105,11 +109,11 @@ export class APIClient {
       withCredentials: true,
       'Access-Control-Allow-Origin': '*',
       'X-Requested-With': 'XMLHttpRequest',
-      Authorization: ctx.app.$cookies.get('tokenType') ? ctx.app.$cookies.get('tokenType') + ' ' + ctx.app.$cookies.get('accessToken') : undefined,
+      Authorization,
       'X-Auth-Client-Id': clientId,
       'X-Auth-Timestamp': timestamp,
       'X-Auth-Nonce': nonce,
-      'X-Auth-Signature': btoa(signature),
+      'X-Auth-Signature': Buffer.from(signature).toString('base64'),
       'X-HTTP-Method-Override': request.method
     } as object
 
