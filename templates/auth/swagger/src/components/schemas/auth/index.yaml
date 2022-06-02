@@ -1,0 +1,15 @@
+required:
+  - access_token
+  - token_type
+  - expired
+type: 'object'
+properties:
+  access_token:
+    type: string
+    nullable: true
+  token_type:
+    type: string
+    nullable: true
+  expired:
+    type: string
+    nullable: true

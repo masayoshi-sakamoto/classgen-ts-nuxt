@@ -1,0 +1,25 @@
+import { Empty<%= ClassName %>PropsFactory, I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+import { IOptionsProps } from '@/entities/Options'
+import { EmptyQueryPropsFactory, IQueryProps } from '@/entities/Query'
+
+export interface I<%= ClassName %>State {
+  byIds: {
+    [id: string]: I<%= ClassName %>Props
+  }
+  fetched: I<%= ClassName %>Props[]
+  query: IQueryProps
+  options: IOptionsProps
+  loading: boolean
+  current: I<%= ClassName %>Props
+}
+
+export const state = (): I<%= ClassName %>State => ({
+  byIds: {},
+  fetched: [],
+  query: EmptyQueryPropsFactory(),
+  options: {},
+  loading: false,
+  current: Empty<%= ClassName %>PropsFactory()
+})
+
+export default state

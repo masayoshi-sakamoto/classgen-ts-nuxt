@@ -7,7 +7,7 @@ export default class LoginUseCase implements BaseUseCase {
 
   async execute(props: IAccountProps) {
     try {
-      this.App.auth.auth = await this.App.<%= toUnderscoreCase(appName) %>Gateway.Auth.Login(props)
+      this.App.auth.auth = await this.App.<%= appname %>Gateway.Auth.Login(props)
     } catch (exception: any) {
       if (exception.statusCode === 422 || exception.statusCode === 429) {
         this.App.state.errors = exception.errors

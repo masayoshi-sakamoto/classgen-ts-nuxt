@@ -9,7 +9,7 @@ const rimraf = require('rimraf')
 export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
-  parse(config: IConfig) {
+  parse(config?: IConfig) {
     const schemas = this.ymlData.components!.schemas || {}
     const paths = this.ymlData.paths || {}
     const tags = this.parsePaths(paths)
@@ -26,7 +26,7 @@ export default class OpenAPIParser {
     })
     return {
       paths: tags,
-      definitions
+      models: definitions || []
     }
   }
 
@@ -92,7 +92,7 @@ export default class OpenAPIParser {
           return prop[key]
         })
         const items = item.reduce((result, prop) => {
-          const tags = prop.tags[0]
+          const tags = prop.tags ? prop.tags[0] : undefined
           result.push({
             ...prop,
             tags
@@ -120,10 +120,13 @@ export default class OpenAPIParser {
   }
 
   parseResponse(responses: any) {
-    return Object.values(responses)
-      .map((prop: any) => {
-        return Object.values(this.schema('responses', prop.content['application/json'].schema))
-      })
-      .flat()
+    if (responses) {
+      return Object.values(responses)
+        .map((prop: any) => {
+          return Object.values(this.schema('responses', prop.content['application/json'].schema))
+        })
+        .flat()
+    }
+    return []
   }
 }

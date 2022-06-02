@@ -3,7 +3,7 @@
     <v-container fluid>
       <v-row>
         <v-col cols="3" align-self="center logo-lg">
-          <nuxt-link to="/"><%= appName %></nuxt-link>
+          <nuxt-link to="/"><%= AppName %></nuxt-link>
         </v-col>
         <v-col cols="6">
           <v-tabs centered>

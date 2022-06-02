@@ -1,17 +1,3 @@
-export interface IOptions {
-  namespace: string // アプリケーション名
-  force?: boolean // ファイルの上書きフラグ
-  sqldump?: string // SQLDUMPファイル
-  dist: string // 出力先
-  model?: string // モデル名
-  table?: string // テーブル名
-  excludes?: string[] // 除外したいカラム名
-  without?: boolean
-  auth?: string
-  type?: string
-  remove?: boolean
-}
-
 export interface IConfig {
   tables?: {
     excludes?: string[]

@@ -1,6 +1,6 @@
-import { APIClient } from '@/infrastructure/network/<%= appName %>/APIClient'
+import { APIClient } from '@/infrastructure/network/<%= AppName %>/APIClient'
 
-export class <%= appName %>GatewayBase {
+export class <%= AppName %>GatewayBase {
   apiClient: APIClient
 
   constructor(apiClient: APIClient) {

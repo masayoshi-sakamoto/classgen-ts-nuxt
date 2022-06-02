@@ -1,0 +1,27 @@
+<%_ for (const file of paths['gateways/AppName'].files) { _%>
+<%_  const gateway = file.split('.')[0] _%>
+<%_ if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') { _%>
+import <%= upperCamel(gateway) %> from './<%= gateway %>'
+<%_ } _%>
+<%_ } _%>
+import { APIClient } from '@/infrastructure/network/<%= AppName %>/APIClient'
+
+export default class <%= AppName %>Gateway {
+  apiClient: APIClient
+<%_ for (const file of paths['gateways/AppName'].files) { _%>
+<%_  const gateway = file.split('.')[0] _%>
+<%_ if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') { _%>
+  <%= upperCamel(gateway) %>: <%= upperCamel(gateway) %>
+<%_ } _%>
+<%_ } _%>
+
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient
+<%_ for (const file of paths['gateways/AppName'].files) { _%>
+<%_  const gateway = file.split('.')[0] _%>
+<%_ if (gateway !== 'translator' && gateway !== 'index' && gateway !== 'base') { _%>
+    this.<%= upperCamel(gateway) %> = new <%= upperCamel(gateway) %>(apiClient)
+<%_ } _%>
+<%_ } _%>
+  }
+}

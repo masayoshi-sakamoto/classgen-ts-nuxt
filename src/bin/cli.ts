@@ -1,5 +1,8 @@
 import { Command } from 'commander'
 import Generator from '../generator'
+import Remove from '../remove'
+import { IInitializeOptions, ISchemaOptions } from '../options'
+import { upperCamel } from '../common'
 
 try {
   const pkg = require('../../package.json')
@@ -7,14 +10,23 @@ try {
 
   commander
     .version(pkg.version)
-    .option('--namespace <namespace>', 'application namespace')
-    .option('-f, --force', 'override output file')
-    .option('-r, --remove', 'remove flag')
-    .option('--sqldump <file>', 'mysql dump file')
-    .option('--dist <dist>', 'output directory')
-    .option('-m, --model <model>', 'model name')
-    .option('-e, --excludes <excludes>', 'excludes column', (items) => items.split(','))
-    .option('--without', 'without paths')
+    .option('--namespace <namespace>', 'application namespace', 'example')
+    .option('--config <filename>', 'application config file name', 'classgen-ts-nuxt.json')
+    .option('--sqldump <filename>', 'sql dump file name')
+    .option('--dist <path>', 'output directory', './')
+    .option('-r, --remove', 'remove option')
+    .option('-f, --force', 'forced command')
+
+  /**
+   * config系のファイルを先にロードする
+   */
+  commander.command('config').action(() => {
+    if (commander.opts().remove) {
+      return new Remove(commander.opts()).config()
+    }
+    new Generator(commander.opts()).config()
+  })
+
   /**
    * 初期化処理
    */
@@ -22,22 +34,65 @@ try {
     .command('initialize')
     .option('--admin', 'template type admin')
     .option('-a, --auth [model]', 'authenticate flag')
-    .action((options: any) => {
+    .action((options: IInitializeOptions) => {
+      if (commander.opts().remove) {
+        return new Remove(commander.opts()).initialize(options)
+      }
       new Generator(commander.opts()).initialize(options)
+    })
+
+  /**
+   * モデル名から一通りのファイルを作成
+   */
+  commander
+    .command('generate')
+    .argument('<name>', 'schema name e.g. user, User, users, Users')
+    .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
+    .option('-sw, --swagger', 'create with swagger file')
+    .action((name, options: ISchemaOptions) => {
+      name = upperCamel(name)
+      if (commander.opts().remove) {
+        return new Remove(commander.opts()).generate(name, options)
+      }
+      new Generator(commander.opts()).generate(name, options)
     })
 
   /**
    * swaggerからentityなどを作成
    */
-  commander.command('schema').action(() => {
-    new Generator(commander.opts()).schema()
-  })
+  commander
+    .command('schema')
+    .argument('<name>', 'schema name e.g. user, User, users, Users')
+    .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
+    .option('-sw, --swagger', 'create with swagger file')
+    .action((name, options: ISchemaOptions) => {
+      name = upperCamel(name)
+      if (commander.opts().remove) {
+        return new Remove(commander.opts()).schema(name, options)
+      }
+      new Generator(commander.opts()).schema(name, options)
+    })
 
   /**
-   * config系のファイルを先にロードする
+   * 認証ファイルの生成
    */
-  commander.command('config').action(() => {
-    new Generator(commander.opts()).settings()
+  commander
+    .command('auth')
+    .argument('<name>', 'auth schema name e.g. admin, Admin, admins Admins')
+    .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
+    .option('-sw, --swagger', 'create with swagger file')
+    .action((name, options: ISchemaOptions) => {
+      if (commander.opts().remove) {
+        return new Remove(commander.opts()).auth(name, options)
+      }
+      new Generator(commander.opts()).auth(name, options)
+    })
+
+  /**
+   * injectorファイルの生成
+   */
+  commander.command('index').action(() => {
+    new Generator(commander.opts()).injector()
   })
 
   commander.parse(process.argv)

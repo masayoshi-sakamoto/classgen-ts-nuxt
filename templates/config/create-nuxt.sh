@@ -1,6 +1,7 @@
 #/bin/sh
 
 # ディレクトリ構成を変更
+rm -i ./layouts/default.vue ./pages/inspire.vue ./components/NuxtLogo.vue ./components/Tutorial.vue ./components/VuetifyLogo.vue
 mkdir app
 mkdir swagger
 mv assets components layouts pages static store app/

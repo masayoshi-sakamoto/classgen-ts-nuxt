@@ -1,5 +1,5 @@
 /* eslint camelcase: 0 */
-import { Query } from '@/infrastructure/network/<%= appName %>/schema'
+import { Query } from '@/infrastructure/network/<%= AppName %>/schema'
 import { EmptyQueryPropsFactory, IQueryProps } from '@/entities/Query'
 import { IOptionsProps } from '@/entities/Options'
 

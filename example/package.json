@@ -4,7 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "class-gen": "node ../lib/bin/cli.js --namespace example --dist ../../nuxt-example-app",
-    "class-gen-sql": "node ../lib/bin/cli.js --namespace example --dist ../../nuxt-example-app -s mysql-schema.sql"
+    "gen": "node ../lib/bin/cli.js",
+    "class-gen": "node ../lib/bin/cli.js --namespace example --dist ./dist",
+    "class-gen-sql": "node ../lib/bin/cli.js --namespace example --dist ./dist --sqldump mysql-schema.sql",
+    "bam-gen": "node ../lib/bin/cli.js --namespace bambooo --dist ../../nuxt-example-app",
+    "bam-gen-sql": "node ../lib/bin/cli.js --namespace bambooo --dist ../../nuxt-example-app --sqldump mysql-schema.sql"
   }
 }

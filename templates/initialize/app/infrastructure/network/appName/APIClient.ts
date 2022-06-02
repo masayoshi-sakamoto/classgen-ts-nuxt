@@ -6,7 +6,7 @@ import { HTTPMethod } from '@/infrastructure/network/types'
 
 export class APIClient {
   baseURL: string = ''
-  timeout: number = 60 * 1000 * 10
+  timeout: number = 15 * 1000
 
   constructor(private ctx: Context) {
     const host = process.server ? process.env.LOCALHOST : process.env.APPLICATION_API

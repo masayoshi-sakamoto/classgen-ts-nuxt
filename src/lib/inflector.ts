@@ -1,6 +1,7 @@
 interface IRules {
   [key: string]: string
 }
+
 export default class Inflector {
   pluralRules: {
     pluralRules: IRules
