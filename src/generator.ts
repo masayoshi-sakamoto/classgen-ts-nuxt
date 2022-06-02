@@ -15,10 +15,7 @@ export default class Generator extends Base {
   }
 
   async initialize(options: IInitializeOptions) {
-    this.generator('initialize', './swagger')
-    await this.index('swagger')
-
-    this.generator('initialize', './app')
+    this.generator('initialize', './')
     await this.injector()
   }
 
@@ -74,6 +71,17 @@ export default class Generator extends Base {
 
     // スキーマファイルが更新されている可能性があるのでswagger.yamlを再生成
     await this.index('swagger')
+    this.__schema(name, options)
+  }
+
+  /**
+   * 指定されたモデル名でentity、translator、schemaファイルを更新
+   * swaggerファイルがない場合はエラー
+   *
+   * @param name
+   * @param options
+   */
+  private async __schema(name: string, options: ISchemaOptions) {
     const files = this.findSchema(name)
     if (files) {
       for (const file of files) {
@@ -85,8 +93,8 @@ export default class Generator extends Base {
       this.generator('schema', './app/entities')
       this.generator('schema', './app/gateways')
     } else {
-      console.log(chalk.red('error'), 'No schema file, please run with --swagger option.')
-      exit
+      console.log(chalk.red('Error:'), chalk.yellow(name), 'No schema file, please run with --swagger option.')
+      exit()
     }
     await this.injector()
   }
@@ -99,9 +107,31 @@ export default class Generator extends Base {
    * @param options
    */
   async generate(name: string, options: ISchemaOptions) {
-    this.parameter.model = name
-    this.schema(name, options)
-    this.generator('generate', './')
+    if (name) {
+      this.parameter.model = name
+      this.schema(name, options)
+      this.generator('generate', './')
+      await this.injector()
+    }
+
+    if (options.all) {
+      if (!this.sqldump) {
+        console.log(chalk.red('Error:'), 'sqldump file is not set')
+        exit()
+      }
+
+      this.dump(options)
+      this.generator('generate', './swagger')
+      await this.index('swagger')
+      this.models()
+      for (const model of this.swagger.models) {
+        if (!this.configs.schemas!.excludes!.includes(model.name) && !model.seed) {
+          this.parameter.model = model.name
+          this.__schema(model.name, options)
+          this.generator('generate', './')
+        }
+      }
+    }
     await this.injector()
   }
 

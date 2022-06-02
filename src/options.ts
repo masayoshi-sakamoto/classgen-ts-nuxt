@@ -14,6 +14,7 @@ export interface IInitializeOptions {
 export interface ISchemaOptions {
   excludes?: string[] // schemaを生成時に除外したいカラム
   swagger?: boolean
+  all?: boolean
 }
 
 export type TOptions = IOptions & ISchemaOptions

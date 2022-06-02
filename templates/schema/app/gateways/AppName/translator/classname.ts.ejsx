@@ -14,7 +14,7 @@ _%>
 import moment from 'moment'
 <%_ } _%>
 <%_ for (const ref of model.refs) { _%>
-import { to<%= ref.name %>Props } from './<%= toUnderscoreCase(ref.name) %>'
+import { to<%= ref.name %>Props } from './<%= snake(ref.name) %>'
 <%_ } _%>
 import { <%= schemas.join(', ') %> } from '@/infrastructure/network/<%= AppName %>/schema'
 <%_ if (model && seed) { _%>

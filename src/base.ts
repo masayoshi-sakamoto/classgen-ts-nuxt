@@ -101,6 +101,10 @@ export default class Base {
     const fullpath = mkdir(this.dist, path.join('swagger/src/components/schemas', snake(yaml.model)))
     this.write(path.resolve(fullpath, 'index.yaml'), yaml.index, false)
     this.write(path.resolve(fullpath, 'seed.yaml'), yaml.seed, false)
+    const origin = this.parameter.model
+    this.parameter.model = upperCamel(yaml.model)
+    this.generator('generate', './swagger')
+    this.parameter.model = origin
   }
 
   /**

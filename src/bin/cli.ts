@@ -3,6 +3,8 @@ import Generator from '../generator'
 import Remove from '../remove'
 import { IInitializeOptions, ISchemaOptions } from '../options'
 import { upperCamel } from '../common'
+import chalk = require('chalk')
+import { exit } from 'process'
 
 try {
   const pkg = require('../../package.json')
@@ -46,15 +48,20 @@ try {
    */
   commander
     .command('generate')
-    .argument('<name>', 'schema name e.g. user, User, users, Users')
+    .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
+    .option('--all', 'create all schemas using sql dump file')
     .action((name, options: ISchemaOptions) => {
-      name = upperCamel(name)
-      if (commander.opts().remove) {
-        return new Remove(commander.opts()).generate(name, options)
+      if (!name && !options.all) {
+        console.log(chalk.red('Error:', 'Please enter a schema name'))
+        exit()
       }
-      new Generator(commander.opts()).generate(name, options)
+
+      if (commander.opts().remove) {
+        return new Remove(commander.opts()).generate(upperCamel(name), options)
+      }
+      new Generator(commander.opts()).generate(upperCamel(name), options)
     })
 
   /**

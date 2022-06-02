@@ -71,14 +71,17 @@ export function replace(options: { model: string; namespace: string }) {
 }
 
 export function snake(name: string, pluralize: boolean = false) {
-  const word = inflector.singularize(toUnderscoreCase(name))
-  return pluralize ? inflector.pluralize(word) : word
+  if (name) {
+    const word = inflector.singularize(toUnderscoreCase(name))
+    return pluralize ? inflector.pluralize(word) : word
+  }
+  return name
 }
 
 export function upperCamel(name: string, pluralize: boolean = false) {
-  return toCamelCase(snake(name, pluralize))
+  return name ? toCamelCase(snake(name, pluralize)) : name
 }
 
 export function lowerCamel(name: string, pluralize: boolean = false) {
-  return toCamelCase(snake(name, pluralize), false)
+  return name ? toCamelCase(snake(name, pluralize), false) : name
 }
