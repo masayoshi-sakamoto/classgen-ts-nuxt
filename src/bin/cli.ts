@@ -16,7 +16,6 @@ try {
     .option('--config <filename>', 'application config file name', 'classgen-ts-nuxt.json')
     .option('--sqldump <filename>', 'sql dump file name')
     .option('--dist <path>', 'output directory', './')
-    .option('-r, --remove', 'remove option')
     .option('-f, --force', 'forced command')
 
   /**
@@ -48,80 +47,58 @@ try {
    */
   commander
     .command('generate')
+    .argument('<command>', 'all | schema | auth | index')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('--all', 'create all schemas using sql dump file')
-    .action((name: string, options: ISchemaOptions) => {
-      if (!name && !options.all) {
-        console.log(chalk.red('Error:', 'Please enter a schema name'))
-        process.exit()
+    .action((command: string, name: string, options: ISchemaOptions) => {
+      const generator = new Generator(commander.opts())
+      if (command === 'all') {
+        if (!name && !options.all) {
+          console.log(chalk.red('Error:', 'Please enter a schema name'))
+          process.exit()
+        }
+        generator.generate(upperCamel(name), options)
+      } else if (command === 'schema') {
+        generator.schema(upperCamel(name), options)
+      } else if (command === 'auth') {
+        generator.auth(name, options)
+      } else if (command === 'index') {
+        generator.injector()
       }
-
-      if (commander.opts().remove) {
-        return new Remove(commander.opts()).generate(upperCamel(name), options)
-      }
-      new Generator(commander.opts()).generate(upperCamel(name), options)
     })
-
   /**
-   * swaggerからentityなどを作成
+   * モデル名から一通りのファイルを作成
    */
   commander
-    .command('schema')
-    .argument('<name>', 'schema name e.g. user, User, users, Users')
-    .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
+    .command('remove')
+    .argument('<command>', 'all | schema | auth | index')
+    .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-sw, --swagger', 'create with swagger file')
-    .action((name: string, options: ISchemaOptions) => {
-      name = upperCamel(name)
-      if (commander.opts().remove) {
-        return new Remove(commander.opts()).schema(name, options)
+    .option('--all', 'create all schemas using sql dump file')
+    .action((command: string, name: string, options: ISchemaOptions) => {
+      const remove = new Remove(commander.opts())
+      if (command === 'all') {
+        remove.generate(upperCamel(name), options)
+      } else if (command === 'schema') {
+        remove.schema(upperCamel(name), options)
+      } else if (command === 'auth') {
+        remove.auth(upperCamel(name), options)
       }
-      new Generator(commander.opts()).schema(name, options)
     })
 
   /**
    * 認証ファイルの生成
    */
   commander
-    .command('auth')
-    .argument('<name>', 'auth schema name e.g. admin, Admin, admins Admins')
-    .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
-    .option('-sw, --swagger', 'create with swagger file')
-    .action((name: string, options: ISchemaOptions) => {
-      if (commander.opts().remove) {
-        return new Remove(commander.opts()).auth(name, options)
+    .command('components')
+    .argument('<command>', 'pages | forms')
+    .action((command: string) => {
+      if (command === 'pages') {
+      } else if (command === 'forms') {
       }
-      new Generator(commander.opts()).auth(name, options)
     })
-
-  /**
-   * 認証ファイルの生成
-   */
-  commander
-    .command('pages')
-    .argument('<name>', 'category name')
-    .argument('[page]', 'page name')
-    .action((name: string, page?: string) => {
-      new Component(commander.opts()).pages(name, page)
-    })
-
-  /**
-   * 認証ファイルの生成
-   */
-  commander
-    .command('forms')
-    .argument('[name]', 'model name')
-    .action((name?: string) => {
-      new Component(commander.opts()).forms(name)
-    })
-
-  /**
-   * injectorファイルの生成
-   */
-  commander.command('index').action(() => {
-    new Generator(commander.opts()).injector()
-  })
 
   commander.parse(process.argv)
 } catch (e) {

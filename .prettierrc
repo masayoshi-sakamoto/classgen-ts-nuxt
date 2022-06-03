@@ -3,7 +3,7 @@
   "arrowParens": "always",
   "singleQuote": true,
   "tabWidth": 2,
-  "printWidth": 180,
+  "printWidth": 120,
   "trailingComma": "none",
   "overrides": [
     {
