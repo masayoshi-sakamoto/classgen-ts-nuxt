@@ -1,20 +1,11 @@
-import { IMenuProps } from '@/entities/Menu'
-
 export const Types = {
-  clear: 'clear',
   loading: 'loading',
   progress: 'progress',
   errors: 'errors',
   drawer: 'drawer',
-  menus: 'menus'
 }
 
 export const path = 'app/'
-
-export class Clear implements FluxStandardAction<void> {
-  type = path + Types.clear
-  constructor() {}
-}
 
 export class Loading implements FluxStandardAction<boolean> {
   type = path + Types.loading
@@ -34,9 +25,4 @@ export class Errors implements FluxStandardAction<any> {
 export class Drawer implements FluxStandardAction<boolean | null> {
   type = path + Types.drawer
   constructor(public payload: boolean | null) {}
-}
-
-export class Menus implements FluxStandardAction<IMenuProps[] | null> {
-  type = path + Types.menus
-  constructor(public payload: IMenuProps[] | null) {}
 }

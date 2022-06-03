@@ -8,7 +8,18 @@ export interface IConfig {
   schemas?: {
     excludes?: string[]
   }
+  menu?: {
+    excludes?: string[]
+  }
 }
+
+export const EmptyConfig = (prop?: Partial<IConfig> | null) => ({
+  tables: { excludes: [] },
+  columns: { excludes: [] },
+  schemas: { excludes: [] },
+  menu: { excludes: [] },
+  ...prop
+})
 
 export interface IModel {
   table: string

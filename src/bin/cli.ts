@@ -4,7 +4,7 @@ import Remove from '../remove'
 import { IInitializeOptions, ISchemaOptions } from '../options'
 import { upperCamel } from '../common'
 import chalk = require('chalk')
-import { exit } from 'process'
+import Component from '../components'
 
 try {
   const pkg = require('../../package.json')
@@ -52,10 +52,10 @@ try {
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('--all', 'create all schemas using sql dump file')
-    .action((name, options: ISchemaOptions) => {
+    .action((name: string, options: ISchemaOptions) => {
       if (!name && !options.all) {
         console.log(chalk.red('Error:', 'Please enter a schema name'))
-        exit()
+        process.exit()
       }
 
       if (commander.opts().remove) {
@@ -72,7 +72,7 @@ try {
     .argument('<name>', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
-    .action((name, options: ISchemaOptions) => {
+    .action((name: string, options: ISchemaOptions) => {
       name = upperCamel(name)
       if (commander.opts().remove) {
         return new Remove(commander.opts()).schema(name, options)
@@ -88,11 +88,22 @@ try {
     .argument('<name>', 'auth schema name e.g. admin, Admin, admins Admins')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
-    .action((name, options: ISchemaOptions) => {
+    .action((name: string, options: ISchemaOptions) => {
       if (commander.opts().remove) {
         return new Remove(commander.opts()).auth(name, options)
       }
       new Generator(commander.opts()).auth(name, options)
+    })
+
+  /**
+   * 認証ファイルの生成
+   */
+  commander
+    .command('pages')
+    .argument('<name>', 'category name')
+    .argument('[page]', 'page name')
+    .action((name: string, page?: string) => {
+      new Component(commander.opts()).pages(name, page)
     })
 
   /**

@@ -1,12 +1,8 @@
 import { MutationTree } from 'vuex'
-import { IAppState, state as init } from '@/store/app'
-import { Types, Loading, Progress, Errors, Drawer, Menus } from '@/store/app/types'
+import { IAppState } from '@/store/app'
+import { Types, Loading, Progress, Errors, Drawer } from '@/store/app/types'
 
 const mutations: MutationTree<IAppState> = {
-  [Types.clear]: (state) => {
-    Object.assign(state, init())
-  },
-
   [Types.loading]: (state, action: Loading) => {
     state.loading = action.payload
   },
@@ -21,10 +17,6 @@ const mutations: MutationTree<IAppState> = {
 
   [Types.drawer]: (state, action: Drawer) => {
     state.drawer = action.payload
-  },
-
-  [Types.menus]: (state, action: Menus) => {
-    state.menus = action.payload
   }
 }
 

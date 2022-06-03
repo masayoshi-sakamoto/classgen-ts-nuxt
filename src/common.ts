@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import Inflector from './lib/inflector'
-import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
+import { toCamelCase, toKebabCase, toUnderscoreCase } from './lib/snake-camel'
 
 const inflector = new Inflector()
 
@@ -61,6 +61,7 @@ export function replace(options: { model: string; namespace: string }) {
   return {
     appname: snake(options.namespace),
     AppName: upperCamel(options.namespace),
+    'class-name': kabab(options.model),
     classname: snake(options.model),
     classnames: snake(options.model, true),
     ClassName: upperCamel(options.model),
@@ -73,6 +74,14 @@ export function replace(options: { model: string; namespace: string }) {
 export function snake(name: string, pluralize: boolean = false) {
   if (name) {
     const word = inflector.singularize(toUnderscoreCase(name))
+    return pluralize ? inflector.pluralize(word) : word
+  }
+  return name
+}
+
+export function kabab(name: string, pluralize: boolean = false) {
+  if (name) {
+    const word = inflector.singularize(toKebabCase(name))
     return pluralize ? inflector.pluralize(word) : word
   }
   return name

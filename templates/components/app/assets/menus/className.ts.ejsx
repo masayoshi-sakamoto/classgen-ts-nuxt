@@ -1,0 +1,13 @@
+import { EmptyMenuPropsFactory, IMenuProps } from '@/entities/Menu'
+
+export const <%= className %>: IMenuProps[] = [
+<%-
+Object.keys(swagger.paths).map((key) => {
+  return `  EmptyMenuPropsFactory({
+    id: '${kabab(key)}',
+    title: '${upperCamel(key)}',
+    to: { name: '${kabab(key)}' }
+  })`
+}).join(',\n')
+%>
+]

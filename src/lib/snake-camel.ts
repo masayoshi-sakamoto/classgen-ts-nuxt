@@ -19,3 +19,11 @@ export function toUnderscoreCase(str: string, first: boolean = true) {
     .join('_')
     .toLowerCase()
 }
+
+export function toKebabCase(str: string, first: boolean = true) {
+  const word = first ? str.charAt(0).toLowerCase() + str.slice(1) : str
+  return word
+    .split(/(?=[A-Z])/)
+    .join('-')
+    .toLowerCase()
+}

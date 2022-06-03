@@ -1,9 +1,7 @@
 import { IInitializeOptions, IOptions, ISchemaOptions } from './options'
 import Base from './base'
 import chalk = require('chalk')
-import { IModel } from './types'
 import { upperCamel } from './common'
-import { exit } from 'process'
 
 export default class Generator extends Base {
   constructor(protected options: IOptions) {
@@ -94,7 +92,7 @@ export default class Generator extends Base {
       this.generator('schema', './app/gateways')
     } else {
       console.log(chalk.red('Error:'), chalk.yellow(name), 'No schema file, please run with --swagger option.')
-      exit()
+      process.exit()
     }
     await this.injector()
   }
@@ -117,7 +115,7 @@ export default class Generator extends Base {
     if (options.all) {
       if (!this.sqldump) {
         console.log(chalk.red('Error:'), 'sqldump file is not set')
-        exit()
+        process.exit()
       }
 
       this.dump(options)

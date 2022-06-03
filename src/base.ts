@@ -5,10 +5,10 @@ import * as chalk from 'chalk'
 import * as YAML from 'js-yaml'
 import swagpack from 'swagpack/lib/build'
 
-import { readdir, replace, snake, upperCamel, lowerCamel, mkdir, replaces } from './common'
+import { readdir, replace, snake, kabab, upperCamel, lowerCamel, mkdir, replaces } from './common'
 import { ISchemaOptions, TOptions } from './options'
 import OpenAPIParser from './openapi'
-import { IConfig, IYAML } from './types'
+import { EmptyConfig, IConfig, IYAML } from './types'
 import SQLParser from './sql'
 import { exit } from 'process'
 const readlineSync = require('readline-sync')
@@ -20,7 +20,7 @@ export default class Base {
   protected paths: any = {}
   protected model?: string
   protected sqldump?: any
-  protected configs?: any
+  protected configs?: IConfig
   protected swagger: any = {
     paths: {},
     models: []
@@ -43,9 +43,8 @@ export default class Base {
     const configpath = path.resolve(process.cwd(), 'classgen-ts-nuxt.json')
 
     // コンフィグの初期化
-    this.configs = { tables: { excludes: [] }, columns: { excludes: [] }, schemas: { excludes: [] } }
     const configs: IConfig = fs.existsSync(configpath) ? JSON.parse(fs.readFileSync(configpath, 'utf-8')) : {}
-    this.configs = { ...this.configs, ...configs }
+    this.configs = EmptyConfig(configs)
 
     // 除外したいカラム名を取得
     this.options.excludes = this.options.excludes || []
@@ -81,7 +80,7 @@ export default class Base {
       ...this.options,
       ...options
     }
-    const yamls = new SQLParser(this.sqldump, this.options).parse(this.configs)
+    const yamls = new SQLParser(this.sqldump, this.options).parse(this.configs!)
     if (model) {
       const dist = yamls.find((yaml) => upperCamel(yaml.model) === upperCamel(model))
       if (dist) {
@@ -161,12 +160,21 @@ export default class Base {
         await new Promise((resolve) => {
           resolve(swagpack(src, dist))
         })
-        this.swagger = new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
+        this.swagger = this.loadSwagger()
       } else {
         console.log(chalk.red('Error:'), 'File not found', src)
         console.log(chalk.green('Noite:'), 'Run the initialize command')
         exit()
       }
+    }
+  }
+  /**
+   * 生成されたファイルから一覧を表示する系のファイルを作成する
+   */
+  protected loadSwagger() {
+    const dist = path.resolve(mkdir(this.dist, 'swagger'), 'swagger.yaml')
+    if (fs.existsSync(dist)) {
+      return new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
     }
   }
 
@@ -177,6 +185,7 @@ export default class Base {
     const options = {
       ...replace(this.parameter),
       snake,
+      kabab,
       upperCamel,
       lowerCamel,
       paths: this.paths,
