@@ -1,5 +1,5 @@
 import { MutationTree } from 'vuex'
-import { I<%= ClassName %>State, state as init } from '@/store/<%= classname %>'
+import { I<%= ClassName %>State } from '@/store/<%= classname %>'
 import { Types, Store, Fetched, Query, Options, Loading, Current } from '@/store/<%= classname %>/types'
 
 const mutations: MutationTree<I<%= ClassName %>State> = {
