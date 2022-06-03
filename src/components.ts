@@ -11,29 +11,36 @@ export default class Component extends Base {
       this.parameter.model = page
       this.generator('components', './app/pages')
     } else {
-      // swaggerのpathsをもとに
-      const swagger = this.loadSwagger()
-      if (swagger) {
-        this.swagger = {
-          models: swagger.models,
-          paths: Object.entries(swagger.paths).reduce((paths, [key, value]) => {
-            if (!this.configs!.menu!.excludes!.includes(key)) {
-              paths = {
-                ...paths,
-                [key]: value
-              }
-            }
-            return paths
-          }, {})
-        }
-        this.parameter.model = name
-        this.generator('components', './app/assets/menus')
+      this.swagger = this.filtter()
+      this.parameter.model = name
+      this.generator('components', './app/assets/menus')
 
-        for (const pagename of Object.keys(this.swagger.paths)) {
-          this.parameter.model = pagename
-          this.generator('components', './app/pages')
-        }
+      for (const pagename of Object.keys(this.swagger.paths)) {
+        this.parameter.model = pagename
+        this.generator('components', './app/pages')
       }
+    }
+  }
+
+  forms(name?: string) {
+    if (name) {
+    } else {
+      this.swagger = this.filtter()
+      for (const key of Object.keys(this.swagger.paths)) {
+        this.parameter.model = key
+        this.generator('components', './app/components/organisms/Form')
+      }
+    }
+  }
+
+  /**
+   * menuに表示しないモデルは排除
+   */
+  private filtter() {
+    const { models, paths } = this.loadSwagger()
+    return {
+      models,
+      paths: Object.entries(paths).reduce((result, [key, value]) => (!this.configs!.menu!.excludes!.includes(key) ? { ...result, [key]: value } : result), {})
     }
   }
 }

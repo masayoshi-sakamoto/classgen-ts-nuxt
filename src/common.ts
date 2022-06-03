@@ -88,9 +88,17 @@ export function kabab(name: string, pluralize: boolean = false) {
 }
 
 export function upperCamel(name: string, pluralize: boolean = false) {
-  return name ? toCamelCase(snake(name, pluralize)) : name
+  if (name) {
+    const word = pluralize ? inflector.pluralize(name) : name
+    return toCamelCase(toUnderscoreCase(word))
+  }
+  return name
 }
 
 export function lowerCamel(name: string, pluralize: boolean = false) {
-  return name ? toCamelCase(snake(name, pluralize), false) : name
+  if (name) {
+    const word = pluralize ? inflector.pluralize(name) : name
+    return toCamelCase(toUnderscoreCase(word), false)
+  }
+  return name
 }

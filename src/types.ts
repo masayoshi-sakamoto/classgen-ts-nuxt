@@ -39,6 +39,13 @@ export interface IColumn {
   }
 }
 
+export interface ISwagger {
+  paths: {
+    [key: string]: any
+  }
+  models: IModel[]
+}
+
 export interface IYAML {
   table: string // テーブル名
   model: string // モデル名

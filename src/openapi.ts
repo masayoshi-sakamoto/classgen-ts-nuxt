@@ -1,7 +1,7 @@
 import { OpenAPIObject, PathObject, SchemaObject } from 'openapi3-ts'
 import Inflector from './lib/inflector'
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
-import { IConfig, IModel, IRef, ITsSchema, types } from './types'
+import { IConfig, IModel, IRef, ISwagger, ITsSchema, types } from './types'
 
 const inflector = new Inflector()
 const rimraf = require('rimraf')
@@ -9,7 +9,7 @@ const rimraf = require('rimraf')
 export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
-  parse(config?: IConfig) {
+  parse(config?: IConfig): ISwagger {
     const schemas = this.ymlData.components!.schemas || {}
     const paths = this.ymlData.paths || {}
     const tags = this.parsePaths(paths)
@@ -22,7 +22,6 @@ export default class OpenAPIParser {
         schema: this.schema(key, schemas[key]),
         seed: !!key.match(/.+(Seed)$/)
       }
-      return []
     })
     return {
       paths: tags,
@@ -85,7 +84,7 @@ export default class OpenAPIParser {
     return schema
   }
 
-  parsePaths(paths: PathObject) {
+  parsePaths(paths: PathObject): { [key: string]: any } {
     return Object.values(paths)
       .map((prop) => {
         const item = Object.keys(prop).map((key) => {

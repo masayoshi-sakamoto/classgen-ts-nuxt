@@ -4,11 +4,12 @@ import * as ejs from 'ejs'
 import * as chalk from 'chalk'
 import * as YAML from 'js-yaml'
 import swagpack from 'swagpack/lib/build'
+import * as prettier from 'prettier'
 
 import { readdir, replace, snake, kabab, upperCamel, lowerCamel, mkdir, replaces } from './common'
 import { ISchemaOptions, TOptions } from './options'
 import OpenAPIParser from './openapi'
-import { EmptyConfig, IConfig, IYAML } from './types'
+import { EmptyConfig, IConfig, ISwagger, IYAML } from './types'
 import SQLParser from './sql'
 import { exit } from 'process'
 const readlineSync = require('readline-sync')
@@ -171,11 +172,12 @@ export default class Base {
   /**
    * 生成されたファイルから一覧を表示する系のファイルを作成する
    */
-  protected loadSwagger() {
+  protected loadSwagger(): ISwagger {
     const dist = path.resolve(mkdir(this.dist, 'swagger'), 'swagger.yaml')
     if (fs.existsSync(dist)) {
       return new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
     }
+    return { paths: {}, models: [] }
   }
 
   /**
@@ -199,13 +201,18 @@ export default class Base {
   /**
    * 生成されたファイルの書き込み
    */
-  protected write(filepath: string, content: string, force: boolean) {
+  protected async write(filepath: string, content: string, force: boolean) {
     const exist = fs.existsSync(filepath)
 
+    const ext = path.extname(filepath).replace('.', '')
+    const options = {
+      parser: ext === 'ts' ? 'typescript' : ext,
+      ...(await prettier.resolveConfig(process.cwd()))
+    }
     if (force) {
-      fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
+      fs.writeFileSync(filepath, prettier.format(content, options), { encoding: 'utf-8', flag: 'w+' })
     } else if (!exist || this.options.force) {
-      fs.writeFileSync(filepath, content, { encoding: 'utf-8', flag: 'w+' })
+      fs.writeFileSync(filepath, prettier.format(content, options), { encoding: 'utf-8', flag: 'w+' })
       const msg = this.options.force && exist ? chalk.yellow(' Override:') : chalk.green(' Generated:')
       console.log(msg, filepath.replace(RegExp(`${this.dist}`), ''))
     }

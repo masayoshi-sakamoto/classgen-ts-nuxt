@@ -1,0 +1,60 @@
+<%_ const model = swagger.models.find((prop) => prop.name === ClassName) _%>
+<template>
+  <v-container fluid>
+    <v-row>
+<%_ for (const schema of Object.values(model.schema)) { _%>
+  <%_ if (!schema.ref && schema.key !== 'id') { _%>
+      <v-col>
+        <a-text-field 
+          v-model.trim="props.<%= lowerCamel(schema.key) %>"
+          label="<%= lowerCamel(schema.title) %>"
+          field="<%= lowerCamel(schema.key) %>"
+          <%_ if (schema.required) { _%>
+          rules="required"
+          <%_ } _%>
+          change="change"
+        >
+      </a-text-field>
+      </v-col>
+  <%_ } _%>
+<%_ } _%>
+    </v-row>
+  </v-container>
+</template>
+
+<script lang="ts">
+import Vue, { PropType } from 'vue'
+import <%= ClassName %>Entity, { Empty<%= ClassName %>PropsFactory, I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+
+interface IData {
+  props: I<%= ClassName %>Props
+}
+
+export default Vue.extend({
+  props: {
+    value: {
+      type: Object as PropType<I<%= ClassName %>Props>,
+      default: undefined
+    }
+  },
+  data(): IData {
+    return {
+      props: Empty<%= ClassName %>PropsFactory()
+    }
+  },
+  watch: {
+    value: {
+      handler() {
+        this.props = this.value ? new <%= ClassName %>Entity(this.value).clone : Empty<%= ClassName %>PropsFactory()
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    change() {
+      this.$emit('input', this.props)
+      this.$emit('change', this.props)
+    }
+  }
+})
+</script>

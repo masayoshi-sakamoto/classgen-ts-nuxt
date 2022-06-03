@@ -107,6 +107,16 @@ try {
     })
 
   /**
+   * 認証ファイルの生成
+   */
+  commander
+    .command('forms')
+    .argument('[name]', 'model name')
+    .action((name?: string) => {
+      new Component(commander.opts()).forms(name)
+    })
+
+  /**
    * injectorファイルの生成
    */
   commander.command('index').action(() => {
