@@ -1,11 +1,11 @@
 import Vuex from 'vuex'
 <%_ paths['store'].dirs.forEach((store) => { _%>
-import * as <%= store.name %> from '@/store/<%= store.name %>'
+import * as <%= lowerCamel(store.name) %> from '@/store/<%= store.name %>'
 <%_ }); _%>
 
 export interface RootState {
   <%_ paths['store'].dirs.forEach((store) => { _%>
-  <%= store.name %>: <%= store.name %>.I<%= upperCamel(store.name) %>State
+  <%= lowerCamel(store.name) %>: <%= lowerCamel(store.name) %>.I<%= upperCamel(store.name) %>State
   <%_ }); _%>
 }
 
@@ -13,7 +13,7 @@ const createStore = () => {
   return new Vuex.Store<RootState>({
     modules: {
       <%_ paths['store'].dirs.forEach((store) => { _%>
-      <%= store.name %>: <%= store.name %>.store,
+      <%= lowerCamel(store.name) %>: <%= lowerCamel(store.name) %>.store,
       <%_ }); _%>
     }
   })

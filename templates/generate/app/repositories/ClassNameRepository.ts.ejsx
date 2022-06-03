@@ -16,7 +16,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get fetched(): I<%= ClassName %>Props[] {
-    return this.store.state.<%= classname %>.fetched
+    return this.store.state.<%= className %>.fetched
   }
 
   set fetched(value: I<%= ClassName %>Props[]) {
@@ -29,7 +29,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get query(): IQueryProps {
-    return this.store.state.<%= classname %>.query
+    return this.store.state.<%= className %>.query
   }
 
   set options(value: IOptionsProps) {
@@ -37,7 +37,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get options(): IOptionsProps {
-    return this.store.state.<%= classname %>.options
+    return this.store.state.<%= className %>.options
   }
 
   set loading(value: boolean) {
@@ -45,7 +45,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get loading(): boolean {
-    return this.store.state.<%= classname %>.loading
+    return this.store.state.<%= className %>.loading
   }
 
   set current(value: I<%= ClassName %>Props) {
@@ -53,11 +53,11 @@ export default class <%= ClassName %>Repository {
   }
 
   get current(): I<%= ClassName %>Props {
-    return this.store.state.<%= classname %>.current
+    return this.store.state.<%= className %>.current
   }
 
   get items() {
-    return new Proxy(this.store.state.<%= classname %>.byIds, {
+    return new Proxy(this.store.state.<%= className %>.byIds, {
       get(target, prop) {
         if (typeof prop === 'symbol') {
           return Object.getOwnPropertySymbols(target)[prop]
