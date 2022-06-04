@@ -1,0 +1,44 @@
+get:
+  tags:
+    - <%= ClassName %>
+  operationId: fetch<%= ClassNames %>
+  description: Fetch <%= ClassNames %>
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= class_name %>
+              - query
+            type: object
+            properties:
+              <%= class_name %>:
+                type: array
+                items:
+                  $ref: '#/components/schemas/<%= ClassName %>'
+              query:
+                $ref: '#/components/schemas/Query'
+post:
+  tags:
+    - <%= ClassName %>
+  operationId: post<%= ClassName %>
+  description: Post <%= ClassName %>
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/<%= ClassName %>Seed'
+  responses:
+    '201':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= class_name %>
+            type: object
+            properties:
+              <%= class_name %>:
+                $ref: '#/components/schemas/<%= ClassName %>'

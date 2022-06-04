@@ -1,141 +1,82 @@
-import { IInitializeOptions, IOptions, ISchemaOptions } from './options'
+import { IOptions } from './options'
 import Base from './base'
-import chalk = require('chalk')
-import { upperCamel } from './common'
+import { app, swagger } from './types'
+import { snake } from './common'
 
 export default class Generator extends Base {
   constructor(protected options: IOptions) {
     super(options)
   }
 
-  config() {
-    this.generator('config', './')
+  async all(name?: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.generate('app/schemas', app.root)
+      await this.generate('app/usecases', app.root)
+      await this.generate('app/index', app.root, true)
+    }
   }
 
-  async initialize(options: IInitializeOptions) {
-    this.generator('initialize', './')
-    await this.injector()
+  async schema(name: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.generate('app/schemas', app.root)
+      await this.generate('app/index', app.root, true)
+    }
   }
 
-  async auth(name: string, options: ISchemaOptions) {
-    this.parameter.model = name
-
-    // アカウント系は強制にスキーマを作成
-    this.generator('auth', './swagger')
-    await this.index('swagger')
-
-    new Array('Account', 'Auth').forEach((schema) => {
-      const files = this.findSchema(schema)
-      if (files) {
-        for (const file of files) {
-          const model = file.split('.')[0]
-          this.parameter.model = schema + (model === 'index' ? '' : upperCamel(model))
-          this.generator('schema', './app/infrastructure')
-        }
-        this.parameter.model = schema
-        this.generator('schema', './app/entities')
-        this.generator('schema', './app/gateways')
-      }
-    })
-
-    this.parameter.model = name
-
-    // app系のファイルは強制的に作成
-    this.generator('auth', './app')
-
-    // ログイン用のスキーマを作成
-    this.schema(name, options)
-    this.generator('generate', './')
-    await this.injector()
+  async usecase(name: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.generate('app/usecases', app.root)
+      await this.generate('app/index', app.root, true)
+    }
   }
 
-  /**
-   * 指定されたモデル名でentity、translator、schemaファイルを更新
-   * swaggerファイルがない場合はエラー
-   *
-   * @param name
-   * @param options
-   */
-  async schema(name: string, options: ISchemaOptions) {
-    this.parameter.model = name
+  async auth(name?: string) {
+    this.classname = name || this.classname
+    this.swagger = this.load()
+    await this.generate('app/auth', app.root)
 
-    // ベースのスキーマファイルを作成
-    // dumpファイルが指定されている場合は自動的にdump内容から生成
-    if (options.swagger) {
-      this.generator('schema', './swagger')
-    } else if (this.sqldump) {
-      this.dump(options, name)
+    for (const schema of ['account', 'auth', name]) {
+      this.classname = schema || this.classname
+      await this.generate('app/schemas', app.root)
     }
 
-    // スキーマファイルが更新されている可能性があるのでswagger.yamlを再生成
-    await this.index('swagger')
-    this.__schema(name, options)
+    this.classname = name || this.classname
+    await this.generate('app/usecases', app.root)
+    await this.generate('app/index', app.root, true)
   }
 
-  /**
-   * 指定されたモデル名でentity、translator、schemaファイルを更新
-   * swaggerファイルがない場合はエラー
-   *
-   * @param name
-   * @param options
-   */
-  private async __schema(name: string, options: ISchemaOptions) {
-    const files = this.findSchema(name)
-    if (files) {
-      for (const file of files) {
-        const model = file.split('.')[0]
-        this.parameter.model = name + (model === 'index' ? '' : upperCamel(model))
-        this.generator('schema', './app/infrastructure')
-      }
-      this.parameter.model = name
-      this.generator('schema', './app/entities')
-      this.generator('schema', './app/gateways')
-    } else {
-      console.log(chalk.red('Error:'), chalk.yellow(name), 'No schema file, please run with --swagger option.')
-      process.exit()
-    }
-    await this.injector()
+  async index(name?: string) {
+    this.classname = name || this.classname
+    this.swagger = this.load()
+    await this.generate('app/index', app.root)
   }
 
-  /**
-   * 指定されたモデル名でentity、translator、schemaファイルを更新
-   * swaggerファイルがない場合はエラー
-   *
-   * @param name
-   * @param options
-   */
-  async generate(name: string, options: ISchemaOptions) {
-    if (name) {
-      this.parameter.model = name
-      this.schema(name, options)
-      this.generator('generate', './')
-      await this.injector()
-    }
-
-    if (options.all) {
-      if (!this.sqldump) {
-        console.log(chalk.red('Error:'), 'sqldump file is not set')
-        process.exit()
-      }
-
-      this.dump(options)
-      this.generator('generate', './swagger')
-      await this.index('swagger')
-      this.models()
-      for (const model of this.swagger.models) {
-        if (!this.configs.schemas!.excludes!.includes(model.name) && !model.seed) {
-          this.parameter.model = model.name
-          this.__schema(model.name, options)
-          this.generator('generate', './')
-        }
-      }
-    }
-    await this.injector()
+  async config() {
+    await this.generate('config', './')
+  }
+  async initialize() {
+    await this.generate('initialize', './')
   }
 
-  async injector() {
-    await this.index('swagger')
-    this.models()
-    await this.index('app')
+  private async schemas(name?: string) {
+    const files = this.readfiles(swagger.schemas).filter(
+      (file) => file.isDirectory() && !this.configs.schemas!.excludes!.includes(file.name)
+    )
+    let schemas: string[] = []
+    for (const file of files) {
+      if (!name || (name && file.name === snake(name))) {
+        schemas.push(file.name)
+      }
+    }
+    return schemas.length === 0 ? [this.classname] : schemas
   }
 }

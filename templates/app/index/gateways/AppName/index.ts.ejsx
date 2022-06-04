@@ -1,0 +1,22 @@
+<%_ 
+const gateways = readfiles(app.gateways)
+  .filter((file) => !file.isDirectory() && file.name !== 'index.ts' && file.name !== 'base.ts')
+  .map((file) => file.name.split('.')[0])
+_%>
+<%_ gateways.forEach((gateway) => { _%>
+import <%= upperCamel(gateway) %> from './<%= snake(gateway) %>'
+<%_ }) _%>
+import { APIClient } from '@/infrastructure/network/<%= AppName %>/APIClient'
+
+export default class <%= AppName %>Gateway {
+<%_ gateways.forEach((gateway) => { _%>
+  <%= upperCamel(gateway) %>: <%= upperCamel(gateway) %>
+<%_ }) _%>
+
+  constructor(apiClient: APIClient) {
+    this.apiClient = apiClient
+<%_ gateways.forEach((gateway) => { _%>
+    this.<%= upperCamel(gateway) %> = new <%= upperCamel(gateway) %>(apiClient)
+<%_ }) _%>
+  }
+}

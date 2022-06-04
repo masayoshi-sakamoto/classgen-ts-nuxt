@@ -1,0 +1,35 @@
+/* eslint camelcase: 0 */
+import { <%= AppName %>GatewayBase } from './base'
+import { to<%= ClassName %>Props, to<%= ClassName %>Seed } from './translator/<%= class_name %>'
+import { optionsToQuery, toQueryProps } from './translator/query'
+import { toOptionsProps } from './translator/options'
+import { Get<%= ClassName %>, Fetch<%= ClassNames %>, Post<%= ClassName %>, Put<%= ClassName %>, Delete<%= ClassName %> } from '@/infrastructure/network/<%= AppName %>/requests/<%= class_name %>'
+import { I<%= ClassName %>Props, Empty<%= ClassName %>PropsFactory } from '@/entities/<%= ClassName %>'
+import { IOptionsProps } from '@/entities/Options'
+
+export default class <%= ClassName %> extends <%= AppName %>GatewayBase {
+  async Get<%= ClassName %>(id: string): Promise<I<%= ClassName %>Props> {
+    const { <%= className %> } = await this.apiClient.request(new Get<%= ClassName %>(id))
+    return <%= className %> ? to<%= ClassName %>Props(<%= className %>) : Empty<%= ClassName %>PropsFactory()
+  }
+
+  async Fetch<%= ClassNames %>(options?: IOptionsProps) {
+    const response = await this.apiClient.request(new Fetch<%= ClassNames %>(optionsToQuery(options)))
+    return {
+      items: response.<%= classNames %>.map((prop) => to<%= ClassName %>Props(prop)),
+      query: toQueryProps(response.query),
+      options: toOptionsProps(response.query)
+    }
+  }
+
+  async Save<%= ClassName %>(props: I<%= ClassName %>Props) {
+    const data = props.id ? new Put<%= ClassName %>(to<%= ClassName %>Seed(props)) : new Post<%= ClassName %>(to<%= ClassName %>Seed(props))
+    await this.apiClient.request(data)
+  }
+
+  async Delete<%= ClassName %>(props: I<%= ClassName %>Props) {
+    if (props.id) {
+      await this.apiClient.request(new Delete<%= ClassName %>(props.id))
+    }
+  }
+}

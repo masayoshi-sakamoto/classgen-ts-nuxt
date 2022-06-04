@@ -1,0 +1,44 @@
+import { Context } from '@nuxt/types/app'
+<%_ const AppNames = readfiles(app.AppName).filter((path) => path.isDirectory()).map((file) => file.name) _%>
+<%_ const repositories = readfiles(app.repositories).map((file) =>file.name.split('.')[0]).filter((file) => file !== 'AppRepository') _%>
+
+// Repositories
+import AppRepository from '@/repositories/AppRepository'
+<%_ repositories.forEach((repository) => { _%>
+import <%= repository %> from '@/repositories/<%= repository %>'
+<%_ }) _%>
+
+// Gateways
+<%_ AppNames.forEach((AppName) => { _%>
+import <%= AppName %>Gateway from '@/gateways/<%= AppName %>'
+<%_ }) _%>
+
+
+declare module 'vuex/types/index' {
+  interface ActionTree<S, R> {
+    nuxtServerInit: (context: ActionContext<S, R>, nuxtContext: Context) => void
+  }
+}
+
+export interface IApp {
+  state: AppRepository
+  <%_ repositories.forEach((repository) => { _%>
+  <%_ const word = lowerCamel(repository.split('Repository')[0])_%>
+  <%= word %>: <%= repository %>
+  <%_ }) _%>
+  <%_ AppNames.forEach((AppName) => { _%>
+  <%= lowerCamel(AppName) %>Gateway: <%= AppName %>Gateway
+  <%_ }) _%>
+}
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    App: IApp
+  }
+}
+
+declare module '@nuxt/types/app/index' {
+  interface Context {
+    App: IApp
+  }
+}

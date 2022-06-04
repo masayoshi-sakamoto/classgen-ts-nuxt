@@ -1,0 +1,13 @@
+import { Module } from 'vuex'
+import { RootState } from '@/store'
+import mutations from '@/store/<%= class_name %>/mutations'
+import { path } from '@/store/<%= class_name %>/types'
+import { mutation } from '@/utils/mutation'
+import state, { I<%= ClassName %>State } from '@/store/<%= class_name %>/state'
+
+export * from '@/store/<%= class_name %>/state'
+
+export const store: Module<I<%= ClassName %>State, RootState> = {
+  state,
+  mutations: mutation(mutations, path)
+}

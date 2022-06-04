@@ -20,6 +20,6 @@
     ]
   },
   "schemas": {
-    "excludes": ["Account", "Auth", "Menu", "Query", "Options"]
+    "excludes": ["query"]
   }
 }

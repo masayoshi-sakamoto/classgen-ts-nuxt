@@ -1,0 +1,8 @@
+<%_ readfiles(swagger.schemas).filter((path) => path.isDirectory()).forEach((path) => { _%>
+  <%_ readfiles(swagger.schemas, path.name).filter((file) => !file.isDirectory()).forEach((file) => { _%>
+    <%_ const filename = file.name.split('.')[0] _%>
+<%= filename === 'index' ? upperCamel(path.name) : upperCamel(path.name+'_'+filename) %>:
+  $ref: './<%= path.name %>/<%= file.name %>'
+  <%_ }) _%>
+  
+<%_ }) _%>

@@ -1,63 +1,84 @@
-import { IInitializeOptions, IOptions, ISchemaOptions } from './options'
+import { IOptions } from './options'
 import Base from './base'
-import { upperCamel } from './common'
+import { app, swagger } from './types'
+import { snake } from './common'
 
 export default class Remove extends Base {
   constructor(protected options: IOptions) {
     super(options)
   }
 
-  config() {
-    this.remove('config', './')
-  }
-  initialize(options: IInitializeOptions) {
-    this.remove('initialize', './')
+  async all(name?: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.remove('app/schemas', app.root)
+      await this.remove('app/usecases', app.root)
+      await this.generate('app/index', app.root, true)
+    }
   }
 
-  generate(name: string, options: ISchemaOptions) {
-    this.schema(name, options)
-    this.remove('generate', './')
+  async schema(name: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.remove('app/schemas', app.root)
+      await this.generate('app/index', app.root, true)
+    }
   }
 
-  /**
-   * 指定されたモデル名でentity、translatorを削除
-   * --swaggerが指定されている場合はスキーマも削除
-   *
-   * @param name
-   * @param options
-   */
-  schema(name: string, options: ISchemaOptions) {
-    this.parameter.model = name
+  async usecase(name: string) {
+    const names = await this.schemas(name)
+    for (const name of names) {
+      this.classname = name
+      this.swagger = this.load()
+      await this.remove('app/usecases', app.root)
+      await this.generate('app/index', app.root, true)
+    }
+  }
 
-    const files = this.findSchema(name)
-    if (files) {
-      for (const file of files) {
-        const model = file.split('.')[0]
-        this.parameter.model = name + (model === 'index' ? '' : upperCamel(model))
-        this.remove('schema', './app/infrastructure')
+  async auth(name?: string) {
+    this.classname = name || this.classname
+    this.swagger = this.load()
+    await this.remove('app/auth', app.root)
+
+    for (const schema of ['account', 'auth', name]) {
+      this.classname = schema || this.classname
+      await this.remove('app/schemas', app.root)
+    }
+
+    this.classname = name || this.classname
+    await this.remove('app/usecases', app.root)
+    await this.generate('app/index', app.root, true)
+  }
+
+  async index(name?: string) {
+    this.classname = name || this.classname
+    await this.remove('app/index', app.root)
+  }
+
+  async config() {
+    await this.remove('config', './')
+  }
+
+  async initialize() {
+    await this.remove('initialize', './')
+  }
+
+  async sql() {
+    console.info('done sql.')
+  }
+
+  private async schemas(name?: string) {
+    const files = this.readfiles(swagger.schemas).filter((file) => file.isDirectory())
+    let schemas: string[] = []
+    for (const file of files) {
+      if (!name || (name && file.name === snake(name))) {
+        schemas.push(file.name)
       }
-      this.parameter.model = name
-      this.remove('schema', './app/entities')
-      this.remove('schema', './app/gateways')
     }
-    // スキーマファイルを削除
-    if (options.swagger) {
-      this.remove('schema', './swagger')
-    }
-
-    this.index('swagger')
-    this.index('app')
-  }
-
-  auth(name: string, options: ISchemaOptions) {
-    this.parameter = {
-      model: name,
-      namespace: this.options.namespace
-    }
-    this.remove('auth', './')
-    this.remove('schema', './')
-    this.index('swagger')
-    this.models(true)
-    this.index('app')
+    return schemas.length === 0 ? [this.classname] : schemas
   }
 }

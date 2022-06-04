@@ -1,8 +1,0 @@
-<%_ for (const path of paths['src/components/schemas'].dirs) { _%>
-<%_ for (const file of path.files) { _%>
-<%_ const filename = file.split('.')[0] _%>
-<%= filename === 'index' ? upperCamel(path.name) : upperCamel(path.name+'_'+filename) %>:
-  $ref: './<%= path.name %>/<%= file %>'
-<%_ } _%>
-
-<%_ } _%>

@@ -1,0 +1,17 @@
+get:
+  tags:
+    - Auth
+  operationId: authMe
+  description: Auth Me
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - <%= class_name %>
+            type: object
+            properties:
+              <%= class_name %>:
+                $ref: '#/components/schemas/<%= ClassName %>'

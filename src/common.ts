@@ -6,33 +6,13 @@ import { toCamelCase, toKebabCase, toUnderscoreCase } from './lib/snake-camel'
 
 const inflector = new Inflector()
 
-/**
- * 各フォルダの階層をおって生成するよう再帰的にフォルダの読み込みを行っている
- */
-export function readdir(src: string, dist: string, options: { model: string; namespace: string }, force: boolean, callback: Function, remove?: boolean) {
-  if (!fs.existsSync(src)) {
-    return
-  }
-  const files = fs.readdirSync(src, { withFileTypes: true })
-
-  for (const file of files) {
-    // 名前の置換
-    const filename = replaces(file.name, options)
-    dist = replaces(dist, options)
-    if (file.isDirectory()) {
-      const dir = mkdir(dist, filename)
-      readdir(path.join(src, file.name), dir, options, force, callback, remove)
-      if (remove && fs.readdirSync(dir).length === 0) {
-        fs.rmdirSync(dir)
-      }
-    } else {
-      callback(path.join(src, file.name), path.join(dist, filename), force)
-    }
-  }
+export function error(msg: string) {
+  console.info(chalk.red('error'), msg)
+  process.exit()
 }
 
-export function replaces(filename: string, options: { model: string; namespace: string }) {
-  return Object.entries(replace(options))
+export function replaces(filename: string, replace: any) {
+  return Object.entries(replace)
     .reduce((name, [key, prop]) => {
       return name.replace(RegExp(`(.*)${key}(.*)`), '$1' + prop + '$2')
     }, filename)
@@ -41,34 +21,15 @@ export function replaces(filename: string, options: { model: string; namespace: 
 }
 
 /**
- * ディレクトリが存在しないエラーを起こさないための関数
- * parentに指定されたディレクトリの下にsrcで指定されたフォルダを作成
- * すでにある場合はなにもしない
- * 作成されたディレクトリパスを返す
+ * srcに拡張子があるならファイルとしてパスを返却
+ * そうでなければディレクトリを生成
  */
-export function mkdir(parent: string, src: string) {
-  const dist = path.resolve(parent, src)
-  if (!fs.existsSync(dist)) {
+export function resolve(...args: string[]) {
+  const dist = path.resolve(...args)
+  if (!args[args.length - 1].match(/^(.*)\.(.+)$/) && !fs.existsSync(dist)) {
     fs.mkdirSync(dist, { recursive: true })
   }
   return dist
-}
-
-/**
- * 名前の変換
- */
-export function replace(options: { model: string; namespace: string }) {
-  return {
-    appname: snake(options.namespace),
-    AppName: upperCamel(options.namespace),
-    'class-name': kabab(options.model),
-    classname: snake(options.model),
-    classnames: snake(options.model, true),
-    ClassName: upperCamel(options.model),
-    ClassNames: upperCamel(options.model, true),
-    className: lowerCamel(options.model),
-    classNames: lowerCamel(options.model, true)
-  }
 }
 
 export function snake(name: string, pluralize: boolean = false) {

@@ -1,0 +1,8 @@
+<%_ readfiles(swagger.paths).filter((path) => path.isDirectory()).forEach((path) => { _%>
+  <%_ readfiles(swagger.paths, path.name).filter((file) => !file.isDirectory()).forEach((file) => { _%>
+    <%_ const filename = file.name.split('.')[0] _%>
+<%= filename === 'path' ? `/${path.name}/{id}:` : filename === 'paths' ? `/${path.name}:` : `/${path.name}/${filename}:` %>
+  $ref: './<%= path.name %>/<%= file.name %>'
+  <%_ }) _%>
+
+<%_ }) _%>

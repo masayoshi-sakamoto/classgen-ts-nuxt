@@ -1,9 +1,9 @@
-export interface IOptions {
+export interface IGlobalOptions {
   namespace: string // アプリケーション名
-  force?: boolean // 強制実行
-  remove?: boolean // 生成ではなく削除オプション
+  config: string // configファイル名
   sqldump?: string // SQLDUMPファイル
   dist: string // 出力先
+  force?: boolean // 強制実行
 }
 
 export interface IInitializeOptions {
@@ -11,10 +11,12 @@ export interface IInitializeOptions {
   auth?: string // 認証系の処理の追加
 }
 
-export interface ISchemaOptions {
+export interface IGenerateOptions {
   excludes?: string[] // schemaを生成時に除外したいカラム
   swagger?: boolean
-  all?: boolean
+  auth?: boolean
 }
 
-export type TOptions = IOptions & ISchemaOptions
+export type IOptions = {
+  global: IGlobalOptions
+} & IGenerateOptions

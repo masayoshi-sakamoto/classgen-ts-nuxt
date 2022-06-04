@@ -3,250 +3,186 @@ import * as path from 'path'
 import * as ejs from 'ejs'
 import * as chalk from 'chalk'
 import * as YAML from 'js-yaml'
-import swagpack from 'swagpack/lib/build'
 import * as prettier from 'prettier'
+import swagpack from 'swagpack/lib/build'
 
-import { readdir, replace, snake, kabab, upperCamel, lowerCamel, mkdir, replaces } from './common'
-import { ISchemaOptions, TOptions } from './options'
+import { snake, kabab, upperCamel, lowerCamel, resolve, replaces, error } from './common'
+import { IOptions } from './options'
 import OpenAPIParser from './openapi'
-import { EmptyConfig, IConfig, ISwagger, IYAML } from './types'
-import SQLParser from './sql'
-import { exit } from 'process'
+import { EmptyConfig, IConfig, swagger, app, exts } from './types'
 const readlineSync = require('readline-sync')
 
 export default class Base {
   protected src: string
   protected dist: string
-  protected parameter: any = {}
-  protected paths: any = {}
-  protected model?: string
+  protected classname: string = 'user'
+  protected swagger: any = { paths: {}, models: [] }
   protected sqldump?: any
-  protected configs?: IConfig
-  protected swagger: any = {
-    paths: {},
-    models: []
-  }
+  protected configs: IConfig
 
-  constructor(protected options: TOptions) {
-    if (!options.namespace) {
-      throw new Error('Namespace is required. Please specify with --namespace option.')
+  constructor(protected opts: IOptions) {
+    // ネームスペースがない場合は処理を終了
+    if (!this.opts.global.namespace) {
+      error('namespace is required. Please specify with --namespace option.')
     }
 
-    // 変換用のパスを指定
+    // テンプレートの読み込み先と、出力先を設定
     this.src = path.resolve(__dirname, '../templates/')
-    this.dist = path.resolve(process.cwd(), this.options.dist)
-    this.parameter = {
-      model: 'user', // モデル名が省略差rている場合はuserテールブルを作成する
-      namespace: this.options.namespace
-    }
+    this.dist = path.resolve(process.cwd(), this.opts.global.dist)
+
+    resolve(this.dist)
 
     // 設定ファイルを読み込み
-    const configpath = path.resolve(process.cwd(), 'classgen-ts-nuxt.json')
+    const configpath = path.resolve(process.cwd(), this.opts.global.config)
 
     // コンフィグの初期化
     const configs: IConfig = fs.existsSync(configpath) ? JSON.parse(fs.readFileSync(configpath, 'utf-8')) : {}
     this.configs = EmptyConfig(configs)
 
-    // 除外したいカラム名を取得
-    this.options.excludes = this.options.excludes || []
-    this.options.excludes = this.configs.columns!.excludes!.concat(this.options.excludes)
-
     // SQLファイルが指定されている場合、ファイルを読み込んでくる
-    if (this.options.sqldump) {
-      if (fs.existsSync(path.resolve(process.cwd(), this.options.sqldump))) {
-        this.sqldump = fs.readFileSync(path.resolve(process.cwd(), this.options.sqldump), 'utf-8')
+    if (this.opts.global.sqldump) {
+      if (fs.existsSync(path.resolve(process.cwd(), this.opts.global.sqldump))) {
+        this.sqldump = fs.readFileSync(path.resolve(process.cwd(), this.opts.global.sqldump), 'utf-8')
       }
     }
   }
-
   /**
    * 指定されたフォルダの中をレンダリングする
    */
-  protected generator(type: string, dir: string, force: boolean = false) {
-    readdir(path.join(this.src, path.join(type, dir)), path.join(this.dist, dir), this.parameter, force, this.render.bind(this))
+  protected async generate(src: string, dist: string, silent: boolean = false) {
+    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'render', silent)
   }
 
   /**
    * 指定されたフォルダの中を削除
    */
-  protected remove(type: string, dir: string, force: boolean = false) {
-    readdir(path.join(this.src, path.join(type, dir)), path.join(this.dist, dir), this.parameter, force, this.rm.bind(this), true)
+  protected async remove(src: string, dist: string, silent: boolean = false) {
+    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'rm', silent)
   }
 
   /**
-   * 指定されたフォルダの中を削除
+   * 指定されたsrcに基づいて、distにディレクトリとファイルを生成と削除
+   * methodを指定することで、そのファイルに対してなにをするかを指定出来る
    */
-  protected dump(options: ISchemaOptions, model?: string) {
-    this.options = {
-      ...this.options,
-      ...options
-    }
-    const yamls = new SQLParser(this.sqldump, this.options).parse(this.configs!)
-    if (model) {
-      const dist = yamls.find((yaml) => upperCamel(yaml.model) === upperCamel(model))
-      if (dist) {
-        this.schemas(dist)
-      }
-    } else {
-      for (const yaml of yamls) {
-        this.schemas(yaml)
-      }
-    }
-  }
-
-  /**
-   * SQLでパースされてきたYAMLデータを適切な場所に書き込む
-   */
-  protected schemas(yaml: IYAML) {
-    const fullpath = mkdir(this.dist, path.join('swagger/src/components/schemas', snake(yaml.model)))
-    this.write(path.resolve(fullpath, 'index.yaml'), yaml.index, false)
-    this.write(path.resolve(fullpath, 'seed.yaml'), yaml.seed, false)
-    const origin = this.parameter.model
-    this.parameter.model = upperCamel(yaml.model)
-    this.generator('generate', './swagger')
-    this.parameter.model = origin
-  }
-
-  /**
-   * schemaのモデルをswagger.ymlにある分だけ全部作成する
-   */
-  protected models(remove: boolean = false) {
-    const origin = this.parameter.model
-    for (const model of this.swagger.models) {
-      this.parameter.model = model.name
-      this.generator('models', './app')
-    }
-    this.parameter.model = origin
-  }
-
-  /**
-   * 生成されたファイルから一覧を表示する系のファイルを作成する
-   */
-  protected async index(type: string) {
-    const types: { [key: string]: string[] } = {
-      swagger: ['src/paths', 'src/components/schemas'],
-      app: ['gateways/AppName', 'gateways', 'repositories', 'plugins', 'store', 'types', 'infrastructure/network/AppName/schema']
-    }
-
-    // typesで指定されたフォルダの中にあるファイルの内容をもとにファイルを生成
-    // typesはdistで指定された先のフォルダの中身を見る
-    for (const dir of types[type]) {
-      const src = path.join(type, dir) // 読み込み先のパスを生成
-      const dist = mkdir(this.dist, replaces(src, this.parameter)) // 書き込み先のパスを生成
-      const files = fs.readdirSync(dist, { withFileTypes: true })
-
-      let paths: {
-        dirs: { name: string; files: string[] }[]
-        files: string[]
-      } = { dirs: [], files: [] }
-
+  protected async readdir(src: string, dist: string, method: string, silent: boolean = false) {
+    if (fs.existsSync(src)) {
+      const files = fs.readdirSync(src, { withFileTypes: true })
       for (const file of files) {
+        const name = resolve(dist, replaces(file.name, this.replace()))
         if (file.isDirectory()) {
-          paths.dirs.push({ name: file.name, files: fs.readdirSync(path.join(dist, file.name)) })
+          await this.readdir(path.join(src, file.name), name, method, silent)
+          if (method === 'rm' && fs.readdirSync(name).length === 0) {
+            fs.rmdirSync(name)
+          }
         } else {
-          paths.files.push(file.name)
+          await (this as any)[method](path.join(src, file.name), name, silent)
         }
       }
-
-      // typesで指定されたパスのディレクトリ情報をejsにわたすために保存
-      this.paths[dir] = paths
-      this.generator('index', src, true)
     }
-
-    // swaggerが更新される時はswaggerファイルを生成
-    if (type === 'swagger') {
-      const src = path.resolve(mkdir(this.dist, 'swagger/src'), 'index.yaml')
-      const dist = path.resolve(mkdir(this.dist, 'swagger'), 'swagger.yaml')
-      if (fs.existsSync(src)) {
-        await new Promise((resolve) => {
-          resolve(swagpack(src, dist))
-        })
-        this.swagger = this.loadSwagger()
-      } else {
-        console.log(chalk.red('Error:'), 'File not found', src)
-        console.log(chalk.green('Noite:'), 'Run the initialize command')
-        exit()
-      }
-    }
-  }
-  /**
-   * 生成されたファイルから一覧を表示する系のファイルを作成する
-   */
-  protected loadSwagger(): ISwagger {
-    const dist = path.resolve(mkdir(this.dist, 'swagger'), 'swagger.yaml')
-    if (fs.existsSync(dist)) {
-      return new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
-    }
-    return { paths: {}, models: [] }
   }
 
   /**
    * EJSを使ってテンプレートファイルからファイルを生成
    */
-  protected render(src: string, dist: string, force: boolean) {
-    const options = {
-      ...replace(this.parameter),
+  protected async render(src: string, dist: string, silent: boolean = false) {
+    const opts = {
+      ...this.replace(),
+      swagger,
+      app,
+      readfiles: this.readfiles.bind(this),
+      ...this.swagger,
+      auth: this.opts.auth,
       snake,
       kabab,
       upperCamel,
-      lowerCamel,
-      paths: this.paths,
-      swagger: this.swagger,
-      auth: false
+      lowerCamel
     }
-    const content = ejs.render(fs.readFileSync(src, 'utf-8'), options)
-    this.write(dist, content, force)
+    await this.write(dist, ejs.render(fs.readFileSync(src, 'utf-8'), opts), silent)
   }
 
   /**
    * 生成されたファイルの書き込み
    */
-  protected async write(filepath: string, content: string, force: boolean) {
-    const exist = fs.existsSync(filepath)
+  protected async write(dist: string, content: string, silent: boolean) {
+    const exist = fs.existsSync(dist) // 書き出し先が存在しているか
+    const ext = path.extname(dist).replace('.', '')
 
-    const ext = path.extname(filepath).replace('.', '')
-    const options = {
-      parser: ext === 'ts' ? 'typescript' : ext,
-      ...(await prettier.resolveConfig(process.cwd()))
-    }
-    if (force) {
-      fs.writeFileSync(filepath, prettier.format(content, options), { encoding: 'utf-8', flag: 'w+' })
-    } else if (!exist || this.options.force) {
-      fs.writeFileSync(filepath, prettier.format(content, options), { encoding: 'utf-8', flag: 'w+' })
-      const msg = this.options.force && exist ? chalk.yellow(' Override:') : chalk.green(' Generated:')
-      console.log(msg, filepath.replace(RegExp(`${this.dist}`), ''))
+    const text = exts.includes(ext)
+      ? prettier.format(content, {
+          parser: ext === 'ts' ? 'typescript' : ext,
+          ...(await prettier.resolveConfig(process.cwd()))
+        })
+      : content
+
+    if (!exist || (exist && this.opts.global.force) || silent) {
+      fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
+      if (!silent) {
+        const msg = exist && this.opts.global.force ? chalk.yellow(' Override:') : chalk.green(' Generated:')
+        console.info(msg, dist.replace(RegExp(`${this.dist}`), ''))
+      }
     }
   }
 
   /**
    * 生成されたファイルの削除
    */
-  protected rm(src: string, dist: string, force: boolean) {
+  protected rm(src: string, dist: string, silent: boolean = false) {
     if (fs.existsSync(dist)) {
       const name = dist.replace(RegExp(`${this.dist}`), '')
-      if (!this.options.force) {
-        if (readlineSync.keyInYN(`${chalk.red('remove')} ${name}?`) !== true) {
-          return
-        }
+      if (!this.opts.global.force && readlineSync.keyInYN(`${chalk.red('remove')} ${name}?`) !== true) {
+        return
       }
       fs.rmSync(dist)
-      if (this.options.force) {
-        console.log(chalk.red('removed:'), name)
+      if (!silent && this.opts.global.force) {
+        console.info(chalk.red(' Removed:'), name)
       }
+    }
+  }
+  /**
+   * 名前の変換
+   */
+  protected replace() {
+    return {
+      appName: lowerCamel(this.opts.global.namespace),
+      AppName: upperCamel(this.opts.global.namespace),
+      'class-name': kabab(this.classname),
+      class_name: snake(this.classname),
+      class_names: snake(this.classname, true),
+      className: lowerCamel(this.classname),
+      classNames: lowerCamel(this.classname, true),
+      ClassName: upperCamel(this.classname),
+      ClassNames: upperCamel(this.classname, true)
     }
   }
 
   /**
-   * Schemaファイルの中に指定されたモデルが有るかをチェック
+   * 指定されたフォルダのファイルリストを取得する
    */
-  protected findSchema(name: string) {
-    const fullpath = path.resolve(this.dist, 'swagger/src/components/schemas')
-    if (fs.existsSync(fullpath)) {
-      const find = fs.readdirSync(fullpath, { withFileTypes: true }).find((file) => file.isDirectory() && file.name === snake(name))
-      if (find) {
-        return fs.readdirSync(path.join(fullpath, find.name))
-      }
+  protected readfiles(src: string, dir: string = '') {
+    const name = resolve(this.dist, replaces(src, this.replace()), dir)
+    return fs.readdirSync(name, { withFileTypes: true })
+  }
+
+  /**
+   * swagger.yamlからschemaとパス情報を取得
+   */
+  protected load() {
+    const dist = resolve(this.dist, 'swagger/swagger.yaml')
+    if (fs.existsSync(dist)) {
+      return new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
     }
-    return undefined
+    return { paths: {}, models: [] }
+  }
+
+  protected async swagpack() {
+    const src = resolve(this.dist, 'swagger/src/index.yaml')
+    const dist = resolve(this.dist, 'swagger/swagger.yaml')
+    if (fs.existsSync(src)) {
+      await new Promise((resolve) => {
+        resolve(swagpack(src, dist))
+      })
+    } else {
+      error('file not found.')
+    }
   }
 }

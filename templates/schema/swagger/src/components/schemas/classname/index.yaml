@@ -1,9 +1,0 @@
-required:
-  - id
-  - title
-properties:
-  id:
-    type: string
-  title:
-    type: string
-    nullable: true

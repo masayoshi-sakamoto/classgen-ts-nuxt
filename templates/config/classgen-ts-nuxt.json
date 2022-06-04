@@ -7,19 +7,13 @@
       "job_batches",
       "failed_jobs",
       "sessions"
-    ],
-    "menus": []
+    ]
   },
   "columns": {
-    "excludes": [
-      "parent_id",
-      "password",
-      "created_at",
-      "updated_at",
-      "deleted_at"
-    ]
+    "excludes": ["password", "created_at", "updated_at", "deleted_at"]
   },
   "schemas": {
     "excludes": ["Account", "Auth", "Menu", "Query", "Options"]
-  }
+  },
+  "menus": []
 }

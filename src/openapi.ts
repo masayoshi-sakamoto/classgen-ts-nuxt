@@ -17,7 +17,7 @@ export default class OpenAPIParser {
     const definitions: IModel[] = Object.keys(schemas).flatMap((key) => {
       return {
         table: inflector.pluralize(toUnderscoreCase(key)),
-        name: key,
+        ClassName: key,
         refs: this.refs(key, schemas[key]),
         schema: this.schema(key, schemas[key]),
         seed: !!key.match(/.+(Seed)$/)

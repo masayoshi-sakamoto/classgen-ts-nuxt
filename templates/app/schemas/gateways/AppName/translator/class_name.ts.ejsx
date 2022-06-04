@@ -1,0 +1,71 @@
+/* eslint camelcase: 0 */
+<%_
+const model = models.find((prop) => prop.ClassName === ClassName)
+const seed = models.find((prop) => prop.ClassName === ClassName + 'Seed')
+const schemas = []
+if (model) {
+  schemas.push(ClassName)
+}
+if (seed) {
+  schemas.push(ClassName+'Seed')
+}
+_%>
+<%_ if (model) { _%>
+  <%_ if (Object.values(model.schema).find((prop) => (prop.format === 'date'))) { _%>
+import moment from 'moment'
+  <%_ } _%>
+    <%_ for (const ref of model.refs) { _%>
+import { to<%= ref.name %>Props } from './<%= snake(ref.name) %>'
+    <%_ } _%>
+  <%_ } _%>
+<%_ if (schemas.length > 0) { _%>
+import { <%= schemas.join(', ') %> } from '@/infrastructure/network/<%= AppName %>/schema'
+<%_ } _%>
+<%_ if (model && seed) { _%>
+import { I<%= ClassName %>Props, Empty<%= ClassName %>PropsFactory } from '@/entities/<%= ClassName %>'
+<%_ } else if (model) { _%>
+import { I<%= ClassName %>Props, Empty<%= ClassName %>PropsFactory } from '@/entities/<%= ClassName %>'
+<%_ } else if (seed) { _%>
+import { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+<%_ } _%>
+<%_ if (model) { _%>
+
+export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefined): I<%= ClassName %>Props => {
+  if (!props) {
+    return Empty<%= ClassName %>PropsFactory()
+  }
+
+  const { <%= Object.values(model.schema).map((prop) => prop.key).join(', ') %> } = props
+  return {
+    <%- Object.values(model.schema).map((prop) => {
+      const camel = lowerCamel(prop.key)
+      const model = upperCamel(prop.key)
+      let src = prop.key
+      if (prop.ref) {
+        src = `to${model}Props(${prop.key})`
+      } else if (prop.format === 'json') {
+        src = `${prop.key} ? JSON.parse(${prop.key}).${prop.key} : {}`
+      } else if (prop.format === 'date') {
+        src = `${prop.key} ? moment(${prop.key}).format('YYYY-MM-DD') : null`
+      }
+      return camel === src ? camel : camel + ': ' + src
+    }).join(',\n    ') %>
+  }
+}
+<%_ } _%>
+<%_ if (seed) { _%>
+
+export const to<%= ClassName %>Seed = (props: I<%= ClassName %>Props): <%= ClassName %>Seed => {
+  const { <%= Object.values(seed.schema).map((prop) => lowerCamel(prop.key)).join(', ') %> } = props
+  return {
+    <%= Object.values(seed.schema).map((prop) => {
+      let camel = lowerCamel(prop.key)
+      const src = prop.key
+      if (prop.format === 'json') {
+        camel = `JSON.stringify({ ${prop.key} })`
+      }
+      return camel === src ? src : src + ': ' + camel
+    }).join(',\n    ') %>
+  }
+}
+<%_ } _%>

@@ -2,8 +2,8 @@ import { Create, Parser } from 'node-sql-parser'
 import { toCamelCase } from './lib/snake-camel'
 import Inflector from './lib/inflector'
 import { IColumn, IConfig, IYAML } from './types'
-import { TOptions } from './options'
-import { upperCamel } from './common'
+import { IOptions } from './options'
+import { snake, upperCamel } from './common'
 
 const YAML = require('json2yaml')
 const inflector = new Inflector()
@@ -11,7 +11,7 @@ const inflector = new Inflector()
 export default class SQLParser {
   private sqlData: string[]
 
-  constructor(sql: string, protected options: TOptions) {
+  constructor(sql: string, protected options: IOptions) {
     // 取得してきたSQL文を1行ずつに変更してCREATE TABLE文のみ取得
     this.sqlData = sql
       .replace(/\r\n/g, '\n')
@@ -54,7 +54,7 @@ export default class SQLParser {
 
         yamls.push({
           table,
-          model: upperCamel(table),
+          class_name: snake(inflector.singularize(table)),
           index: YAML.stringify({
             required: columns.map((prop) => prop.property),
             properties: this.properties(columns, 'index')

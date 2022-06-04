@@ -21,9 +21,42 @@ export const EmptyConfig = (prop?: Partial<IConfig> | null) => ({
   ...prop
 })
 
+export const swagger = {
+  root: 'swagger',
+  src: 'swagger/src',
+  components: 'swagger/src/components',
+  schemas: 'swagger/src/components/schemas',
+  paths: 'swagger/src/paths'
+}
+
+export const app = {
+  root: 'app',
+  entities: 'app/entities',
+  AppName: 'app/gateways',
+  gateways: 'app/gateways/AppName',
+  translator: 'app/gateways/AppName/translator',
+  infrastructure: 'app/infrastructure',
+  models: 'app/infrastructure/network/AppName/schema/models',
+  plugins: 'app/plugins',
+  store: 'app/store',
+  repositories: 'app/repositories',
+  types: 'app/types',
+  usecases: 'app/usecases'
+}
+
+export const components = {
+  root: 'app/components',
+  molecules: 'app/components/molecules',
+  organisms: 'app/components/organisms',
+  templates: 'app/components/templates',
+  pages: 'app/pages'
+}
+
+export const exts = ['css', 'html', 'json', 'scss', 'ts', 'vue', 'yaml']
+
 export interface IModel {
   table: string
-  name: string
+  ClassName: string
   refs: any
   schema: ITsSchema
   seed: boolean
@@ -48,7 +81,7 @@ export interface ISwagger {
 
 export interface IYAML {
   table: string // テーブル名
-  model: string // モデル名
+  class_name: string // クラス名
   index: string // 通常モデルのYAML文
   seed: string // StoreモデルのYAML文
 }
