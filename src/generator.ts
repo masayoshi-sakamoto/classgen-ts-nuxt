@@ -43,7 +43,8 @@ export default class Generator extends Base {
 
   async initialize() {
     await this.update('initialize', './')
-    await this.entity('query')
+    this.swagger = this.load()
+    await this.injector(false)
   }
 
   private async injector(silent: boolean) {

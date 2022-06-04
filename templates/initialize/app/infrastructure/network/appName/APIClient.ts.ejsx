@@ -13,19 +13,21 @@ export class APIClient {
     this.baseURL = `${host}`
   }
 
-  request<U>(request: APIRequest<U>): Promise<U> {
+  request<U>(request: APIRequest<U>, type?: string, onUploadProgress?: any): Promise<U> {
     const isRead = request.method === HTTPMethod.GET
+    const path = type === 'users' ? `/users` : '/admins'
     return new Promise<U>((resolve, reject) => {
       axios
         .request({
-          url: request.path,
+          url: path + request.path,
           method: 'POST',
           params: isRead && request.params,
           data: !isRead && this.encodedParams(request),
           timeout: this.timeout,
           baseURL: request.baseURL || this.baseURL,
           headers: this.createHeaders(request),
-          maxContentLength: Infinity
+          maxContentLength: Infinity,
+          onUploadProgress
         })
         .then((data) => {
           if (!process.server || !this.ctx) {

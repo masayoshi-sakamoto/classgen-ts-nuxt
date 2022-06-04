@@ -8,10 +8,10 @@ export default class Component extends Base {
   }
 
   async form(name?: string) {
-    await this.generate('components/index', components.organisms)
+    await this.update('components/index', components.organisms)
   }
 
   async auth(name?: string) {
-    await this.generate('components/auth', app.root)
+    await this.update('components/auth', app.root)
   }
 }
