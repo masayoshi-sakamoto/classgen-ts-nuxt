@@ -1,82 +1,62 @@
 import { IOptions } from './options'
 import Base from './base'
-import { app, swagger } from './types'
-import { snake } from './common'
+import { app } from './types'
+import { error, upperCamel } from './common'
 
 export default class Generator extends Base {
   constructor(protected options: IOptions) {
     super(options)
   }
 
-  async all(name?: string) {
-    const names = await this.schemas(name)
-    for (const name of names) {
-      this.classname = name
-      this.swagger = this.load()
-      await this.generate('app/schemas', app.root)
-      await this.generate('app/usecases', app.root)
-      await this.generate('app/index', app.root, true)
+  async schema(name?: string) {
+    this.swagger = this.load()
+    for (const model of this.swagger.models) {
+      if (!name || (name && model.ClassName === upperCamel(name))) {
+        this.classname = model.ClassName
+        await this.update('app/schemas/', app.root)
+      }
     }
-  }
-
-  async schema(name: string) {
-    const names = await this.schemas(name)
-    for (const name of names) {
-      this.classname = name
-      this.swagger = this.load()
-      await this.generate('app/schemas', app.root)
-      await this.generate('app/index', app.root, true)
-    }
-  }
-
-  async usecase(name: string) {
-    const names = await this.schemas(name)
-    for (const name of names) {
-      this.classname = name
-      this.swagger = this.load()
-      await this.generate('app/usecases', app.root)
-      await this.generate('app/index', app.root, true)
-    }
+    await this.injector(true)
   }
 
   async auth(name?: string) {
-    this.classname = name || this.classname
-    this.swagger = this.load()
-    await this.generate('app/auth', app.root)
-
-    for (const schema of ['account', 'auth', name]) {
-      this.classname = schema || this.classname
-      await this.generate('app/schemas', app.root)
+    if (!name) {
+      error('name is required.')
     }
-
-    this.classname = name || this.classname
-    await this.generate('app/usecases', app.root)
-    await this.generate('app/index', app.root, true)
+    this.swagger = this.load()
+    await this.update('app/auth', app.root)
+    for (const model of ['auth', 'account']) {
+      await this.entity(model)
+    }
+    await this.schema(name)
   }
 
-  async index(name?: string) {
-    this.classname = name || this.classname
+  async index() {
     this.swagger = this.load()
-    await this.generate('app/index', app.root)
+    console.log(this.swagger)
+    await this.injector(false)
   }
 
   async config() {
-    await this.generate('config', './')
-  }
-  async initialize() {
-    await this.generate('initialize', './')
+    await this.update('config', './')
   }
 
-  private async schemas(name?: string) {
-    const files = this.readfiles(swagger.schemas).filter(
-      (file) => file.isDirectory() && !this.configs.schemas!.excludes!.includes(file.name)
-    )
-    let schemas: string[] = []
-    for (const file of files) {
-      if (!name || (name && file.name === snake(name))) {
-        schemas.push(file.name)
-      }
+  async initialize() {
+    await this.update('initialize', './')
+    await this.entity('query')
+  }
+
+  private async injector(silent: boolean) {
+    for (const model of this.swagger.models) {
+      this.classname = model.ClassName
+      await this.generate('app/models', app.root)
     }
-    return schemas.length === 0 ? [this.classname] : schemas
+    await this.generate('app/index', app.root, silent)
+  }
+
+  private async entity(name: string) {
+    this.classname = name
+    await this.update('app/schemas/entities', app.entities)
+    await this.update('app/schemas/gateways/AppName/translator', app.translator)
   }
 }

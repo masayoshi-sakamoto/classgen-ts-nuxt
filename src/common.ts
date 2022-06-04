@@ -25,11 +25,12 @@ export function replaces(filename: string, replace: any) {
  * そうでなければディレクトリを生成
  */
 export function resolve(...args: string[]) {
+  const file = args[args.length - 1].match(/^(.*)\.(.+)$/) ? args.pop()! : ''
   const dist = path.resolve(...args)
-  if (!args[args.length - 1].match(/^(.*)\.(.+)$/) && !fs.existsSync(dist)) {
+  if (!fs.existsSync(dist)) {
     fs.mkdirSync(dist, { recursive: true })
   }
-  return dist
+  return path.resolve(dist, file)
 }
 
 export function snake(name: string, pluralize: boolean = false) {

@@ -9,14 +9,15 @@ import swagpack from 'swagpack/lib/build'
 import { snake, kabab, upperCamel, lowerCamel, resolve, replaces, error } from './common'
 import { IOptions } from './options'
 import OpenAPIParser from './openapi'
-import { EmptyConfig, IConfig, swagger, app, exts } from './types'
+import { EmptyConfig, IConfig, swagger, app, exts, IModel } from './types'
+
 const readlineSync = require('readline-sync')
 
 export default class Base {
   protected src: string
   protected dist: string
   protected classname: string = 'user'
-  protected swagger: any = { paths: {}, models: [] }
+  protected swagger: { paths: any; models: IModel[] } = { paths: {}, models: [] }
   protected sqldump?: any
   protected configs: IConfig
 
@@ -46,6 +47,18 @@ export default class Base {
       }
     }
   }
+
+  /**
+   * 削除フラグがあったら削除、なければ作成
+   */
+  protected async update(src: string, dist: string) {
+    if (this.opts.global.remove) {
+      await this.remove(src, dist)
+    } else {
+      await this.generate(src, dist)
+    }
+  }
+
   /**
    * 指定されたフォルダの中をレンダリングする
    */
@@ -67,6 +80,7 @@ export default class Base {
   protected async readdir(src: string, dist: string, method: string, silent: boolean = false) {
     if (fs.existsSync(src)) {
       const files = fs.readdirSync(src, { withFileTypes: true })
+      dist = replaces(dist, this.replace())
       for (const file of files) {
         const name = resolve(dist, replaces(file.name, this.replace()))
         if (file.isDirectory()) {
@@ -118,7 +132,7 @@ export default class Base {
       fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
       if (!silent) {
         const msg = exist && this.opts.global.force ? chalk.yellow(' Override:') : chalk.green(' Generated:')
-        console.info(msg, dist.replace(RegExp(`${this.dist}`), ''))
+        console.info(msg, dist.replace(RegExp(`${this.dist}\/`), ''))
       }
     }
   }
@@ -126,9 +140,9 @@ export default class Base {
   /**
    * 生成されたファイルの削除
    */
-  protected rm(src: string, dist: string, silent: boolean = false) {
+  protected async rm(src: string, dist: string, silent: boolean = false) {
     if (fs.existsSync(dist)) {
-      const name = dist.replace(RegExp(`${this.dist}`), '')
+      const name = dist.replace(RegExp(`${this.dist}\/`), '')
       if (!this.opts.global.force && readlineSync.keyInYN(`${chalk.red('remove')} ${name}?`) !== true) {
         return
       }
@@ -166,12 +180,13 @@ export default class Base {
   /**
    * swagger.yamlからschemaとパス情報を取得
    */
-  protected load() {
+  protected load(): { paths: any; models: IModel[] } {
     const dist = resolve(this.dist, 'swagger/swagger.yaml')
     if (fs.existsSync(dist)) {
       return new OpenAPIParser(YAML.load(fs.readFileSync(dist, 'utf-8')) as any).parse()
     }
-    return { paths: {}, models: [] }
+    error('not swagger/swagger.yaml')
+    process.exit()
   }
 
   protected async swagpack() {

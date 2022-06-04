@@ -14,29 +14,29 @@ export default class Swagger extends Base {
 
   async all(name?: string) {
     this.classname = name || this.classname
-    await this.generate('swagger/schemas', swagger.schemas)
-    await this.generate('swagger/paths', swagger.paths)
+    await this.update('swagger/schemas', swagger.schemas)
+    await this.update('swagger/paths', swagger.paths)
     await this.generate('swagger/index', swagger.root, true)
     await this.swagpack()
   }
 
   async schema(name?: string) {
     this.classname = name || this.classname
-    await this.generate('swagger/schemas', swagger.schemas)
+    await this.update('swagger/schemas', swagger.schemas)
     await this.generate('swagger/index', swagger.root, true)
     await this.swagpack()
   }
 
   async path(name?: string) {
     this.classname = name || this.classname
-    await this.generate('swagger/paths', swagger.paths)
+    await this.update('swagger/paths', swagger.paths)
     await this.generate('swagger/index', swagger.root, true)
     await this.swagpack()
   }
 
   async auth(name?: string) {
     this.classname = name || this.classname
-    await this.generate('swagger/auth', swagger.root)
+    await this.update('swagger/auth', swagger.root)
     await this.generate('swagger/index', swagger.root, true)
     await this.swagpack()
   }
@@ -53,7 +53,7 @@ export default class Swagger extends Base {
       if (!name || (name && yaml.class_name === name)) {
         this.classname = yaml.class_name
         await this.sqlToYaml(yaml)
-        await this.generate('swagger/paths', swagger.paths)
+        await this.update('swagger/paths', swagger.paths)
       }
     }
     await this.generate('swagger/index', swagger.root, true)
@@ -62,7 +62,7 @@ export default class Swagger extends Base {
 
   async index(name?: string) {
     this.classname = name || this.classname
-    await this.generate('swagger/index', swagger.root)
+    await this.update('swagger/index', swagger.root)
     await this.swagpack()
   }
 
@@ -77,7 +77,11 @@ export default class Swagger extends Base {
   private async sqlToYaml(yaml: any) {
     for (const name of ['index', 'seed']) {
       const dist = resolve(this.dist, swagger.schemas, yaml.class_name)
-      await this.write(path.join(dist, name + '.yaml'), yaml[name], false)
+      if (this.opts.global.remove) {
+        await this.rm('', path.join(dist, name + '.yaml'))
+      } else {
+        await this.write(path.join(dist, name + '.yaml'), yaml[name], false)
+      }
     }
   }
 }

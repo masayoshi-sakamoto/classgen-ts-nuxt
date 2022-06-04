@@ -4,6 +4,7 @@ export interface IGlobalOptions {
   sqldump?: string // SQLDUMPファイル
   dist: string // 出力先
   force?: boolean // 強制実行
+  remove?: boolean // 削除
 }
 
 export interface IInitializeOptions {

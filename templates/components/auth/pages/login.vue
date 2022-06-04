@@ -15,6 +15,7 @@ export default Vue.extend({
   components: {
     TtemplateLogin
   },
+  layout: 'auth',
   data(): IData {
     return {
       value: undefined

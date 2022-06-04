@@ -1,4 +1,5 @@
 import { OpenAPIObject, PathObject, SchemaObject } from 'openapi3-ts'
+import { error } from './common'
 import Inflector from './lib/inflector'
 import { toCamelCase, toUnderscoreCase } from './lib/snake-camel'
 import { IConfig, IModel, IRef, ISwagger, ITsSchema, types } from './types'
@@ -10,16 +11,20 @@ export default class OpenAPIParser {
   constructor(protected ymlData: OpenAPIObject) {}
 
   parse(config?: IConfig): ISwagger {
-    const schemas = this.ymlData.components!.schemas || {}
-    const paths = this.ymlData.paths || {}
-    const tags = this.parsePaths(paths)
+    const schemas = this.ymlData.components!.schemas
+    const paths = this.ymlData.paths
 
-    const definitions: IModel[] = Object.keys(schemas).flatMap((key) => {
+    if ((!schemas || Object.keys(schemas)[0] === '$ref') && (!paths || Object.keys(paths)[0] === '$ref')) {
+      error('swagger.yml format is incorrect')
+    }
+
+    const tags = this.parsePaths(paths)
+    const definitions: IModel[] = Object.keys(schemas!).flatMap((key) => {
       return {
         table: inflector.pluralize(toUnderscoreCase(key)),
         ClassName: key,
-        refs: this.refs(key, schemas[key]),
-        schema: this.schema(key, schemas[key]),
+        refs: this.refs(key, schemas![key]),
+        schema: this.schema(key, schemas![key]),
         seed: !!key.match(/.+(Seed)$/)
       }
     })

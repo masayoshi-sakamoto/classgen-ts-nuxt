@@ -9,6 +9,7 @@ import <%= upperCamel(gateway) %> from './<%= snake(gateway) %>'
 import { APIClient } from '@/infrastructure/network/<%= AppName %>/APIClient'
 
 export default class <%= AppName %>Gateway {
+  apiClient: APIClient
 <%_ gateways.forEach((gateway) => { _%>
   <%= upperCamel(gateway) %>: <%= upperCamel(gateway) %>
 <%_ }) _%>
