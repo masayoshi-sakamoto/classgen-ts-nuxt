@@ -12,6 +12,8 @@ export default class Component extends Base {
   }
 
   async auth(name?: string) {
+    this.swagger = this.load()
+    this.classname = 'account'
     await this.update('components/auth', app.root)
   }
 }

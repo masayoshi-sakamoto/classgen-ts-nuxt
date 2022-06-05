@@ -2,17 +2,22 @@
   <v-container>
     <v-row justify="center">
       <v-card width="100%" max-width="380" flat>
-        <v-card-title class="justify-center text-h4 font-weight-bold mb-5">ログイン</v-card-title>
+        <v-card-title class="justify-center text-h4 font-weight-bold mb-5">会員登録</v-card-title>
         <v-card-text>
           <a-form id="form" v-slot="{ invalid }" @submit.prevent="$emit('submit', $event)">
-            <FormLogin v-model="___value"></FormLogin>
-            <a-btn submit :disabled="invalid">ログイン</a-btn>
+            <FormSignup v-model="___value"></FormSignup>
+            <a-btn submit :disabled="invalid">同意して登録する</a-btn>
           </a-form>
-          <div class="mt-5 text-center text-caption">
-            <nuxt-link to="/forget" class="grey--text">パスワードを忘れた方</nuxt-link>
+          <div class="mt-5 text-caption">
+            会員登録には、<nuxt-link to="/term" class="grey--text">利用規約</nuxt-link>と<nuxt-link
+              to="/policy"
+              class="grey--text"
+              >プライバシーポリシー</nuxt-link
+            >への同意が必要です。
           </div>
+          <v-divider class="mt-8"></v-divider>
           <div class="mt-8 text-center text-body-1">
-            <v-btn rounded depressed color="primary" to="/signup">登録はこちら</v-btn>
+            <nuxt-link to="/login">ログインはこちら</nuxt-link>
           </div>
         </v-card-text>
       </v-card>
@@ -23,11 +28,11 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
 import { IAccountProps } from '@/entities/Account'
-import FormLogin from '@/components/organisms/Form/Auth/Login'
+import FormSignup from '@/components/organisms/Form/Auth/Signup'
 
 export default Vue.extend({
   components: {
-    FormLogin
+    FormSignup
   },
   props: {
     value: {

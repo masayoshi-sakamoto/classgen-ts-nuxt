@@ -1,12 +1,12 @@
 <template>
-  <TtemplateLogin v-model="value" @submit="login"></TtemplateLogin>
+  <TtemplateSignup v-model="value" @submit="signup"></TtemplateSignup>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import TtemplateLogin from '@/components/templates/Login'
+import TtemplateSignup from '@/components/templates/Signup'
 import { IAccountProps } from '@/entities/Account'
-import LoginUseCase from '@/usecases/auth/LoginUseCase'
+import SignupUseCase from '@/usecases/auth/SignupUseCase'
 
 interface IData {
   value: IAccountProps | undefined
@@ -14,7 +14,7 @@ interface IData {
 
 export default Vue.extend({
   components: {
-    TtemplateLogin
+    TtemplateSignup
   },
   layout: 'auth',
   data(): IData {
@@ -23,10 +23,10 @@ export default Vue.extend({
     }
   },
   methods: {
-    async login() {
+    async signup() {
       try {
         this.App.admin.loading = true
-        if (await new LoginUseCase(this.App).execute(this.value!)) {
+        if (await new SignupUseCase(this.App).execute(this.value!)) {
           this.$router.push('/home')
         }
       } catch (e: any) {

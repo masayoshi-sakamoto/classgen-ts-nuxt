@@ -8,6 +8,9 @@
           v-model.trim="props.<%= lowerCamel(schema.key) %>"
           label="<%= lowerCamel(schema.title) %>"
           field="<%= lowerCamel(schema.key) %>"
+          <%_ if (schema.format === 'password') { _%>
+          password
+          <%_ } _%>
           <%_ if (schema.required) { _%>
           rules="required"
           <%_ } _%>

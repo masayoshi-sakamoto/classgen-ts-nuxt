@@ -6,6 +6,9 @@ properties:
   username:
     type: string
     nullable: true
+    title: 'アカウントID'
   password:
     type: string
     nullable: true
+    format: password
+    title: 'パスワード'

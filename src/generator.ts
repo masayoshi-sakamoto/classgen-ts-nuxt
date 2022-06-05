@@ -24,6 +24,7 @@ export default class Generator extends Base {
       error('name is required.')
     }
     this.swagger = this.load()
+    this.classname = name || this.classname
     await this.update('app/auth', app.root)
     for (const model of ['auth', 'account']) {
       await this.entity(model)

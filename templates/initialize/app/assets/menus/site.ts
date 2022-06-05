@@ -1,6 +1,6 @@
 import { EmptyMenuPropsFactory, IMenuProps } from '@/entities/Menu'
 
-export const menus: IMenuProps[] = [
+const menus: IMenuProps[] = [
   EmptyMenuPropsFactory({
     id: 'product',
     title: '製品',
@@ -22,3 +22,4 @@ export const menus: IMenuProps[] = [
     to: { name: 'contact' }
   })
 ]
+export default menus

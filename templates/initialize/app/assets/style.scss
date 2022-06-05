@@ -1,1 +1,29 @@
 @import '@/assets/variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');
+
+// global css
+.pointer {
+  cursor: pointer;
+}
+.grab {
+  cursor: grab;
+}
+.move {
+  cursor: move;
+}
+
+// logo
+.logo {
+  font-size: 1.35rem !important;
+  line-height: 1.5rem;
+  letter-spacing: -0.05rem !important;
+  font-family: 'Comfortaa', sans-serif !important;
+  a {
+    color: inherit !important;
+    text-decoration: none;
+  }
+  &.lg {
+    font-size: 2rem !important;
+    line-height: 1.25rem;
+  }
+}
