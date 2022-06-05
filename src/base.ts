@@ -128,12 +128,20 @@ export default class Base {
         })
       : content
 
-    if (!exist || (exist && this.opts.global.force) || silent) {
-      fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
-      if (!silent) {
-        const msg = exist && this.opts.global.force ? chalk.yellow(' Override:') : chalk.green(' Generated:')
-        console.info(msg, dist.replace(RegExp(`${this.dist}\/`), ''))
-      }
+    const name = dist.replace(RegExp(`${this.dist}\/`), '')
+
+    if (
+      !silent &&
+      exist &&
+      !this.opts.global.force &&
+      readlineSync.keyInYN(`${chalk.yellow('override')} ${name}?`) !== true
+    ) {
+      return
+    }
+    fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
+    if (!silent) {
+      const msg = exist && this.opts.global.force ? chalk.yellow('Override:') : chalk.green('Generated:')
+      console.info(msg, name)
     }
   }
 
@@ -148,7 +156,7 @@ export default class Base {
       }
       fs.rmSync(dist)
       if (!silent && this.opts.global.force) {
-        console.info(chalk.red(' Removed:'), name)
+        console.info(chalk.red('Removed:'), name)
       }
     }
   }

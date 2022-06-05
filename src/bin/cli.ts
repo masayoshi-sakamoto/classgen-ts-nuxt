@@ -63,10 +63,14 @@ try {
         return
       }
 
+      if (command === 'auth') {
+        options.auth = true
+      }
+
       if (options.swagger && command.match(/^(schema|auth|index)$/)) {
         const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
         await swagger[command === 'schema' ? 'all' : command](name)
-        if (command === 'schema' && commander.opts().sqldump) {
+        if (command !== 'index' && commander.opts().sqldump) {
           await swagger.sql(name)
         }
       }
@@ -81,11 +85,11 @@ try {
   commander
     .command('component')
     .alias('com')
-    .argument('<command>', 'form|auth')
+    .argument('<command>', 'form|auth|web')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(form|auth)$/)) {
-        error('command must be one of form|auth')
+      if (!command.match(/^(form|auth|web)$/)) {
+        error('command must be one of form|auth|web')
       }
       const component: any = new Component({ ...options, global: { ...commander.opts() } })
       await component[command](name)

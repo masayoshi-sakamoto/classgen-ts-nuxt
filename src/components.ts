@@ -16,4 +16,10 @@ export default class Component extends Base {
     this.classname = 'account'
     await this.update('components/auth', app.root)
   }
+
+  async web(name?: string) {
+    this.swagger = this.load()
+    this.classname = 'account'
+    await this.update('components/web', app.root)
+  }
 }
