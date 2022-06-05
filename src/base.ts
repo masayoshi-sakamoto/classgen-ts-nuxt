@@ -106,6 +106,7 @@ export default class Base {
       readfiles: this.readfiles.bind(this),
       ...this.swagger,
       auth: this.opts.auth,
+      configs: this.configs,
       snake,
       kabab,
       upperCamel,
@@ -130,18 +131,19 @@ export default class Base {
 
     const name = dist.replace(RegExp(`${this.dist}\/`), '')
 
-    if (
-      !silent &&
-      exist &&
-      !this.opts.global.force &&
-      readlineSync.keyInYN(`${chalk.yellow('override')} ${name}?`) !== true
-    ) {
-      return
-    }
-    fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
-    if (!silent) {
-      const msg = exist && this.opts.global.force ? chalk.yellow('Override:') : chalk.green('Generated:')
-      console.info(msg, name)
+    const overwrite =
+      !silent /* サイレントが設定されていなく */ &&
+      this.opts.global.info /* 確認メッセージが設定されていて */ &&
+      exist /* ファルが存在していて */ &&
+      !this.opts.global.force /* 強制実行が設定されていなければ */ &&
+      readlineSync.keyInYN(`${chalk.yellow('override')} ${name}?`) === true /* かつ上書きがyesの場合 */
+
+    if (!exist || overwrite || this.opts.global.force || silent) {
+      fs.writeFileSync(dist, text, { encoding: 'utf-8', flag: 'w+' })
+      if (!silent) {
+        const msg = exist && this.opts.global.force ? chalk.yellow('Overwrite:') : chalk.green('Generated:')
+        console.info(msg, name)
+      }
     }
   }
 

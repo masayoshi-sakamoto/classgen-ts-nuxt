@@ -20,6 +20,7 @@ try {
     .option('--dist <path>', 'output directory', './')
     .option('-f, --force', 'forced command')
     .option('-rm, --remove', 'forced command')
+    .option('-i, --info', 'displays a confirmation message')
 
   /**
    * swaggerファイルの生成
@@ -44,14 +45,14 @@ try {
   commander
     .command('generate')
     .alias('gen')
-    .argument('<command>', 'schema|auth|index|config|initialize')
+    .argument('<command>', 'usecase|schema|auth|index|config|initialize')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('-a, --auth', 'create all schemas using sql dump file')
     .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(schema|auth|index|config|initialize)$/)) {
-        error('command must be one of schema|auth|index|config|initialize')
+      if (!command.match(/^(usecase|schema|auth|index|config|initialize)$/)) {
+        error('command must be one of usecase|schema|auth|index|config|initialize')
       }
 
       if (
@@ -85,11 +86,11 @@ try {
   commander
     .command('component')
     .alias('com')
-    .argument('<command>', 'form|auth|web')
+    .argument('<command>', 'page|form|menu|auth|web')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(form|auth|web)$/)) {
-        error('command must be one of form|auth|web')
+      if (!command.match(/^(page|form|menu|auth|web)$/)) {
+        error('command must be one of page|form|menu|auth|web')
       }
       const component: any = new Component({ ...options, global: { ...commander.opts() } })
       await component[command](name)

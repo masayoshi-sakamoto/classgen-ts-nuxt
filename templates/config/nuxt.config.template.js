@@ -20,6 +20,12 @@ export default {
     script: [{ src: 'https://polyfill.io/v3/polyfill.min.js?features=es6' }]
   },
 
+  pwa: {
+    manifest: {
+      lang: 'ja'
+    }
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['@/assets/style.scss'],
 

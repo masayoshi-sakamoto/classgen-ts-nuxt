@@ -5,6 +5,7 @@ export interface IGlobalOptions {
   dist: string // 出力先
   force?: boolean // 強制実行
   remove?: boolean // 削除
+  info?: boolean // 確認メッセージ
 }
 
 export interface IInitializeOptions {

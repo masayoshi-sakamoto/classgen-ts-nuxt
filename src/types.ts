@@ -46,6 +46,7 @@ export const app = {
 
 export const components = {
   root: 'app/components',
+  assets: 'app/assets',
   molecules: 'app/components/molecules',
   organisms: 'app/components/organisms',
   templates: 'app/components/templates',
