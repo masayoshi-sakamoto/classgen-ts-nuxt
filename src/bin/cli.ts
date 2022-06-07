@@ -47,10 +47,11 @@ try {
     .alias('gen')
     .argument('<command>', 'usecase|schema|auth|index|config|initialize')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
+    .argument('[type]', 'gateway connection type. only usecase')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('-a, --auth', 'create all schemas using sql dump file')
-    .action(async (command: string, name: string, options: IGenerateOptions) => {
+    .action(async (command: string, name: string, type: string, options: IGenerateOptions) => {
       if (!command.match(/^(usecase|schema|auth|index|config|initialize)$/)) {
         error('command must be one of usecase|schema|auth|index|config|initialize')
       }
@@ -77,7 +78,7 @@ try {
       }
 
       const generator: any = new Generator({ ...options, global: { ...commander.opts() } })
-      await generator[command](name)
+      await generator[command](name, type)
     })
 
   /**

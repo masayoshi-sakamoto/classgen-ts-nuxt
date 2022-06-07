@@ -1,8 +1,11 @@
+import { IMenuProps } from '@/entities/Menu'
+
 export interface IAppState {
   loading: boolean
   progress: number
   errors: any
   drawer: boolean | null
+  current: IMenuProps | undefined
 }
 
 export const state = (props?: Partial<IAppState>): IAppState => ({
@@ -10,6 +13,7 @@ export const state = (props?: Partial<IAppState>): IAppState => ({
   progress: 0,
   errors: {},
   drawer: false,
+  current: undefined,
   ...props
 })
 

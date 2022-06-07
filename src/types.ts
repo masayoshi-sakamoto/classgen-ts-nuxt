@@ -49,6 +49,7 @@ export const components = {
   assets: 'app/assets',
   molecules: 'app/components/molecules',
   organisms: 'app/components/organisms',
+  Form: 'app/components/organisms/Form',
   templates: 'app/components/templates',
   pages: 'app/pages'
 }

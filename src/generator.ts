@@ -8,10 +8,12 @@ export default class Generator extends Base {
     super(options)
   }
 
-  async usecase(name?: string) {
+  async usecase(name?: string, type?: string) {
     await this.__swagger()
     this.swagger = this.load()
-    for (const model of this.swagger.models) {
+    this.type = type
+    const models = this.entities()
+    for (const model of models) {
       if (!name || (name && model.ClassName === upperCamel(name))) {
         this.classname = model.ClassName
         await this.update('app/schemas/', app.root)
@@ -23,7 +25,8 @@ export default class Generator extends Base {
   async schema(name?: string) {
     this.__swagger()
     this.swagger = this.load()
-    for (const model of this.swagger.models) {
+    const models = this.entities()
+    for (const model of models) {
       if (!name || (name && model.ClassName === upperCamel(name))) {
         await this.entity(model.ClassName)
       }
@@ -46,7 +49,6 @@ export default class Generator extends Base {
 
   async index() {
     this.swagger = this.load()
-    console.log(this.swagger)
     await this.injector(false)
   }
 

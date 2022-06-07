@@ -1,7 +1,7 @@
 import { IOptions } from './options'
 import Base from './base'
 import { app, components } from './types'
-import { snake } from './common'
+import { snake, upperCamel } from './common'
 
 export default class Component extends Base {
   constructor(protected options: IOptions) {
@@ -12,7 +12,7 @@ export default class Component extends Base {
     this.swagger = this.load()
     if (name) {
       this.classname = name
-      await this.update('components/app/assets', components.assets)
+      await this.update('components/app/pages', components.pages)
     } else {
       Object.keys(this.swagger.paths)
         .filter((key) => {
@@ -26,7 +26,14 @@ export default class Component extends Base {
   }
 
   async form(name?: string) {
-    await this.update('components/index', components.organisms)
+    this.swagger = this.load()
+    const models = this.entities().filter((model) => !this.configs.schemas!.excludes?.includes(model.ClassName))
+    for (const model of models) {
+      if (!name || (name && model.ClassName === upperCamel(name))) {
+        this.classname = model.ClassName
+        await this.update('components/' + components.organisms, components.organisms)
+      }
+    }
   }
 
   async auth(name?: string) {

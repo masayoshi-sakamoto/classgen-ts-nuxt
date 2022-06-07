@@ -2,6 +2,7 @@ import { NuxtCookies } from 'cookie-universal-nuxt'
 import { Store } from 'vuex'
 import { RootState } from '@/store'
 import * as types from '@/store/app/types'
+import MenuEntity from '@/entities/Menu'
 
 export default class AppRepository {
   private cookies: NuxtCookies
@@ -34,5 +35,13 @@ export default class AppRepository {
 
   get drawer(): boolean | null {
     return this.store.state.app.drawer
+  }
+
+  set current(value: MenuEntity | undefined) {
+    this.store.commit(new types.Current(value?.props))
+  }
+
+  get current(): MenuEntity | undefined {
+    return this.store.state.app.current ? new MenuEntity(this.store.state.app.current) : undefined
   }
 }

@@ -20,6 +20,7 @@ export default class Base {
   protected swagger: { paths: any; models: IModel[] } = { paths: {}, models: [] }
   protected sqldump?: any
   protected configs: IConfig
+  protected type?: string
 
   constructor(protected opts: IOptions) {
     // ネームスペースがない場合は処理を終了
@@ -103,6 +104,7 @@ export default class Base {
       ...this.replace(),
       swagger,
       app,
+      type: this.type,
       readfiles: this.readfiles.bind(this),
       ...this.swagger,
       auth: this.opts.auth,
@@ -209,5 +211,14 @@ export default class Base {
     } else {
       error('file not found.')
     }
+  }
+
+  /**
+   * schemaからSeedを抜いたモデル名だけ返す
+   */
+  protected entities() {
+    return this.swagger.models.filter((model) => {
+      return !model.ClassName.match(/(.+)Seed$/)
+    })
   }
 }
