@@ -5,10 +5,11 @@
     :query="App.<%= className %>.query"
     :headers="headers"
     @save="save"
-    @fetch="fetch"
+    @remove="remove"
+    @fetch="params"
   >
     <template #form="{ item }">
-      <Form<%= ClassName %> :value="item" @input="value = $event"></Form<%= ClassName %>>
+      <Form<%= ClassName %> :value="item" type="dialog" @input="value = $event"></Form<%= ClassName %>>
     </template>
   </TtemplateList>
 </template>
@@ -20,6 +21,7 @@ import Form<%= ClassName %> from '@/components/organisms/Form/<%= ClassName %>'
 import { I<%= ClassName %>Props, headers } from '@/entities/<%= ClassName %>'
 import Fetch<%= ClassName %>sUseCase from '@/usecases/<%= className %>/Fetch<%= ClassName %>sUseCase'
 import Save<%= ClassName %>UseCase from '@/usecases/<%= className %>/Save<%= ClassName %>UseCase'
+import Delete<%= ClassName %>UseCase from '@/usecases/<%= className %>/Delete<%= ClassName %>UseCase'
 
 interface IData {
   items: I<%= ClassName %>Props[]
@@ -40,17 +42,32 @@ export default Vue.extend({
     }
   },
   async fetch() {
-    await this.fetch()
+    if (this.App.<%= className %>.fetched.length === 0) {
+      this.App.<%= className %>.options = {
+        ...this.App.<%= className %>.options,
+        ...this.$route.query
+      }
+      await this.fetch()
+    }
   },
   methods: {
+    async params() {
+      this.$router.push({
+        path: this.$route.path,
+        query: { ...this.App.<%= className %>.options } as any
+      })
+      await this.fetch()
+    },
     async fetch() {
-      try {
-        this.App.data.loading = true
-        await new Fetch<%= ClassName %>sUseCase(this.App).execute()
-      } catch (e: any) {
-        this.$nuxt.error(e)
-      } finally {
-        this.App.data.loading = false
+      if (!this.App.data.loading) {
+        try {
+          this.App.data.loading = true
+          await new Fetch<%= ClassName %>sUseCase(this.App).execute()
+        } catch (e: any) {
+          this.$nuxt.error(e)
+        } finally {
+          this.App.data.loading = false
+        }
       }
     },
     async save() {
@@ -64,6 +81,16 @@ export default Vue.extend({
         this.$nuxt.error(e)
       } finally {
         this.App.data.saving = false
+      }
+    },
+    async remove(value: I<%= ClassName %>Props) {
+      try {
+        await new Delete<%= ClassName %>UseCase(this.App).execute(value!)
+        await this.fetch()
+      } catch (e: any) {
+        this.$nuxt.error(e)
+      } finally {
+        this.App.data.removing = false
       }
     }
   }

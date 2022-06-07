@@ -30,7 +30,11 @@ export default {
   css: ['@/assets/style.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/injector', '@/plugins/veeValidate'],
+  plugins: [
+    '@/plugins/injector',
+    { src: '@/plugins/veeValidate', ssr: true }
+    // '@/plugins/vuetify'
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: [{ path: '@/components/atoms', extensions: ['vue'] }],
