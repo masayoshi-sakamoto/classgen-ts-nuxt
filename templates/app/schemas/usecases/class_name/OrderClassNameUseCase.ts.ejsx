@@ -1,0 +1,21 @@
+import { IApp } from '@/types/nuxt'
+import { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+import refresh from '@/utils/refresh'
+
+export default class Order<%= ClassName %>UseCase implements BaseUseCase {
+  App: IApp
+  constructor(app: IApp) {
+    this.App = app
+  }
+
+  async execute(props: I<%= ClassName %>Props[]) {
+    try {
+      await refresh(this.App)
+      await this.App.<%= appName %>Gateway.<%= ClassName %>.Order<%= ClassName %>(props)
+    } catch (exception: any) {
+      this.App.logService.handle(exception)
+      return false
+    }
+    return true
+  }
+}

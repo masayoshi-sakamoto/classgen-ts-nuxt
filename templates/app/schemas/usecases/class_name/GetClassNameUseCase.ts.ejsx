@@ -10,10 +10,16 @@ export default class Get<%= ClassName %>UseCase implements BaseUseCase {
   }
 
   async execute(id: string) {
-    <%_ if (auth) { _%>
-    await refresh(this.App)
-    <%_ } _%>
-    const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Get<%= ClassName %>(id)
-    this.App.<%= className %>.fetched = [response]
+    try {
+      <%_ if (auth) { _%>
+      await refresh(this.App)
+      <%_ } _%>
+      const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Get<%= ClassName %>(id)
+      this.App.<%= className %>.fetched = [response]
+    } catch (exception: any) {
+      this.App.logService.handle(exception)
+      return false
+    }
+    return true
   }
 }

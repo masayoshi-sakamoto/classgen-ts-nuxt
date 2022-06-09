@@ -1,3 +1,4 @@
+import * as fs from 'fs'
 import { IOptions } from './options'
 import Base from './base'
 import { app, swagger } from './types'
@@ -9,14 +10,22 @@ export default class Generator extends Base {
   }
 
   async usecase(name?: string, type?: string) {
+    await this.schema(name)
     await this.__swagger()
     this.swagger = this.load()
     this.type = type
-    const models = this.entities()
-    for (const model of models) {
-      if (!name || (name && model.ClassName === upperCamel(name))) {
-        this.classname = model.ClassName
-        await this.update('app/schemas/', app.root)
+
+    const paths: any = Object.entries(this.swagger.paths)
+    for (const [key, path] of paths) {
+      if (!name || (name && key === upperCamel(name))) {
+        this.classname = name || this.classname
+        await this.update('app/schemas/gateways/AppName', app.gateways)
+        await this.update('app/schemas/infrastructure', app.infrastructure)
+        for (const prop of Object.values(path)) {
+          const operationId: string = (prop as any).operationId
+          const filename = operationId === 'Post' + key ? 'Save' + key : operationId
+          await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
+        }
       }
     }
     await this.injector(true)

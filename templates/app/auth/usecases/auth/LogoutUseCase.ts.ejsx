@@ -8,9 +8,10 @@ export default class LogoutUseCase implements BaseUseCase {
   async execute() {
     try {
       await refresh(this.App)
-      return await this.App.<%= appName %>Gateway.Auth.Logout()
-    } catch (exception) {
+      await this.App.<%= appName %>Gateway.Auth.Logout()
+    } catch (exception: any) {
+      this.App.logService.handle(exception)
       return false
     }
-  }
+    return true  }
 }

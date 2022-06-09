@@ -19,12 +19,11 @@ import Vue from 'vue'
 import TtemplateList from '@/components/templates/List'
 import Form<%= ClassName %> from '@/components/organisms/Form/<%= ClassName %>'
 import { I<%= ClassName %>Props, headers } from '@/entities/<%= ClassName %>'
-import Fetch<%= ClassName %>sUseCase from '@/usecases/<%= className %>/Fetch<%= ClassName %>sUseCase'
+import Fetch<%= ClassName %>UseCase from '@/usecases/<%= className %>/Fetch<%= ClassName %>UseCase'
 import Save<%= ClassName %>UseCase from '@/usecases/<%= className %>/Save<%= ClassName %>UseCase'
 import Delete<%= ClassName %>UseCase from '@/usecases/<%= className %>/Delete<%= ClassName %>UseCase'
 
 interface IData {
-  items: I<%= ClassName %>Props[]
   headers: { text: string; value: any }[]
   value: I<%= ClassName %>Props | undefined
 }
@@ -36,7 +35,6 @@ export default Vue.extend({
   },
   data(): IData {
     return {
-      items: [],
       headers,
       value: undefined
     }
@@ -59,39 +57,17 @@ export default Vue.extend({
       await this.fetch()
     },
     async fetch() {
-      if (!this.App.data.loading) {
-        try {
-          this.App.data.loading = true
-          await new Fetch<%= ClassName %>sUseCase(this.App).execute()
-        } catch (e: any) {
-          this.$nuxt.error(e)
-        } finally {
-          this.App.data.loading = false
-        }
-      }
+      await new Fetch<%= ClassName %>UseCase(this.App).execute()
     },
     async save() {
-      try {
-        this.App.data.saving = true
-        if (await new Save<%= ClassName %>UseCase(this.App).execute(this.value!)) {
-          await this.fetch()
-          this.App.data.dialog = false
-        }
-      } catch (e: any) {
-        this.$nuxt.error(e)
-      } finally {
-        this.App.data.saving = false
+      if (await new Save<%= ClassName %>UseCase(this.App).execute(this.value!)) {
+        await this.fetch()
+        this.App.data.dialog = false
       }
     },
     async remove(value: I<%= ClassName %>Props) {
-      try {
-        await new Delete<%= ClassName %>UseCase(this.App).execute(value!)
-        await this.fetch()
-      } catch (e: any) {
-        this.$nuxt.error(e)
-      } finally {
-        this.App.data.removing = false
-      }
+      await new Delete<%= ClassName %>UseCase(this.App).execute(value!)
+      await this.fetch()
     }
   }
 })

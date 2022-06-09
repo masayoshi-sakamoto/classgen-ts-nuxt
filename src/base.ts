@@ -52,33 +52,33 @@ export default class Base {
   /**
    * 削除フラグがあったら削除、なければ作成
    */
-  protected async update(src: string, dist: string) {
+  protected async update(src: string, dist: string, match?: string) {
     if (this.opts.global.remove) {
-      await this.remove(src, dist)
+      await this.remove(src, dist, false, match)
     } else {
-      await this.generate(src, dist)
+      await this.generate(src, dist, false, match)
     }
   }
 
   /**
    * 指定されたフォルダの中をレンダリングする
    */
-  protected async generate(src: string, dist: string, silent: boolean = false) {
-    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'render', silent)
+  protected async generate(src: string, dist: string, silent: boolean = false, match?: string) {
+    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'render', silent, match)
   }
 
   /**
    * 指定されたフォルダの中を削除
    */
-  protected async remove(src: string, dist: string, silent: boolean = false) {
-    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'rm', silent)
+  protected async remove(src: string, dist: string, silent: boolean = false, match?: string) {
+    await this.readdir(path.join(this.src, src), path.join(this.dist, dist), 'rm', silent, match)
   }
 
   /**
    * 指定されたsrcに基づいて、distにディレクトリとファイルを生成と削除
    * methodを指定することで、そのファイルに対してなにをするかを指定出来る
    */
-  protected async readdir(src: string, dist: string, method: string, silent: boolean = false) {
+  protected async readdir(src: string, dist: string, method: string, silent: boolean = false, match?: string) {
     if (fs.existsSync(src)) {
       const files = fs.readdirSync(src, { withFileTypes: true })
       dist = replaces(dist, this.replace())
@@ -90,7 +90,9 @@ export default class Base {
             fs.rmdirSync(name)
           }
         } else {
-          await (this as any)[method](path.join(src, file.name), name, silent)
+          if (!match || (match && name.match(new RegExp(`(.*)\/${match}`)))) {
+            await (this as any)[method](path.join(src, file.name), name, silent)
+          }
         }
       }
     }

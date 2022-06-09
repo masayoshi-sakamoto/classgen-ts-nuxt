@@ -69,9 +69,9 @@ try {
         options.auth = true
       }
 
-      if (options.swagger && command.match(/^(schema|auth|index)$/)) {
+      if (options.swagger && command.match(/^(usecase|schema|auth|index)$/)) {
         const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
-        await swagger[command === 'schema' ? 'all' : command](name)
+        await swagger[command === 'schema' || command === 'usecase' ? 'all' : command](name)
         if (command !== 'index' && commander.opts().sqldump) {
           await swagger.sql(name)
         }

@@ -56,7 +56,7 @@ export default class OpenAPIParser {
       title: value.title,
       required,
       nullable: value.nullable,
-      default: value.default || 'null',
+      default: value.default === null ? 'null' : value.default,
       format: value.format
     }
     if (value.$ref !== undefined) {
@@ -91,12 +91,12 @@ export default class OpenAPIParser {
 
   parsePaths(paths: PathObject): { [key: string]: any } {
     return Object.values(paths)
-      .map((prop) => {
-        const item = Object.keys(prop).map((key) => {
-          return prop[key]
+      .map((path) => {
+        const item = Object.keys(path).map((key) => {
+          return { ...path[key], method: key.toUpperCase() }
         })
         const items = item.reduce((result, prop) => {
-          const tags = prop.tags ? prop.tags[0] : undefined
+          const tags = prop.tags || undefined
           result.push({
             ...prop,
             tags
@@ -111,6 +111,7 @@ export default class OpenAPIParser {
           ...result[prop.tags],
           [prop.operationId]: {
             ...prop,
+            method: prop.method,
             requestBody: prop.requestBody ? this.parseRequestBody(prop.requestBody) : undefined,
             responses: this.parseResponse(prop.responses)
           }

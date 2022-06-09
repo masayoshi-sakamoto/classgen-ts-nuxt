@@ -11,9 +11,20 @@ export default class Delete<%= ClassName %>UseCase implements BaseUseCase {
   }
 
   async execute(props: I<%= ClassName %>Props) {
-    <%_ if (auth) { _%>
-    await refresh(this.App)
-    <%_ } _%>
-    await this.App.<%= appName %>Gateway.<%= ClassName %>.Delete<%= ClassName %>(props)
+    try {
+      if (!this.App.data.removing) {
+        this.App.data.removing = true
+        <%_ if (auth) { _%>
+        await refresh(this.App)
+        <%_ } _%>
+        await this.App.<%= appName %>Gateway.<%= ClassName %>.Delete<%= ClassName %>(props)
+      }
+    } catch (exception: any) {
+      this.App.logService.handle(exception)
+      return false
+    } finally {
+      this.App.data.removing = false
+    }
+    return true
   }
 }

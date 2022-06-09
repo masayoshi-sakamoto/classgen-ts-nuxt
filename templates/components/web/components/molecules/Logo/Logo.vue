@@ -2,7 +2,7 @@
   <div class="logo">
     <nuxt-link to="/" class="d-flex align-end">
       <img width="25" src="/assets/img/logo.svg" />
-      <div class="ml-3">Bambooo Work</div>
+      <div class="ml-3"><%= AppName %></div>
     </nuxt-link>
   </div>
 </template>

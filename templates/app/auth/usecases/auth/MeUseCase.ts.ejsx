@@ -10,13 +10,8 @@ export default class MeUseCase implements BaseUseCase {
       await refresh(this.App)
       this.App.<%= class_name %>.current = await this.App.<%= appName %>Gateway.Auth.Me()
     } catch (exception: any) {
-      if (exception.statusCode === 401) {
-        return false
-      } else {
-        console.log(exception)
-        throw new Error(exception)
-      }
+      this.App.logService.handle(exception)
+      return false
     }
-    return true
-  }
+    return true  }
 }

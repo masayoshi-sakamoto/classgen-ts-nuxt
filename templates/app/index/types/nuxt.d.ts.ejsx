@@ -13,6 +13,8 @@ import <%= repository %> from '@/repositories/<%= repository %>'
 import <%= AppName %>Gateway from '@/gateways/<%= AppName %>'
 <%_ }) _%>
 
+// Services
+import LogService from '@/services/LogService'
 
 declare module 'vuex/types/index' {
   interface ActionTree<S, R> {
@@ -29,6 +31,7 @@ export interface IApp {
   <%_ AppNames.forEach((AppName) => { _%>
   <%= lowerCamel(AppName) %>Gateway: <%= AppName %>Gateway
   <%_ }) _%>
+  logService: LogService
 }
 
 declare module 'vue/types/vue' {

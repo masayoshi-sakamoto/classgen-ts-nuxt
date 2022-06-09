@@ -41,7 +41,7 @@ export const app = {
   store: 'app/store',
   repositories: 'app/repositories',
   types: 'app/types',
-  usecases: 'app/usecases'
+  usecases: 'app/usecases/class_name'
 }
 
 export const components = {
@@ -86,6 +86,8 @@ export interface IYAML {
   class_name: string // クラス名
   index: string // 通常モデルのYAML文
   seed: string // StoreモデルのYAML文
+  path: string // /{class_names}/{id} get put delete
+  paths: string // /{class_names}/ fetch post
 }
 
 // swagger-type: typescript-type
@@ -125,6 +127,19 @@ export type ITsSchema = {
   default?: any
   format?: string
 }
+
 export type IRef = {
   name: string
+}
+
+export interface IProperty {
+  type: string
+  format?: string
+  title: string
+  nullable?: boolean
+  default: any
+}
+
+export interface IProperties {
+  [id: string]: IProperty | { [$ref: string]: string }
 }

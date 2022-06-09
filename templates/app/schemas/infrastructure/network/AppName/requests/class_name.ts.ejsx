@@ -2,60 +2,43 @@ import { <%= AppName %>, <%= ClassName %>Seed } from '@/infrastructure/network/<
 import { APIRequest } from '@/infrastructure/network/APIRequest'
 import { HTTPMethod } from '@/infrastructure/network/types'
 import { IQueryProps } from '@/entities/Query'
+<%_ const key = Object.keys(paths).find((key) => key === ClassName) _%>
+<%_ const path = key ? paths[key] : undefined _%>
+<%_ if (path) { _%>
+<%_ Object.values(path).forEach((prop) => { _%>
 
-export class Get<%= ClassName %> implements APIRequest<<%= AppName %>.<%= ClassName %>.get<%= ClassName %>Response> {
-  response: <%= AppName %>.<%= ClassName %>.get<%= ClassName %>Response
+export class <%= prop.operationId %> implements APIRequest<<%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response> {
+  response: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response
   path: string
   contentType = 'application/json'
-  method = HTTPMethod.GET
-  constructor(<%= className %>Id: string) {
-    this.path = `/<%= class_name %>s/${<%= className %>Id}`
-  }
-}
-
-export class Fetch<%= ClassNames %> implements APIRequest<<%= AppName %>.<%= ClassName %>.fetch<%= ClassNames %>Response> {
-  response: <%= AppName %>.<%= ClassName %>.fetch<%= ClassNames %>Response
-  path: string
-  contentType = 'application/json'
-  method = HTTPMethod.GET
+  method = HTTPMethod.<%= prop.method %>
+  <%_ const id = prop.operationId.replace(ClassName, '') _%>
+  <%_ if ( id === 'Get') { _%>
+  constructor(<%= prop.parameters ? 'id: '+prop.parameters.schema.type : '' %>) {
+  <%_ } else if ( id === 'Fetch') { _%>
   params?: IQueryProps
   constructor(query?: IQueryProps) {
     this.params = query
-    this.path = '/<%= class_name %>s'
-  }
-}
-
-export class Post<%= ClassName %> implements APIRequest<<%= AppName %>.<%= ClassName %>.post<%= ClassName %>Response> {
-  response: <%= AppName %>.<%= ClassName %>.post<%= ClassName %>Response
-  path: string
-  contentType = 'application/json'
-  method = HTTPMethod.POST
-  params: <%= AppName %>.<%= ClassName %>.post<%= ClassName %>Request
+  <%_ } else if ( id === 'Post') { _%>
+  params: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request
   constructor(params: <%= ClassName %>Seed) {
     this.params = params
-    this.path = '/<%= class_name %>s'
-  }
-}
-
-export class Put<%= ClassName %> implements APIRequest<<%= AppName %>.<%= ClassName %>.put<%= ClassName %>Response> {
-  response: <%= AppName %>.<%= ClassName %>.put<%= ClassName %>Response
-  path: string
-  contentType = 'application/json'
-  method = HTTPMethod.PUT
-  params: <%= AppName %>.<%= ClassName %>.put<%= ClassName %>Request
+  <%_ } else if ( id === 'Put') { _%>
+  params: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request
   constructor(params: <%= ClassName %>Seed) {
-    const <%= className %>Id = params.id
+    const id = params.id
     this.params = params
-    this.path = `/<%= class_name %>s/${<%= className %>Id}`
+  <%_ } else if ( id === 'Delete') { _%>
+  constructor(id: string) {
+  <%_ } else if ( id === 'Order') { _%>
+  params: { order: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request[] }
+  constructor(params: <%= ClassName %>Seed[]) {
+    this.params = { order: params }
+  <%_ } else  { _%>
+  constructor() {
+  <%_ } _%>
+    this.path = `/<%= class_names %><%= prop.parameters ? '/${id}' : '' %>`
   }
 }
-
-export class Delete<%= ClassName %> implements APIRequest<<%= AppName %>.<%= ClassName %>.delete<%= ClassName %>Response> {
-  response: <%= AppName %>.<%= ClassName %>.delete<%= ClassName %>Response
-  path: string
-  contentType = 'application/json'
-  method = HTTPMethod.DELETE
-  constructor(<%= className %>Id: string) {
-    this.path = `/<%= class_name %>s/${<%= className %>Id}`
-  }
-}
+<%_ }) _%>
+<%_ } _%>

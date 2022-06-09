@@ -1,35 +1,52 @@
+<%_ const key = Object.keys(paths).find((key) => key === ClassName) _%>
+<%_ const path = key ? paths[key] : undefined _%>
+<%_ if (path) { _%>
 /* eslint camelcase: 0 */
 import { <%= AppName %>GatewayBase } from './base'
 import { to<%= ClassName %>Props, to<%= ClassName %>Seed } from './translator/<%= class_name %>'
 import { optionsToQuery, toQueryProps } from './translator/query'
 import { toOptionsProps } from './translator/options'
-import { Get<%= ClassName %>, Fetch<%= ClassNames %>, Post<%= ClassName %>, Put<%= ClassName %>, Delete<%= ClassName %> } from '@/infrastructure/network/<%= AppName %>/requests/<%= class_name %>'
+import { <%= Object.values(path).map((prop) => prop.operationId).join(', ') %> } from '@/infrastructure/network/<%= AppName %>/requests/<%= class_name %>'
 import { I<%= ClassName %>Props, Empty<%= ClassName %>PropsFactory } from '@/entities/<%= ClassName %>'
 import { IOptionsProps } from '@/entities/Options'
 
 export default class <%= ClassName %> extends <%= AppName %>GatewayBase {
-  async Get<%= ClassName %>(id: string): Promise<I<%= ClassName %>Props> {
-    const { <%= className %> } = await this.apiClient.request(new Get<%= ClassName %>(id)<%- type ? `, '${type}'` : ''  %>)
+<%_ Object.values(path).forEach((prop) => { _%>
+  <%_ const id = prop.operationId.replace(ClassName, '') _%>
+  <%_ if ( id === 'Get') { _%>
+  async <%= prop.operationId %>(<%= prop.parameters ? 'id: '+prop.parameters.schema.type : '' %>): Promise<I<%= ClassName %>Props> {
+    const { <%= className %> } = await this.apiClient.request(new <%= prop.operationId %>(id)<%- type ? `, '${type}'` : ''  %>)
     return <%= className %> ? to<%= ClassName %>Props(<%= className %>) : Empty<%= ClassName %>PropsFactory()
   }
+  <%_ } else if ( id === 'Fetch') { _%>
 
-  async Fetch<%= ClassNames %>(options?: IOptionsProps) {
-    const response = await this.apiClient.request(new Fetch<%= ClassNames %>(optionsToQuery(options))<%- type ? `, '${type}'` : ''  %>)
-    return {
-      items: response.<%= classNames %>.map((prop) => to<%= ClassName %>Props(prop)),
-      query: toQueryProps(response.query),
-      options: toOptionsProps(response.query)
-    }
+  async <%= prop.operationId %>(options?: IOptionsProps) {
+  const response = await this.apiClient.request(new <%= prop.operationId %>(optionsToQuery(options))<%- type ? `, '${type}'` : ''  %>)
+  return {
+    items: response.<%= classNames %>.map((prop) => to<%= ClassName %>Props(prop)),
+    query: toQueryProps(response.query),
+    options: toOptionsProps(response.query)
   }
+  }
+  <%_ } else if ( id === 'Post') { _%>
 
   async Save<%= ClassName %>(props: I<%= ClassName %>Props) {
     const data = props.id ? new Put<%= ClassName %>(to<%= ClassName %>Seed(props)) : new Post<%= ClassName %>(to<%= ClassName %>Seed(props))
     await this.apiClient.request(data<%- type ? `, '${type}'` : ''  %>)
   }
+  <%_ } else if ( id === 'Delete') { _%>
 
   async Delete<%= ClassName %>(props: I<%= ClassName %>Props) {
     if (props.id) {
       await this.apiClient.request(new Delete<%= ClassName %>(props.id)<%- type ? `, '${type}'` : ''  %>)
     }
   }
+  <%_ } else if ( id === 'Order') { _%>
+
+  async Order<%= ClassName %>(props: I<%= ClassName %>Props[]) {
+    await this.apiClient.request(new Order<%= ClassName %>(props.map((prop) => to<%= ClassName %>Seed(prop)))<%- type ? `, '${type}'` : ''  %>)
+  }
+  <%_ } _%>
+<%_ }) _%>
 }
+<%_ } _%>

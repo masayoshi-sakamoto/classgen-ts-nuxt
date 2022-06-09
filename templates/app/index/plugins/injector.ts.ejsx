@@ -20,6 +20,9 @@ import <%= repository %> from '@/repositories/<%= repository %>'
 import <%= AppName %>Gateway from '@/gateways/<%= AppName %>'
 <%_ }) _%>
 
+// Services
+import LogService from '@/services/LogService'
+
 export default (ctx: Context) => {
   const { store, app } = ctx
   <%_ AppNames.forEach((AppName) => { _%>
@@ -35,6 +38,7 @@ export default (ctx: Context) => {
     <%_ AppNames.forEach((AppName) => { _%>
     <%= lowerCamel(AppName) %>Gateway: new <%= AppName %>Gateway(<%= lowerCamel(AppName) %>APIClient),
     <%_ }) _%>
+    logService: new LogService(ctx, app.$sentry)
   }
 
   ctx.App = {
@@ -46,5 +50,6 @@ export default (ctx: Context) => {
     <%_ AppNames.forEach((AppName) => { _%>
     <%= lowerCamel(AppName) %>Gateway: new <%= AppName %>Gateway(<%= lowerCamel(AppName) %>APIClient),
     <%_ }) _%>
+    logService: new LogService(ctx, app.$sentry)
   }
 }
