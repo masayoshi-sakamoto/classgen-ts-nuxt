@@ -1,15 +1,18 @@
 <%_ const model = models.find((prop) => prop.ClassName === ClassName) _%>
 <%_ if (model) { _%>
   <%_ for (const ref of model.refs) { _%>
-import <%= ref.name %>Entity, { I<%= ref.name %>Props } from '@/entities/<%= ref.name %>'
+  <%_ const name = upperCamel(ref.name) _%>
+import <%= name %>Entity, { I<%= name %>Props } from '@/entities/<%= name %>'
   <%_ } _%>
 <%_ } _%>
   
 export interface I<%= ClassName %>Props {
 <%_ if (model) { _%>
-<%_ for (const schema of Object.values(model.schema)) { _%>
-  <%= schema.required && schema.key !== 'id' ? lowerCamel(schema.key) : lowerCamel(schema.key)+'?' %>: <% if(schema.ref) { %>I<%= schema.tstype %>Props<% } else { %><%= schema.tstype %><% } %>
-<%_ } _%>
+  <%_ for (const schema of Object.values(model.schema)) { _%>
+    <%_ const property = schema.required && schema.key !== 'id' ? lowerCamel(schema.key) : lowerCamel(schema.key) + '?' _%>
+    <%_ const type = schema.ref ? `I${schema.tstype}Props` : schema.format === 'json' ? 'any' : schema.tstype  _%>
+  <%= property %>: <%= type %>
+  <%_ } _%>
 <%_ } _%>
 }
 
@@ -29,8 +32,9 @@ export default class <%= ClassName %>Entity {
   }
 <%_ if (model) { _%>
   <%_ for (const schema of Object.values(model.schema)) { _%>
-  
-  get <%= lowerCamel(schema.key) %>(): <% if (schema.ref) { %><%= schema.tstype %>Entity<%} else { %><%= schema.tstype %><% } %><%= !schema.required || schema.key === 'id' ? ' | undefined' : '' %> {
+    <%_ const type = schema.ref ? `${schema.tstype}Entity` : schema.format === 'json' ? 'any' : schema.tstype _%>
+    
+  get <%= lowerCamel(schema.key) %>(): <%= type %><%= !schema.required || schema.key === 'id' ? ' | undefined' : ''%> {
     <%_ if (schema.ref) { _%>
     return this._props.<%= lowerCamel(schema.key) %> ? new <%= schema.tstype %>Entity(this._props.<%= lowerCamel(schema.key) %>) : undefined
     <%_} else { _%>
@@ -55,8 +59,9 @@ export const headers = [
 export const Empty<%= ClassName %>PropsFactory = (props?: Partial<I<%= ClassName %>Props> | null): I<%= ClassName %>Props => ({
 <%_ if (model) { _%>
   <%_ for (const schema of Object.values(model.schema)) { _%>
-    <%_ if (schema.required && schema.key !== 'id') {_%>
-  <%= lowerCamel(schema.key) %>: <% if(schema.ref) { %>Empty<%= schema.tstype %>PropsFactory<% } else { %><%= schema.default %><% } %>,
+    <%_ if (schema.required && schema.key !== 'id') { _%>
+    <%_ const value = schema.ref ? `Empty${schema.tstype}PropsFactory` : schema.format === 'json' ? '{}' : schema.default  _%>
+  <%= lowerCamel(schema.key) %>: <%= value %>,
     <%_ } _%>
   <%_ } _%>
 <%_ } _%>

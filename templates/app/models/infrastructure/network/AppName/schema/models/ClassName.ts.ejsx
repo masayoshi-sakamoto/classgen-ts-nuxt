@@ -4,7 +4,7 @@
 <%_ const model = models.find((prop) => prop.ClassName === ClassName) _%>
 <%_ if (model) { _%>
 <%_ for (const ref of model.refs) { _%>
-import <%= ref.name %> from './<%= ref.name %>'
+import <%= ref.schema %> from './<%= ref.schema %>'
 <%_ } _%>
 <%_ } _%>
 

@@ -130,6 +130,7 @@ export type ITsSchema = {
 
 export type IRef = {
   name: string
+  schema: string
 }
 
 export interface IProperty {

@@ -10,11 +10,14 @@ export default class Order<%= ClassName %>UseCase implements BaseUseCase {
 
   async execute(props: I<%= ClassName %>Props[]) {
     try {
+      this.App.data.saving = true
       await refresh(this.App)
       await this.App.<%= appName %>Gateway.<%= ClassName %>.Order<%= ClassName %>(props)
     } catch (exception: any) {
       this.App.logService.handle(exception)
       return false
+    } finally {
+      this.App.data.saving = false
     }
     return true
   }

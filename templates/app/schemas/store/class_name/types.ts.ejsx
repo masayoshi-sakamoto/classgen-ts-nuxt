@@ -5,10 +5,12 @@ import { IQueryProps } from '@/entities/Query'
 export const Types = {
   store: 'store',
   fetched: 'fetched',
+  udpate: 'udpate',
   query: 'query',
   options: 'options',
   loading: 'loading',
-  current: 'current'
+  current: 'current',
+  reset: 'reset'
 }
 
 export const path = '<%= class_name %>/'
@@ -21,6 +23,11 @@ export class Store implements FluxStandardAction<I<%= ClassName %>Props[]> {
 export class Fetched implements FluxStandardAction<I<%= ClassName %>Props[]> {
   type = path + Types.fetched
   constructor(public payload: I<%= ClassName %>Props[]) {}
+}
+
+export class Update implements FluxStandardAction<I<%= ClassName %>Props> {
+  type = path + Types.udpate
+  constructor(public payload: I<%= ClassName %>Props) {}
 }
 
 export class Query implements FluxStandardAction<IQueryProps> {
@@ -41,4 +48,9 @@ export class Loading implements FluxStandardAction<boolean> {
 export class Current implements FluxStandardAction<I<%= ClassName %>Props> {
   type = path + Types.current
   constructor(public payload: I<%= ClassName %>Props) {}
+}
+
+export class Reset implements FluxStandardAction<boolean> {
+  type = path + Types.reset
+  constructor(public payload: boolean) {}
 }

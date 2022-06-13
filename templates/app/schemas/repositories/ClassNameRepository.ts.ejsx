@@ -24,6 +24,10 @@ export default class <%= ClassName %>Repository {
     this.store.commit(new types.Store(value))
   }
 
+  get items() {
+    return this.store.state.cast.byIds
+  }
+
   set query(value: IQueryProps) {
     this.store.commit(new types.Query(value))
   }
@@ -56,14 +60,34 @@ export default class <%= ClassName %>Repository {
     return this.store.state.<%= className %>.current
   }
 
-  get items() {
-    return new Proxy(this.store.state.<%= className %>.byIds, {
-      get(target, prop) {
-        if (typeof prop === 'symbol') {
-          return Object.getOwnPropertySymbols(target)[prop]
-        }
-        return target[prop]
-      }
+  set reset(value: boolean) {
+    this.store.commit(new types.Reset(value))
+  }
+
+  get reset(): boolean {
+    return this.store.state.cast.reset
+  }
+
+  /**
+   * orderカラムを持っていてソート機能を使う場合はコメントアウトしてください
+   *
+  get sortable(): I<%= ClassName %>Props[] {
+    return Object.values(this.store.state.<%= className %>.byIds).sort((a, b) => {
+      return a.order > b.order ? 1 : a.order < b.order ? -1 : 0
     })
+  }
+
+  set sortable(value: I<%= ClassName %>Props[]) {
+    let i = 1
+    const v = JSON.parse(JSON.stringify(value)).map((props: any) => {
+      props.order = i++
+      return props
+    })
+    this.store.commit(new types.Store(v))
+  }
+  */
+
+  update(value: I<%= ClassName %>Props) {
+    this.store.commit(new types.Update(value))
   }
 }

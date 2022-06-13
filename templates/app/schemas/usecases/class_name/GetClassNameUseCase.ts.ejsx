@@ -15,7 +15,7 @@ export default class Get<%= ClassName %>UseCase implements BaseUseCase {
       await refresh(this.App)
       <%_ } _%>
       const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Get<%= ClassName %>(id)
-      this.App.<%= className %>.fetched = [response]
+      this.App.<%= className %>.update(response)
     } catch (exception: any) {
       this.App.logService.handle(exception)
       return false

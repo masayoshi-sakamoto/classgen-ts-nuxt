@@ -21,6 +21,8 @@ export default class Generator extends Base {
         this.classname = name || this.classname
         await this.update('app/schemas/gateways/AppName', app.gateways)
         await this.update('app/schemas/infrastructure', app.infrastructure)
+        await this.update('app/schemas/repositories', app.repositories)
+        await this.update('app/schemas/store', app.store)
         for (const prop of Object.values(path)) {
           const operationId: string = (prop as any).operationId
           const filename = operationId === 'Post' + key ? 'Save' + key : operationId

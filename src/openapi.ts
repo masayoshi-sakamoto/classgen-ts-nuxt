@@ -36,7 +36,8 @@ export default class OpenAPIParser {
 
   private refs(key: string, value: SchemaObject): IRef[] {
     if (value.$ref !== undefined) {
-      return [{ name: toCamelCase(key) }]
+      const name = value.$ref.split('/').pop()
+      return [{ name: key, schema: name }]
     } else if (value.properties !== undefined) {
       const refs = Object.keys(value.properties).flatMap((key) => {
         if (value.properties![key].$ref !== undefined) {
@@ -63,7 +64,7 @@ export default class OpenAPIParser {
       const name = value.$ref.split('/').pop()
       schema = {
         ...schema,
-        key: toUnderscoreCase(name),
+        key,
         tstype: name,
         ref: true
       }

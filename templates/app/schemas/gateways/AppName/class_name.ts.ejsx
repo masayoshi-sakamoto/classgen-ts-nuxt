@@ -32,7 +32,8 @@ export default class <%= ClassName %> extends <%= AppName %>GatewayBase {
 
   async Save<%= ClassName %>(props: I<%= ClassName %>Props) {
     const data = props.id ? new Put<%= ClassName %>(to<%= ClassName %>Seed(props)) : new Post<%= ClassName %>(to<%= ClassName %>Seed(props))
-    await this.apiClient.request(data<%- type ? `, '${type}'` : ''  %>)
+    const { <%= className %> } = await this.apiClient.request(data<%- type ? `, '${type}'` : ''  %>)
+    return <%= className %> ? to<%= ClassName %>Props(<%= className %>) : Empty<%= ClassName %>PropsFactory()
   }
   <%_ } else if ( id === 'Delete') { _%>
 

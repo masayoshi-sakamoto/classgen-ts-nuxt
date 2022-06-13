@@ -11,6 +11,7 @@ export interface I<%= ClassName %>State {
   options: IOptionsProps
   loading: boolean
   current: I<%= ClassName %>Props
+  reset: boolean
 }
 
 export const state = (): I<%= ClassName %>State => ({
@@ -19,7 +20,8 @@ export const state = (): I<%= ClassName %>State => ({
   query: EmptyQueryPropsFactory(),
   options: {},
   loading: false,
-  current: Empty<%= ClassName %>PropsFactory()
+  current: Empty<%= ClassName %>PropsFactory(),
+  reset: true
 })
 
 export default state

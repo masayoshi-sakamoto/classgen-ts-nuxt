@@ -4,7 +4,7 @@
       <v-card width="100%" max-width="380" flat>
         <v-card-title v-if="title" class="justify-center text-h4 font-weight-bold mb-5">{{ title }}</v-card-title>
         <v-card-text>
-          <a-form id="form" v-slot="{ invalid }" @submit.prevent="$emit('submit', $event)">
+          <a-form id="form" v-slot="{ invalid }" @submit="$emit('submit', $event)">
             <slot></slot>
             <a-btn submit :disabled="invalid">{{ button }}</a-btn>
           </a-form>

@@ -15,7 +15,7 @@ _%>
 import moment from 'moment'
   <%_ } _%>
     <%_ for (const ref of model.refs) { _%>
-import { to<%= ref.name %>Props } from './<%= snake(ref.name) %>'
+import { to<%= upperCamel(ref.name) %>Props } from './<%= snake(ref.name) %>'
     <%_ } _%>
   <%_ } _%>
 <%_ if (schemas.length > 0) { _%>
@@ -35,7 +35,11 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
     return Empty<%= ClassName %>PropsFactory()
   }
 
-  const { <%= Object.values(model.schema).map((prop) => prop.key).join(', ') %> } = props
+  const { <%= Object.values(model.schema).flatMap((prop) => (prop.format !== 'json' ? prop.key : [])).join(', ') %> } = props
+  <%_ Object.values(model.schema).filter((prop) => prop.format === 'json').forEach((prop) => { _%>
+  const <%= prop.key %> = props.<%= prop.key %> ? JSON.parse(props.<%= prop.key %>).<%= prop.key %> : null
+  <%_ }) _%>
+  
   return {
     <%- Object.values(model.schema).map((prop) => {
       const camel = lowerCamel(prop.key)
@@ -44,7 +48,7 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
       if (prop.ref) {
         src = `to${model}Props(${prop.key})`
       } else if (prop.format === 'json') {
-        src = `${prop.key} ? JSON.parse(${prop.key}).${prop.key} : {}`
+        src = `${prop.key} || {}`
       } else if (prop.format === 'date') {
         src = `${prop.key} ? moment(${prop.key}).format('YYYY-MM-DD') : null`
       }
