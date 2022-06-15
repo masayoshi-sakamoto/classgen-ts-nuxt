@@ -54,6 +54,7 @@ export default Vue.extend({
         this.App.state.errors = []
         this.props = this.value ? new <%= ClassName %>Entity(this.value).clone : Empty<%= ClassName %>PropsFactory()
       },
+      deep: true,
       immediate: true
     }
   },

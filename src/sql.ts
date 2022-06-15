@@ -1,7 +1,7 @@
 import { Create, Parser } from 'node-sql-parser'
 import { toCamelCase } from './lib/snake-camel'
 import Inflector from './lib/inflector'
-import { IColumn, IConfig, IProperties, IProperty, IYAML } from './types'
+import { IColumn, IConfig, IProperties, IProperty, IYAML, types } from './types'
 import { IOptions } from './options'
 import { snake, upperCamel } from './common'
 
@@ -15,6 +15,7 @@ export default class SQLParser {
     // 取得してきたSQL文を1行ずつに変更してCREATE TABLE文のみ取得
     this.sqlData = sql
       .replace(/\r\n/g, '\n')
+      .replace(/#.*\n/g, '')
       .replace(/\n/g, '')
       .replace(/;/g, ';\n')
       .split('\n')
@@ -136,7 +137,7 @@ export default class SQLParser {
       in: 'path',
       className: Object.keys(properties)[0],
       schema: {
-        type: Object.values(properties)[0].type
+        type: types[Object.values(properties)[0].type]
       },
       required: true
     }

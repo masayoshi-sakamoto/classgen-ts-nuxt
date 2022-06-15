@@ -1,3 +1,15 @@
+<%_ const key = Object.keys(paths).find((key) => key === ClassName) _%>
+<%_ const path = key ? paths[key] : undefined _%>
+<%_ 
+let type = 'string'
+if (path) { 
+  const value = Object.values(path).find((prop) => {
+    const id = prop.operationId.replace(ClassName, '')
+    return id === 'Get'
+  })
+  type = value.parameters.schema.type
+}
+_%>
 import { IApp } from '@/types/nuxt'
 <%_ if (auth) { _%>
 import refresh from '@/utils/refresh'
@@ -9,7 +21,7 @@ export default class Get<%= ClassName %>UseCase implements BaseUseCase {
     this.App = app
   }
 
-  async execute(id: string) {
+  async execute(id: <%= type %>) {
     try {
       <%_ if (auth) { _%>
       await refresh(this.App)

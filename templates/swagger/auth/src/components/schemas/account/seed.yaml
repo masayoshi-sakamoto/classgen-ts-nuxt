@@ -7,8 +7,10 @@ properties:
     type: string
     nullable: true
     title: 'アカウントID'
+    default: null
   password:
     type: string
     nullable: true
     format: password
     title: 'パスワード'
+    default: null

@@ -36,12 +36,12 @@ export default class DataRepository {
     return this.store.state.data.removing
   }
 
-  set dialog(value: boolean | null) {
-    this.store.commit(new types.Dialog(value))
+  set finished(value: boolean | null) {
+    this.store.commit(new types.Finished(value))
   }
 
-  get dialog(): boolean | null {
-    return this.store.state.data.dialog
+  get finished(): boolean | null {
+    return this.store.state.data.finished
   }
 
   set errors(value: any) {
@@ -50,5 +50,13 @@ export default class DataRepository {
 
   get errors(): any {
     return this.store.state.data.errors
+  }
+
+  set dialog(value: boolean | null) {
+    this.store.commit(new types.Dialog(value))
+  }
+
+  get dialog(): boolean | null {
+    return this.store.state.data.dialog
   }
 }

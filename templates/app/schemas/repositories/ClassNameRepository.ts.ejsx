@@ -25,7 +25,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get items() {
-    return this.store.state.cast.byIds
+    return this.store.state.<%= className %>.byIds
   }
 
   set query(value: IQueryProps) {
@@ -65,7 +65,7 @@ export default class <%= ClassName %>Repository {
   }
 
   get reset(): boolean {
-    return this.store.state.cast.reset
+    return this.store.state.<%= className %>.reset
   }
 
   /**

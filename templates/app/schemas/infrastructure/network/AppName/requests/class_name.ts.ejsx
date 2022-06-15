@@ -29,7 +29,7 @@ export class <%= prop.operationId %> implements APIRequest<<%= AppName %>.<%= Cl
     const id = params.id
     this.params = params
   <%_ } else if ( id === 'Delete') { _%>
-  constructor(id: string) {
+  constructor(<%= 'id: '+prop.parameters.schema.type %>) {
   <%_ } else if ( id === 'Order') { _%>
   params: { order: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request[] }
   constructor(params: <%= ClassName %>Seed[]) {

@@ -7,9 +7,12 @@ properties:
   access_token:
     type: string
     nullable: true
+    default: null
   token_type:
     type: string
     nullable: true
+    default: null
   expired:
     type: string
     nullable: true
+    default: null
