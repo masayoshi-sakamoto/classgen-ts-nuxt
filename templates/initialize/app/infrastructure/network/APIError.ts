@@ -1,6 +1,7 @@
 export interface APIError {
+  statusCode?: number
   message: string
-  statusCode: number | undefined
+  data?: string
   errors: any[]
   raw: Error
 }

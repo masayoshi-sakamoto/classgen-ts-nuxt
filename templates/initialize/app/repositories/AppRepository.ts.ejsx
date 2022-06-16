@@ -44,4 +44,20 @@ export default class AppRepository {
   get current(): MenuEntity | undefined {
     return this.store.state.app.current ? new MenuEntity(this.store.state.app.current) : undefined
   }
+
+  set toolbar(value: boolean) {
+    this.store.commit(new types.Toolbar(value))
+  }
+
+  get toolbar(): boolean {
+    return this.store.state.app.toolbar
+  }
+
+  set extension(value: boolean) {
+    this.store.commit(new types.Extension(value))
+  }
+
+  get extension(): boolean {
+    return this.store.state.app.extension
+  }
 }

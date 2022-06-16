@@ -1,10 +1,21 @@
 <template>
-  <TtemplateLogin v-model="value" @submit="login"></TtemplateLogin>
+  <TtemplateAuth title="ログイン" button="ログイン" @submit="login">
+    <FormLogin v-model="value"></FormLogin>
+    <template #extension>
+      <div class="mt-5 text-center text-caption">
+        <nuxt-link to="/forget" class="grey--text">パスワードを忘れた方</nuxt-link>
+      </div>
+      <div class="mt-8 text-center text-body-1">
+        <v-btn rounded depressed color="primary" to="/signup">登録はこちら</v-btn>
+      </div>
+    </template>
+  </TtemplateAuth>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import TtemplateLogin from '@/components/templates/Login'
+import TtemplateAuth from '@/components/templates/Auth'
+import FormLogin from '@/components/organisms/Form/Auth/Login'
 import { IAccountProps } from '@/entities/Account'
 import LoginUseCase from '@/usecases/auth/LoginUseCase'
 
@@ -14,7 +25,8 @@ interface IData {
 
 export default Vue.extend({
   components: {
-    TtemplateLogin
+    TtemplateAuth,
+    FormLogin
   },
   layout: 'auth',
   data(): IData {
@@ -24,16 +36,10 @@ export default Vue.extend({
   },
   methods: {
     async login() {
-      try {
-        this.App.admin.loading = true
-        if (await new LoginUseCase(this.App).execute(this.value!)) {
-          this.$router.push('/home')
-        }
-      } catch (e: any) {
-        this.$nuxt.error(e)
-      } finally {
-        this.App.admin.loading = false
+      if (await new LoginUseCase(this.App).execute(this.value!)) {
+        return this.$router.push('/home')
       }
+      this.App.state.loading = false
     }
   }
 })

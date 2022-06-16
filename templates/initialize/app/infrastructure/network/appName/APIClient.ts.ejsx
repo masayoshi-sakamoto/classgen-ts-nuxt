@@ -62,7 +62,8 @@ export class APIClient {
   private normalizeError(error: any): APIError {
     return {
       statusCode: error.response && error.response.status,
-      message: error.response && error.response.data.message,
+      message: (error.response && (error.response.statusText || error.response.data.message)) || error.message || error.raw.message,
+      data: (error.response && error.response.data) || undefined,
       errors: (error.response && error.response.data.errors) || [],
       raw: error
     }

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <a-loading></a-loading>
+    <a-loading :value="App.state.loading"></a-loading>
   </v-app>
 </template>
 
@@ -9,7 +9,7 @@ import Vue from 'vue'
 import LogoutUseCase from '@/usecases/auth/LogoutUseCase'
 
 export default Vue.extend({
-  layout: 'service',
+  layout: 'auth',
   async fetch({ App, redirect }) {
     App.state.loading = true
     await new LogoutUseCase(App).execute()

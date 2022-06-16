@@ -6,7 +6,7 @@
         <v-card-text>
           <a-form id="form" v-slot="{ invalid }" @submit="$emit('submit', $event)">
             <slot></slot>
-            <a-btn submit :disabled="invalid">{{ button }}</a-btn>
+            <a-btn class="mt-6" submit :disabled="invalid">{{ button }}</a-btn>
           </a-form>
           <slot name="extension"></slot>
         </v-card-text>

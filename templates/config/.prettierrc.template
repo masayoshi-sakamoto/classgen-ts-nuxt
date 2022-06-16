@@ -7,6 +7,24 @@
   "trailingComma": "none",
   "overrides": [
     {
+      "files": ["*.ts"],
+      "options": {
+        "printWidth": 160
+      }
+    },
+    {
+      "files": ["*.scss"],
+      "options": {
+        "printWidth": 300
+      }
+    },
+    {
+      "files": ["*.vue"],
+      "options": {
+        "printWidth": 120
+      }
+    },
+    {
       "files": ["*.js"],
       "options": {
         "printWidth": 80

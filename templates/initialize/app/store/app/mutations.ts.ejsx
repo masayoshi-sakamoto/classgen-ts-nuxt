@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex'
 import { IAppState } from '@/store/app'
-import { Types, Loading, Progress, Errors, Drawer, Current } from '@/store/app/types'
+import { Types, Loading, Progress, Errors, Drawer, Current, Toolbar, Extension } from '@/store/app/types'
 
 const mutations: MutationTree<IAppState> = {
   [Types.loading]: (state, action: Loading) => {
@@ -21,7 +21,15 @@ const mutations: MutationTree<IAppState> = {
 
   [Types.current]: (state, action: Current) => {
     state.current = action.payload
-  }
+  },
+  
+  [Types.toolbar]: (state, action: Toolbar) => {
+    state.toolbar = action.payload
+  },
+
+  [Types.extension]: (state, action: Extension) => {
+    state.extension = action.payload
+  }  
 }
 
 export default mutations

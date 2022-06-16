@@ -1,10 +1,26 @@
 <template>
-  <TtemplateSignup v-model="value" @submit="signup"></TtemplateSignup>
+  <TtemplateAuth title="会員登録" button="同意して登録する" @submit="login">
+    <FormSignup v-model="value"></FormSignup>
+    <template #extension>
+      <div class="mt-5 text-caption">
+        会員登録には、<nuxt-link to="/term" class="grey--text">利用規約</nuxt-link>と<nuxt-link
+          to="/policy"
+          class="grey--text"
+          >プライバシーポリシー</nuxt-link
+        >への同意が必要です。
+      </div>
+      <v-divider class="mt-8"></v-divider>
+      <div class="mt-8 text-center text-body-1">
+        <nuxt-link to="/login">ログインはこちら</nuxt-link>
+      </div>
+    </template>
+  </TtemplateAuth>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import TtemplateSignup from '@/components/templates/Signup'
+import TtemplateAuth from '@/components/templates/Auth'
+import FormSignup from '@/components/organisms/Form/Auth/Signup'
 import { IAccountProps } from '@/entities/Account'
 import SignupUseCase from '@/usecases/auth/SignupUseCase'
 
@@ -14,7 +30,8 @@ interface IData {
 
 export default Vue.extend({
   components: {
-    TtemplateSignup
+    TtemplateAuth,
+    FormSignup
   },
   layout: 'auth',
   data(): IData {
@@ -23,16 +40,9 @@ export default Vue.extend({
     }
   },
   methods: {
-    async signup() {
-      try {
-        this.App.admin.loading = true
-        if (await new SignupUseCase(this.App).execute(this.value!)) {
-          this.$router.push('/home')
-        }
-      } catch (e: any) {
-        this.$nuxt.error(e)
-      } finally {
-        this.App.admin.loading = false
+    async login() {
+      if (await new SignupUseCase(this.App).execute(this.value!)) {
+        this.$router.push('/home')
       }
     }
   }

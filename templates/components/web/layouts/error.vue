@@ -1,24 +1,12 @@
 <template>
-  <v-container fluid class="fill-height">
-    <v-row class="fill-height">
-      <v-col align-self="center" class="text-center">
-        <div class="logo lg mb-6">{{ error.statusCode }}</div>
-        <div class="text-body-1 mb-4">
-          {{ error.statusCode === 404 ? pageNotFound : otherError }}
+  <v-container fluid>
+    <v-row id="error">
+      <v-col class="text-center">
+        <div class="logo status mb-10">{{ error.statusCode }}</div>
+        <div class="body">
+          {{ error.statusCode === 404 ? pageNotFound : error.message }}
         </div>
-        <v-sheet
-          v-if="error.statusCode !== 404"
-          width="100%"
-          max-width="400"
-          class="pa-4 mx-auto"
-          color="grey lighten-4"
-          rounded="lg"
-        >
-          <v-layout fill-height justify-center align-center class="grey--text">
-            {{ error.raw.message }}
-          </v-layout>
-        </v-sheet>
-        <div class="mt-10">
+        <div v-if="error.statusCode === 404" class="mt-10">
           <nuxt-link to="/">トップページに戻る</nuxt-link>
         </div>
       </v-col>
@@ -52,6 +40,21 @@ export default Vue.extend({
       },
       immediate: true
     }
+  },
+  mounted() {
+    this.App.state.toolbar = false
   }
 })
 </script>
+
+<style lang="scss" scoped>
+#error {
+  margin-top: 100px;
+  .status {
+    font-size: 4rem !important;
+  }
+  .body {
+    font-size: 1.6rem;
+  }
+}
+</style>

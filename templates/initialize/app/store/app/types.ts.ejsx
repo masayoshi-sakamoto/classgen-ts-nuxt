@@ -5,7 +5,9 @@ export const Types = {
   progress: 'progress',
   errors: 'errors',
   drawer: 'drawer',
-  current: 'current'
+  current: 'current',
+  toolbar: 'toolbar',
+  extension: 'extension'
 }
 
 export const path = 'app/'
@@ -33,4 +35,14 @@ export class Drawer implements FluxStandardAction<boolean | null> {
 export class Current implements FluxStandardAction<IMenuProps | undefined> {
   type = path + Types.current
   constructor(public payload: IMenuProps | undefined) {}
+}
+
+export class Toolbar implements FluxStandardAction<boolean> {
+  type = path + Types.toolbar
+  constructor(public payload: boolean) {}
+}
+
+export class Extension implements FluxStandardAction<boolean> {
+  type = path + Types.extension
+  constructor(public payload: boolean) {}
 }

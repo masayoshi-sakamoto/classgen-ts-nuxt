@@ -1,6 +1,6 @@
 <%_ const model = models.find((prop) => prop.ClassName === ClassName) _%>
 <template>
-    <v-row no-gutters>
+    <v-row>
 <%_ for (const schema of Object.values(model.schema)) { _%>
   <%_ if (!schema.ref && schema.key !== 'id') { _%>
       <v-col cols="12">

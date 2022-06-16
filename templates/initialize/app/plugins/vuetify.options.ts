@@ -6,7 +6,8 @@ export default {
     themes: {
       light: {
         primary: colors.lightBlue.darken1,
-        accent: colors.blueGrey.lighten5
+        secondary: colors.grey.lighten1,
+        accent: colors.blueGrey.darken3
       }
     }
   }

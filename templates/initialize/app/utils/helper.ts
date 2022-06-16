@@ -9,3 +9,10 @@ export function textColor(hexcolor: string) {
 
   return (r * 299 + g * 587 + b * 114) / 1000 < 128 ? 'white--text' : 'black--text'
 }
+
+export async function validate(refs: any, name: string = 'provider'): Promise<any> {
+  if (refs[name]) {
+    return await refs[name].validate()
+  }
+  return null
+}

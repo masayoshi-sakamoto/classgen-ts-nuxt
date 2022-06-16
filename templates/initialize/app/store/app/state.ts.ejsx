@@ -5,7 +5,9 @@ export interface IAppState {
   progress: number
   errors: any
   drawer: boolean | null
-  current: IMenuProps | undefined
+  current?: IMenuProps
+  toolbar: boolean
+  extension: boolean
 }
 
 export const state = (props?: Partial<IAppState>): IAppState => ({
@@ -14,6 +16,8 @@ export const state = (props?: Partial<IAppState>): IAppState => ({
   errors: {},
   drawer: false,
   current: undefined,
+  toolbar: false,
+  extension: false,
   ...props
 })
 
