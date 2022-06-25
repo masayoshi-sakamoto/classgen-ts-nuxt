@@ -55,7 +55,9 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
     ['@nuxtjs/dotenv', { path: './' }],
-    ['cookie-universal-nuxt', { parseJSON: false }]
+    ['cookie-universal-nuxt', { parseJSON: false }],
+    'portal-vue/nuxt',
+    '@nuxtjs/sentry'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

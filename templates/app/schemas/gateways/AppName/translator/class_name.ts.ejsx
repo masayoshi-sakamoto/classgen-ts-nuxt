@@ -51,6 +51,8 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
         src = `${prop.key} || {}`
       } else if (prop.format === 'date') {
         src = `${prop.key} ? moment(${prop.key}).format('YYYY-MM-DD') : null`
+      } else if (prop.format === 'date-time') {
+        src = `${prop.key} ? moment(${prop.key}).format('YYYY-MM-DD HH:mm:ss') : null`
       }
       return camel === src ? camel : camel + ': ' + src
     }).join(',\n    ') %>

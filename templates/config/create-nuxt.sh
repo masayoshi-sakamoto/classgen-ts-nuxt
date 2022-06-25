@@ -7,10 +7,10 @@ mkdir swagger
 mv assets components layouts pages static store app/
 
 # .gitignoreファイルに除外ファイルを追加
-echo '/*.template' >> .gitignore
+echo '\n/*template*\n' >> .gitignore
 
 # 必要なライブラリを追加
-yarn add cookie-universal-nuxt @nuxtjs/moment @nuxtjs/dotenv cross-env vee-validate@^3.0 vuedraggable vue-infinite-loading vue-scrollto
+yarn add cookie-universal-nuxt @nuxtjs/moment @nuxtjs/dotenv cross-env vee-validate@^3.0 vuedraggable vue-infinite-loading vue-scrollto portal-vue
 yarn add @sentry/vue @sentry/tracing @nuxtjs/sentry
 
 # optional

@@ -11,7 +11,7 @@ import <%= ref.schema %> from './<%= ref.schema %>'
 export default interface <%= ClassName %> {
 <%_ if (model) { _%>
 <%_ for (const schema of Object.values(model.schema)) { _%>
-  <%= schema.required ? schema.key : schema.key+'?' %>: <%= schema.tstype%>
+  <%= schema.required ? schema.key : schema.key+'?' %>: <%= schema.tstype%><%= schema.array ? '[]': '' %>
 <%_ } _%>
 <%_ } _%>
 }

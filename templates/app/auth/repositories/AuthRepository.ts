@@ -20,29 +20,32 @@ export default class AppRepository {
     if (value) {
       // トークンの利用可能時間を保存
       const date = new Date().getTime() + 1000 * 60 * Number(value.expired)
-      this.cookies.set('accessToken', value.accessToken, { path: '/', maxAge: 60 * 60 * 24 * 14 }) // 2週間
-      this.cookies.set('tokenType', value.tokenType, { path: '/', maxAge: 60 * 60 * 24 * 14 }) // 2週間
-      this.cookies.set('expired', date, { path: '/', maxAge: 60 * 60 * 24 * 14 }) // 2週間
+      this.cookies.set(process.env.APP_NAME + '_accessToken', value.accessToken, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 14
+      }) // 2週間
+      this.cookies.set(process.env.APP_NAME + '_tokenType', value.tokenType, { path: '/', maxAge: 60 * 60 * 24 * 14 }) // 2週間
+      this.cookies.set(process.env.APP_NAME + '_expired', date, { path: '/', maxAge: 60 * 60 * 24 * 14 }) // 2週間
     } else {
-      this.cookies.remove('accessToken', { path: '/', maxAge: 1 })
-      this.cookies.remove('tokenType', { path: '/', maxAge: 1 })
-      this.cookies.remove('expired', { path: '/', maxAge: 1 })
+      this.cookies.remove(process.env.APP_NAME + '_accessToken', { path: '/', maxAge: 1 })
+      this.cookies.remove(process.env.APP_NAME + '_tokenType', { path: '/', maxAge: 1 })
+      this.cookies.remove(process.env.APP_NAME + '_expired', { path: '/', maxAge: 1 })
     }
   }
 
   get auth(): IAuthProps | null {
     return EmptyAuthPropsFactory({
-      accessToken: this.cookies.get('accessToken'),
-      tokenType: this.cookies.get('tokenType'),
-      expired: this.cookies.get('expired')
+      accessToken: this.cookies.get(process.env.APP_NAME + '_accessToken'),
+      tokenType: this.cookies.get(process.env.APP_NAME + '_tokenType'),
+      expired: this.cookies.get(process.env.APP_NAME + '_expired')
     })
   }
 
   get token(): string {
-    return this.cookies.get('accessToken')
+    return this.cookies.get(process.env.APP_NAME + '_accessToken')
   }
 
   get expired(): number {
-    return Number(this.cookies.get('expired'))
+    return Number(this.cookies.get(process.env.APP_NAME + '_expired'))
   }
 }

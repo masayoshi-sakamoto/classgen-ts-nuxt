@@ -60,7 +60,7 @@ export const Empty<%= ClassName %>PropsFactory = (props?: Partial<I<%= ClassName
 <%_ if (model) { _%>
   <%_ for (const schema of Object.values(model.schema)) { _%>
     <%_ if (schema.required && schema.key !== 'id') { _%>
-    <%_ const value = schema.ref ? `Empty${schema.tstype}PropsFactory` : schema.format === 'json' ? '{}' : schema.default  _%>
+    <%_ const value = schema.ref ? `Empty${schema.tstype}PropsFactory` : schema.format === 'json' ? '{}' : schema.format === 'int64' || schema.format === 'int32' ? '0' : schema.default || 'null'  _%>
   <%= lowerCamel(schema.key) %>: <%= value %>,
     <%_ } _%>
   <%_ } _%>

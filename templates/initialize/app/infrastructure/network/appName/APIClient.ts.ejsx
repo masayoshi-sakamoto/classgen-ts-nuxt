@@ -27,7 +27,8 @@ export class APIClient {
           baseURL: request.baseURL || this.baseURL,
           headers: this.createHeaders(request),
           maxContentLength: Infinity,
-          onUploadProgress
+          onUploadProgress,
+          withCredentials: true
         })
         .then((data) => {
           if (!process.server || !this.ctx) {
@@ -102,14 +103,13 @@ export class APIClient {
     const sign = `${clientId}.${timestamp}.${nonce}`
     const signature = crypto.createHmac('sha256', secret).update(sign).digest('hex')
 
-    const tokenType = ctx.app.$cookies.get('tokenType')
-    const accessToken = ctx.app.$cookies.get('accessToken')
+    const tokenType = ctx.app.$cookies.get(process.env.APP_NAME + '_tokenType')
+    const accessToken = ctx.app.$cookies.get(process.env.APP_NAME + '_accessToken')
     const Authorization = tokenType ? tokenType + ' ' + accessToken : null
 
     let header = {
       'Content-Type': request.contentType,
       xhrFields: true,
-      withCredentials: true,
       'Access-Control-Allow-Origin': '*',
       'X-Requested-With': 'XMLHttpRequest',
       Authorization,

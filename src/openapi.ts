@@ -43,6 +43,12 @@ export default class OpenAPIParser {
         if (value.properties![key].$ref !== undefined) {
           return this.refs(key, value.properties![key])
         }
+        if ((value.properties![key] as SchemaObject).type === 'array') {
+          const data: SchemaObject = value.properties![key]
+          if (data.items!.$ref !== undefined) {
+            return this.refs(key, data.items!)
+          }
+        }
         return []
       })
       return refs

@@ -4,7 +4,9 @@ properties:
   id:
     type: string
     nullable: true
+    default: ''
   title:
     type: string
     nullable: true
     title: 'タイトル'
+    default: null

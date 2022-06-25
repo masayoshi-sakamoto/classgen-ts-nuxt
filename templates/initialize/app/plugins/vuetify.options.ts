@@ -7,8 +7,12 @@ export default {
       light: {
         primary: colors.lightBlue.darken1,
         secondary: colors.grey.lighten1,
-        accent: colors.blueGrey.darken3
+        accent: colors.blueGrey.darken3,
+        grey: colors.grey.base
       }
+    },
+    options: {
+      customProperties: true
     }
   }
 }
