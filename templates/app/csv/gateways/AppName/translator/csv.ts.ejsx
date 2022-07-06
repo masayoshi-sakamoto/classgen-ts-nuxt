@@ -1,0 +1,16 @@
+/* eslint camelcase: 0 */
+import { Csv } from '@/infrastructure/network/<%= AppName %>/schema'
+import { EmptyCsvPropsFactory, ICsvProps } from '@/entities/Csv'
+
+export const toCsvProps = (props: Csv | null | undefined): ICsvProps => {
+  if (!props) {
+    return EmptyCsvPropsFactory()
+  }
+
+  const { field, name } = props
+
+  return {
+    field,
+    name
+  }
+}

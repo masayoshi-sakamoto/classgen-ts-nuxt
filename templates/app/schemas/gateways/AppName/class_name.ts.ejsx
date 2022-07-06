@@ -6,6 +6,12 @@ import { <%= AppName %>GatewayBase } from './base'
 import { to<%= ClassName %>Props, to<%= ClassName %>Seed } from './translator/<%= class_name %>'
 import { optionsToQuery, toQueryProps } from './translator/query'
 import { toOptionsProps } from './translator/options'
+<%_ Object.values(path).forEach((prop) => { _%>
+<%_ const id = prop.operationId.replace(ClassName, '') _%>
+  <%_ if (id === 'Csv') { _%>
+import { toCsvProps } from './translator/csv'
+  <%_ } _%>
+<%_ }) _%>
 import { <%= Object.values(path).map((prop) => prop.operationId).join(', ') %> } from '@/infrastructure/network/<%= AppName %>/requests/<%= class_name %>'
 import { I<%= ClassName %>Props, Empty<%= ClassName %>PropsFactory } from '@/entities/<%= ClassName %>'
 import { IOptionsProps } from '@/entities/Options'
@@ -47,6 +53,23 @@ export default class <%= ClassName %> extends <%= AppName %>GatewayBase {
   async Order<%= ClassName %>(props: I<%= ClassName %>Props[]) {
     await this.apiClient.request(new Order<%= ClassName %>(props.map((prop) => to<%= ClassName %>Seed(prop)))<%- type ? `, '${type}'` : ''  %>)
   }
+  <%_ } else if ( id === 'Csv') { _%>
+
+  async Csv<%= ClassName %>() {
+    const { csvs } = await this.apiClient.request(new <%= prop.operationId %>()<%- type ? `, '${type}'` : ''  %>)
+    return csvs.map((prop) => toCsvProps(prop))
+  }
+  <%_ } else if ( id === 'Download') { _%>
+
+  async Download<%= ClassName %>(options?: IOptionsProps) {
+    const { csv } = await this.apiClient.request(new Download<%= ClassName %>(optionsToQuery(options))<%- type ? `, '${type}'` : ''  %>)
+    return await this.base64DecodeAsBlob(csv, 'text/csv;charset=UTF-8')
+  }
+
+  async base64DecodeAsBlob(text: string, type = 'text/plain;charset=UTF-8') {
+    return await fetch(`data:${type};base64,` + text).then((response) => response.blob())
+  }
+
   <%_ } _%>
 <%_ }) _%>
 }

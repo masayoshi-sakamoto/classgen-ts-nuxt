@@ -5,11 +5,9 @@ import { Types, Store, Fetched, Update, Query, Options, Loading, Current, Reset 
 const mutations: MutationTree<I<%= ClassName %>State> = {
   [Types.store]: (state, action: Store) => {
     for (const prop of action.payload) {
-      if (prop.id) {
-        state.byIds = {
-          ...state.byIds,
-          [prop.id]: prop
-        }
+      state.byIds = {
+        ...state.byIds,
+        [prop.id!]: prop
       }
     }
   },

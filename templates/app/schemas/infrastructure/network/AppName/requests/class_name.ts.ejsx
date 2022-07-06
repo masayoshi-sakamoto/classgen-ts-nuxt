@@ -3,10 +3,10 @@ import { APIRequest } from '@/infrastructure/network/APIRequest'
 import { HTTPMethod } from '@/infrastructure/network/types'
 import { IQueryProps } from '@/entities/Query'
 <%_ const key = Object.keys(paths).find((key) => key === ClassName) _%>
-<%_ const path = key ? paths[key] : undefined _%>
+<%_ let path = key ? paths[key] : undefined _%>
 <%_ if (path) { _%>
 <%_ Object.values(path).forEach((prop) => { _%>
-
+<%_ const params = '' _%>
 export class <%= prop.operationId %> implements APIRequest<<%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response> {
   response: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response
   path: string
@@ -34,10 +34,19 @@ export class <%= prop.operationId %> implements APIRequest<<%= AppName %>.<%= Cl
   params: { order: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request[] }
   constructor(params: <%= ClassName %>Seed[]) {
     this.params = { order: params }
+  <%_ } else if ( id === 'Csv') { _%>
+  <%_ params = '/csv' _%>
+  params: { order: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Request[] }
+  constructor() {
+  <%_ } else if ( id === 'Download') { _%>
+  <%_ params = '/download' _%>
+  params?: IQueryProps
+  constructor(query?: IQueryProps) {
+    this.params = query
   <%_ } else  { _%>
   constructor() {
   <%_ } _%>
-    this.path = `/<%= class_names %><%= prop.parameters ? '/${id}' : '' %>`
+    this.path = `/<%= class_names %><%= prop.parameters ? '/${id}' : params %>`
   }
 }
 <%_ }) _%>

@@ -15,7 +15,7 @@
           rules="required"
           <%_ } _%>
           :field-type="type"
-          @change="change"
+          @input="$emit('input', props)"
         >
       </a-text-field>
       </v-col>
@@ -51,17 +51,11 @@ export default Vue.extend({
   watch: {
     value: {
       handler() {
-        this.App.state.errors = []
+        this.App.data.errors = []
         this.props = this.value ? new <%= ClassName %>Entity(this.value).clone : Empty<%= ClassName %>PropsFactory()
       },
       deep: true,
       immediate: true
-    }
-  },
-  methods: {
-    change() {
-      this.$emit('input', this.props)
-      this.$emit('change', this.props)
     }
   }
 })

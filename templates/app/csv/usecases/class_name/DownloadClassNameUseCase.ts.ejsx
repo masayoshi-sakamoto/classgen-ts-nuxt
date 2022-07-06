@@ -3,7 +3,7 @@ import { IApp } from '@/types/nuxt'
 import refresh from '@/utils/refresh'
 <%_ } _%>
 
-export default class Fetch<%= ClassName %>UseCase implements BaseUseCase {
+export default class Download<%= ClassName %>UseCase implements BaseUseCase {
   App: IApp
   constructor(app: IApp) {
     this.App = app
@@ -16,21 +16,18 @@ export default class Fetch<%= ClassName %>UseCase implements BaseUseCase {
         <%_ if (auth) { _%>
         await refresh(this.App)
         <%_ } _%>
-        const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(this.App.<%= className %>.options)
-        this.App.<%= className %>.fetched = response.items
-        this.App.<%= className %>.query = response.query
         this.App.<%= className %>.options = {
           ...this.App.<%= className %>.options,
-          ...response.options
+          query: this.App.<%= className %>.options.query ? JSON.parse(this.App.<%= className %>.options.query) : undefined
         }
+        return await this.App.<%= appName %>Gateway.<%= ClassName %>.Download<%= ClassName %>(this.App.<%= className %>.options)
       }
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return false
+      return null
     } finally {
       this.App.data.loading = false
     }
-    return true
-
+    return null
   }
 }

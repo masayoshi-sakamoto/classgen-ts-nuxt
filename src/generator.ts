@@ -58,6 +58,16 @@ export default class Generator extends Base {
     await this.schema(name)
   }
 
+  async csv(name?: string) {
+    if (!name) {
+      error('name is required.')
+    }
+    this.swagger = this.load()
+    this.classname = name || this.classname
+    await this.update('app/csv', app.root)
+    await this.schema(name)
+  }
+
   async index() {
     this.swagger = this.load()
     await this.injector(false)

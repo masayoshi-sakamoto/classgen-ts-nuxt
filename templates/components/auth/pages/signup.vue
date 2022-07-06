@@ -1,5 +1,5 @@
 <template>
-  <TtemplateAuth title="会員登録" button="同意して登録する" @submit="login">
+  <TtemplateAuth title="会員登録" button="同意して登録する" @submit="signup">
     <FormSignup v-model="value"></FormSignup>
     <template #extension>
       <div class="mt-5 text-caption">
@@ -40,7 +40,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    async login() {
+    async signup() {
       if (await new SignupUseCase(this.App).execute(this.value!)) {
         this.$router.push('/home')
       }

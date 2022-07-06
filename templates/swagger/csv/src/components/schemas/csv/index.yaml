@@ -1,0 +1,15 @@
+required:
+  - field
+  - name
+type: 'object'
+properties:
+  field:
+    type: string
+    nullable: true
+    title: 'フィールド名'
+    default: null
+  name:
+    type: string
+    nullable: true
+    title: 'カラム名'
+    default: null

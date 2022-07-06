@@ -1,0 +1,15 @@
+---
+get:
+  tags: '<%= ClassName %>'
+  operationId: 'Download<%= ClassName %>'
+  responses:
+    200:
+      content:
+        application/json:
+          schema:
+            required:
+              - 'csv'
+            type: 'object'
+            properties:
+              csv:
+                type: 'string'

@@ -1,0 +1,17 @@
+---
+get:
+  tags: '<%= ClassName %>'
+  operationId: 'Csv<%= ClassName %>'
+  responses:
+    200:
+      content:
+        application/json:
+          schema:
+            required:
+              - 'csvs'
+            type: 'object'
+            properties:
+              csvs:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/Csv'

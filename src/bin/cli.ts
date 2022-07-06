@@ -28,12 +28,12 @@ try {
   commander
     .command('swagger')
     .alias('swg')
-    .argument('<command>', 'all|schema|path|auth|sql|index')
+    .argument('<command>', 'all|schema|path|auth|csv|sql|index')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(all|schema|path|auth|sql|index)$/)) {
-        error('command must be one of all|schema|path|auth|sql|index|')
+      if (!command.match(/^(all|schema|path|auth|csv|sql|index)$/)) {
+        error('command must be one of all|schema|path|auth|csv|sql|index|')
       }
       const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
       await swagger[command](name)
@@ -45,15 +45,15 @@ try {
   commander
     .command('generate')
     .alias('gen')
-    .argument('<command>', 'usecase|schema|auth|index|config|initialize')
+    .argument('<command>', 'usecase|schema|auth|csv|index|config|initialize')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .argument('[type]', 'gateway connection type. only usecase')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
-    .option('-a, --auth', 'create all schemas using sql dump file')
+    .option('-a, --auth', 'added authentication process')
     .action(async (command: string, name: string, type: string, options: IGenerateOptions) => {
-      if (!command.match(/^(usecase|schema|auth|index|config|initialize)$/)) {
-        error('command must be one of usecase|schema|auth|index|config|initialize')
+      if (!command.match(/^(usecase|schema|auth|csv|index|config|initialize)$/)) {
+        error('command must be one of usecase|schema|auth|csv|index|config|initialize')
       }
 
       if (
@@ -69,7 +69,7 @@ try {
         options.auth = true
       }
 
-      if (options.swagger && command.match(/^(usecase|schema|auth|index)$/)) {
+      if (options.swagger && command.match(/^(usecase|schema|auth|csv|index)$/)) {
         const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
         await swagger[command === 'schema' || command === 'usecase' ? 'all' : command](name)
         if (command !== 'index' && commander.opts().sqldump) {

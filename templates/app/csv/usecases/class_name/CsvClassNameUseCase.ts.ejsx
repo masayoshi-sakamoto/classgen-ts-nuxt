@@ -1,0 +1,29 @@
+import { IApp } from '@/types/nuxt'
+<%_ if (auth) { _%>
+import refresh from '@/utils/refresh'
+<%_ } _%>
+
+export default class Csv<%= ClassName %>UseCase implements BaseUseCase {
+  App: IApp
+  constructor(app: IApp) {
+    this.App = app
+  }
+
+  async execute() {
+    try {
+      if (!this.App.data.loading) {
+        this.App.data.loading = true
+        <%_ if (auth) { _%>
+        await refresh(this.App)
+        <%_ } _%>
+        return await this.App.<%= appName %>Gateway.<%= ClassName %>.Csv<%= ClassName %>()
+      }
+    } catch (exception: any) {
+      this.App.logService.handle(exception)
+      return []
+    } finally {
+      this.App.data.loading = false
+    }
+    return []
+  }
+}

@@ -47,6 +47,13 @@ export default class Swagger extends Base {
     await this.swagpack()
   }
 
+  async csv(name?: string) {
+    this.classname = name || this.classname
+    await this.update('swagger/csv', swagger.root)
+    await this.generate('swagger/index', swagger.root, true)
+    await this.swagpack()
+  }
+
   async sql(name?: string) {
     if (!this.sqldump) {
       error('sqldump is required. Please specify with --sqldump option.')
