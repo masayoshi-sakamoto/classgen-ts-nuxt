@@ -34,7 +34,7 @@ export default class <%= ClassName %>Entity {
   <%_ for (const schema of Object.values(model.schema)) { _%>
     <%_ const type = schema.ref ? `${schema.tstype}Entity` : schema.format === 'json' ? 'any' : schema.tstype _%>
     
-  get <%= lowerCamel(schema.key) %>(): <%= type %><%= !schema.required || schema.key === 'id' ? ' | undefined' : ''%> {
+  get <%= lowerCamel(schema.key) %>(): <%= type %><%= !schema.required || schema.key === 'id' ? ' | undefined' : schema.ref ? ' | undefined' : ''%> {
     <%_ if (schema.ref) { _%>
     return this._props.<%= lowerCamel(schema.key) %> ? new <%= schema.tstype %>Entity(this._props.<%= lowerCamel(schema.key) %>) : undefined
     <%_} else { _%>
@@ -60,7 +60,7 @@ export const Empty<%= ClassName %>PropsFactory = (props?: Partial<I<%= ClassName
 <%_ if (model) { _%>
   <%_ for (const schema of Object.values(model.schema)) { _%>
     <%_ if (schema.required && schema.key !== 'id') { _%>
-    <%_ const value = schema.ref ? `Empty${schema.tstype}PropsFactory` : schema.format === 'json' ? '{}' : schema.format === 'int64' || schema.format === 'int32' ? '0' : schema.default || 'null'  _%>
+    <%_ const value = schema.ref ? `Empty${schema.tstype}PropsFactory(props?.${lowerCamel(schema.key)})` : schema.format === 'json' ? '{}' : schema.format === 'int64' || schema.format === 'int32' ? '0' : schema.default || 'null'  _%>
   <%= lowerCamel(schema.key) %>: <%= value %>,
     <%_ } _%>
   <%_ } _%>

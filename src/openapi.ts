@@ -75,7 +75,7 @@ export default class OpenAPIParser {
         ref: true
       }
     } else if (value.type !== undefined && value.type === 'array') {
-      const data = this.schema(key, value.items as SchemaObject)
+      const data = this.schema(key, value.items as SchemaObject, required)
       schema = {
         ...data,
         array: true

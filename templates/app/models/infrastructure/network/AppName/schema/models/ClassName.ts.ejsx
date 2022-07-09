@@ -3,7 +3,8 @@
 /* eslint-disable */
 <%_ const model = models.find((prop) => prop.ClassName === ClassName) _%>
 <%_ if (model) { _%>
-<%_ for (const ref of model.refs) { _%>
+<%_ const refs = model.refs.filter((element, index, self) => self.findIndex((e) => e.schema === element.schema) === index) _%>
+<%_ for (const ref of refs) { _%>
 import <%= ref.schema %> from './<%= ref.schema %>'
 <%_ } _%>
 <%_ } _%>
