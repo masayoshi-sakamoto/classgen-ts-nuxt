@@ -10,8 +10,11 @@ mv assets components layouts pages static store app/
 echo '\n/*template*\n' >> .gitignore
 
 # 必要なライブラリを追加
-yarn add cookie-universal-nuxt @nuxtjs/moment @nuxtjs/dotenv cross-env vee-validate@^3.0 vuedraggable vue-infinite-loading vue-scrollto portal-vue
-yarn add @sentry/vue @sentry/tracing @nuxtjs/sentry
+yarn add cookie-universal-nuxt @nuxtjs/moment @nuxtjs/dotenv cross-env vee-validate@^3.0 vuedraggable vue-infinite-loading vue-scrollto portal-vue@^2.0
+yarn add @nuxtjs/sentry
 
 # optional
 # yarn add @fortawesome/fontawesome-pro minify-css-string
+
+yarn class-gen-sql gen config
+yarn class-gen-sql gen initialize

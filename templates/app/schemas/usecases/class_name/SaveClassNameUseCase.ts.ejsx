@@ -5,28 +5,21 @@ import refresh from '@/utils/refresh'
 <%_ } _%>
 
 export default class Save<%= ClassName %>UseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
-  }
+  constructor(protected App: IApp) {}
 
   async execute(props: I<%= ClassName %>Props) {
     try {
-      if (!this.App.data.saving) {
-        this.App.data.finished = false
-        this.App.data.saving = true
-        <%_ if (auth) { _%>
-        await refresh(this.App)
-        <%_ } _%>
-        const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Save<%= ClassName %>(props)
-        this.App.<%= className %>.update(response)
-      }
+      this.App.data.finished = false
+      this.App.data.saving = true
+      <%_ if (auth) { _%>
+      await refresh(this.App)
+      <%_ } _%>
+      return await this.App.<%= appName %>Gateway.<%= ClassName %>.Save<%= ClassName %>(props)
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return false
     } finally {
       this.App.data.saving = false
     }
-    return true
+    return null
   }
 }

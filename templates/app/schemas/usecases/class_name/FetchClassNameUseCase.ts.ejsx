@@ -1,36 +1,27 @@
+import { IOptionsProps } from '@/entities/Options'
 import { IApp } from '@/types/nuxt'
 <%_ if (auth) { _%>
 import refresh from '@/utils/refresh'
 <%_ } _%>
 
 export default class Fetch<%= ClassName %>UseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
-  }
+  constructor(protected App: IApp) {}
 
-  async execute() {
+  async execute(options?: IOptionsProps) {
     try {
       if (!this.App.data.loading) {
         this.App.data.loading = true
         <%_ if (auth) { _%>
         await refresh(this.App)
         <%_ } _%>
-        const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(this.App.<%= className %>.options)
-        this.App.<%= className %>.fetched = response.items
-        this.App.<%= className %>.query = response.query
-        this.App.<%= className %>.options = {
-          ...this.App.<%= className %>.options,
-          ...response.options
-        }
+        return await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(options)
       }
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return false
+      return null
     } finally {
+      this.App.data.none = this.App.<%= className %>.query.total === 0
       this.App.data.loading = false
     }
-    return true
-
   }
 }

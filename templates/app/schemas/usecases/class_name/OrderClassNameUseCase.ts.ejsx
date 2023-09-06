@@ -3,10 +3,7 @@ import { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
 import refresh from '@/utils/refresh'
 
 export default class Order<%= ClassName %>UseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
-  }
+  constructor(protected App: IApp) {}
 
   async execute(props: I<%= ClassName %>Props[]) {
     try {

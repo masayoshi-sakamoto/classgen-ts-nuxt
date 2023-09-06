@@ -15,7 +15,7 @@ import <%= AppName %>Gateway from '@/gateways/<%= AppName %>'
 
 // Services
 import LogService from '@/services/LogService'
-import RouterService from '@/services/RouterService'
+// import RouterService from '@/services/RouterService'
 
 declare module 'vuex/types/index' {
   interface ActionTree<S, R> {
@@ -33,7 +33,7 @@ export interface IApp {
   <%= lowerCamel(AppName) %>Gateway: <%= AppName %>Gateway
   <%_ }) _%>
   logService: LogService
-  routerService: RouterService
+  // routerService: RouterService
 }
 
 declare module 'vue/types/vue' {

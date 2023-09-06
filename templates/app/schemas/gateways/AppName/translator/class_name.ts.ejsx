@@ -11,7 +11,7 @@ if (seed) {
 }
 _%>
 <%_ if (model) { _%>
-  <%_ if (Object.values(model.schema).find((prop) => (prop.format === 'date'))) { _%>
+  <%_ if (Object.values(model.schema).find((prop) => (prop.format === 'date' || prop.format === 'date-time'))) { _%>
 import moment from 'moment'
   <%_ } _%>
     <%_ for (const ref of model.refs) { _%>

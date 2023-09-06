@@ -22,7 +22,7 @@ import <%= AppName %>Gateway from '@/gateways/<%= AppName %>'
 
 // Services
 import LogService from '@/services/LogService'
-import RouterService from '@/services/RouterService'
+// import RouterService from '@/services/RouterService'
 
 export default (ctx: Context) => {
   const { store, app } = ctx
@@ -40,7 +40,7 @@ export default (ctx: Context) => {
     <%= lowerCamel(AppName) %>Gateway: new <%= AppName %>Gateway(<%= lowerCamel(AppName) %>APIClient),
     <%_ }) _%>
     logService: new LogService(ctx, app.$sentry),
-    routerService: new RouterService(ctx)
+    // routerService: new RouterService(ctx)
   }
 
   ctx.App = {
@@ -53,6 +53,6 @@ export default (ctx: Context) => {
     <%= lowerCamel(AppName) %>Gateway: new <%= AppName %>Gateway(<%= lowerCamel(AppName) %>APIClient),
     <%_ }) _%>
     logService: new LogService(ctx, app.$sentry),
-    routerService: new RouterService(ctx)
+    // routerService: new RouterService(ctx)
   }
 }

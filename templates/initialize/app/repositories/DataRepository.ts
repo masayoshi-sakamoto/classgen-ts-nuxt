@@ -12,6 +12,14 @@ export default class DataRepository {
     this.store = store
   }
 
+  set observer(value: any) {
+    this.store.commit(new types.Observer(value))
+  }
+
+  get observer(): any {
+    return this.store.state.data.observer
+  }
+
   set loading(value: boolean) {
     this.store.commit(new types.Loading(value))
   }
@@ -42,6 +50,14 @@ export default class DataRepository {
 
   get finished(): boolean | null {
     return this.store.state.data.finished
+  }
+
+  set none(value: boolean | null) {
+    this.store.commit(new types.None(value))
+  }
+
+  get none(): boolean | null {
+    return this.store.state.data.none
   }
 
   set errors(value: any) {

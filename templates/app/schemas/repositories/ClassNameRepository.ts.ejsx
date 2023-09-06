@@ -3,7 +3,7 @@ import { Store } from 'vuex'
 import { RootState } from '@/store'
 import * as types from '@/store/<%= class_name %>/types'
 import { IOptionsProps } from '@/entities/Options'
-import { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+import <%= ClassName %>Entity, { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
 import { IQueryProps } from '@/entities/Query'
 
 export default class <%= ClassName %>Repository {
@@ -24,7 +24,15 @@ export default class <%= ClassName %>Repository {
     this.store.commit(new types.Store(value))
   }
 
+  get entities(): <%= ClassName %>Entity[] {
+    return Object.values(this.store.state.<%= className %>.fetched).map((prop) => new <%= ClassName %>Entity(prop))
+  }
+
   get items() {
+    return Object.values(this.store.state.<%= className %>)
+  }
+
+  get byIds() {
     return this.store.state.<%= className %>.byIds
   }
 

@@ -6,7 +6,8 @@ import { IQueryProps } from '@/entities/Query'
 <%_ let path = key ? paths[key] : undefined _%>
 <%_ if (path) { _%>
 <%_ Object.values(path).forEach((prop) => { _%>
-<%_ const params = '' _%>
+<%_ let params = '' _%>
+
 export class <%= prop.operationId %> implements APIRequest<<%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response> {
   response: <%= AppName %>.<%= ClassName %>.<%= prop.operationId %>Response
   path: string

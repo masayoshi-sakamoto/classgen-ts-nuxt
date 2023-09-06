@@ -16,22 +16,17 @@ import refresh from '@/utils/refresh'
 <%_ } _%>
 
 export default class Get<%= ClassName %>UseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
-  }
+  constructor(protected App: IApp) {}
 
   async execute(id: <%= type %>) {
     try {
       <%_ if (auth) { _%>
       await refresh(this.App)
       <%_ } _%>
-      const response = await this.App.<%= appName %>Gateway.<%= ClassName %>.Get<%= ClassName %>(id)
-      this.App.<%= className %>.update(response)
+      return await this.App.<%= appName %>Gateway.<%= ClassName %>.Get<%= ClassName %>(id)
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return false
     }
-    return true
+    return null
   }
 }

@@ -5,26 +5,21 @@ import refresh from '@/utils/refresh'
 <%_ } _%>
 
 export default class Delete<%= ClassName %>UseCase implements BaseUseCase {
-  App: IApp
-  constructor(app: IApp) {
-    this.App = app
-  }
+  constructor(protected App: IApp) {}
 
   async execute(props: I<%= ClassName %>Props) {
     try {
-      if (!this.App.data.removing) {
-        this.App.data.removing = true
-        <%_ if (auth) { _%>
-        await refresh(this.App)
-        <%_ } _%>
-        await this.App.<%= appName %>Gateway.<%= ClassName %>.Delete<%= ClassName %>(props)
-      }
+      this.App.data.removing = true
+      <%_ if (auth) { _%>
+      await refresh(this.App)
+      <%_ } _%>
+      await this.App.<%= appName %>Gateway.<%= ClassName %>.Delete<%= ClassName %>(props)
+      return true
     } catch (exception: any) {
       this.App.logService.handle(exception)
       return false
     } finally {
       this.App.data.removing = false
     }
-    return true
   }
 }
