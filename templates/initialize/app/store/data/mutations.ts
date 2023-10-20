@@ -1,11 +1,8 @@
 import { MutationTree } from 'vuex'
 import { IDataState } from '@/store/data'
-import { Observer, Types, Loading, Saving, Removing, Finished, None, Errors, Dialog } from '@/store/data/types'
+import { Types, Loading, Saving, Removing, Finished, Errors, Dialog, None } from '@/store/data/types'
 
 const mutations: MutationTree<IDataState> = {
-  [Types.observer]: (state, action: Observer) => {
-    state.observer = action.payload
-  },
   [Types.loading]: (state, action: Loading) => {
     state.loading = action.payload
   },
@@ -21,16 +18,16 @@ const mutations: MutationTree<IDataState> = {
     state.finished = action.payload
   },
 
-  [Types.none]: (state, action: None) => {
-    state.none = action.payload
-  },
-
   [Types.errors]: (state, action: Errors) => {
     state.errors = action.payload === null ? {} : action.payload
   },
 
   [Types.dialog]: (state, action: Dialog) => {
     state.dialog = action.payload
+  },
+
+  [Types.none]: (state, action: None) => {
+    state.none = action.payload
   }
 }
 

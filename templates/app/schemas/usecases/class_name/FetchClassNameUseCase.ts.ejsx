@@ -9,19 +9,13 @@ export default class Fetch<%= ClassName %>UseCase implements BaseUseCase {
 
   async execute(options?: IOptionsProps) {
     try {
-      if (!this.App.data.loading) {
-        this.App.data.loading = true
-        <%_ if (auth) { _%>
-        await refresh(this.App)
-        <%_ } _%>
-        return await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(options)
-      }
+      <%_ if (auth) { _%>
+      await refresh(this.App)
+      <%_ } _%>
+      return await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(options)
     } catch (exception: any) {
       this.App.logService.handle(exception)
       return null
-    } finally {
-      this.App.data.none = this.App.<%= className %>.query.total === 0
-      this.App.data.loading = false
     }
   }
 }

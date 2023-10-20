@@ -45,15 +45,15 @@ try {
   commander
     .command('generate')
     .alias('gen')
-    .argument('<command>', 'usecase|schema|auth|csv|index|config|initialize')
+    .argument('<command>', 'usecase|repository|gateway|store|schema|auth|csv|index|config|initialize')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .argument('[type]', 'gateway connection type. only usecase')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('-a, --auth', 'added authentication process')
     .action(async (command: string, name: string, type: string, options: IGenerateOptions) => {
-      if (!command.match(/^(usecase|schema|auth|csv|index|config|initialize)$/)) {
-        error('command must be one of usecase|schema|auth|csv|index|config|initialize')
+      if (!command.match(/^(usecase|repository|gateway|store|schema|auth|csv|index|config|initialize)$/)) {
+        error('command must be one of usecase|repository|gateway|store|schema|auth|csv|index|config|initialize')
       }
 
       if (

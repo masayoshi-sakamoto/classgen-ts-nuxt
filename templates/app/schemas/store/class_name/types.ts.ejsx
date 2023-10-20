@@ -10,7 +10,8 @@ export const Types = {
   options: 'options',
   loading: 'loading',
   current: 'current',
-  reset: 'reset'
+  reset: 'reset',
+  clear: 'clear'
 }
 
 export const path = '<%= class_name %>/'
@@ -53,4 +54,9 @@ export class Current implements FluxStandardAction<I<%= ClassName %>Props> {
 export class Reset implements FluxStandardAction<boolean> {
   type = path + Types.reset
   constructor(public payload: boolean) {}
+}
+
+export class Clear implements FluxStandardAction<void> {
+  type = path + Types.clear
+  constructor() {}
 }

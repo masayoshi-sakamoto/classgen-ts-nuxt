@@ -9,7 +9,16 @@ export default class Generator extends Base {
     super(options)
   }
 
-  async usecase(name?: string, type?: string) {
+  async usecases() {
+    await this.__swagger()
+    this.swagger = this.load()
+    const models = this.entities()
+    for (const model of models) {
+      await this.usecase(model.ClassName)
+    }
+  }
+
+  async all(name?: string, type?: string) {
     await this.schema(name)
     await this.__swagger()
     this.swagger = this.load()
@@ -28,6 +37,98 @@ export default class Generator extends Base {
           const filename = operationId === 'Post' + key ? 'Save' + key : operationId
           await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
         }
+      }
+    }
+    await this.injector(true)
+  }
+
+  async gateways() {
+    await this.__swagger()
+    this.swagger = this.load()
+    const models = this.entities()
+    for (const model of models) {
+      await this.gateway(model.ClassName)
+    }
+  }
+
+  async gateway(name?: string, type?: string) {
+    await this.__swagger()
+    this.swagger = this.load()
+    this.type = type
+    const paths: any = Object.entries(this.swagger.paths)
+    for (const [key, _] of paths) {
+      if (!name || (name && key === upperCamel(name))) {
+        this.classname = name || this.classname
+        await this.update('app/schemas/gateways/AppName', app.gateways)
+        await this.update('app/schemas/infrastructure', app.infrastructure)
+      }
+    }
+    await this.injector(true)
+  }
+
+  async usecase(name?: string, type?: string) {
+    await this.__swagger()
+    this.swagger = this.load()
+    this.type = type
+    const paths: any = Object.entries(this.swagger.paths)
+    for (const [key, path] of paths) {
+      if (!name || (name && key === upperCamel(name))) {
+        this.classname = name || this.classname
+        for (const prop of Object.values(path)) {
+          const operationId: string = (prop as any).operationId
+          const filename = operationId === 'Post' + key ? 'Save' + key : operationId
+          await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
+        }
+      }
+    }
+    await this.injector(true)
+  }
+
+  async repositories() {
+    await this.__swagger()
+    this.swagger = this.load()
+    const models = this.entities()
+    for (const model of models) {
+      await this.repository(model.ClassName)
+    }
+  }
+
+  async repository(name?: string, type?: string) {
+    await this.schema(name)
+    await this.__swagger()
+    this.swagger = this.load()
+    this.type = type
+
+    const paths: any = Object.entries(this.swagger.paths)
+    for (const [key, path] of paths) {
+      if (!name || (name && key === upperCamel(name))) {
+        this.classname = name || this.classname
+        await this.update('app/schemas/repositories', app.repositories)
+      }
+    }
+    await this.injector(true)
+  }
+
+  async stores() {
+    await this.__swagger()
+    this.swagger = this.load()
+    const models = this.entities()
+    for (const model of models) {
+      await this.store(model.ClassName)
+    }
+  }
+
+  async store(name?: string, type?: string) {
+    await this.schema(name)
+    await this.__swagger()
+    this.swagger = this.load()
+    this.type = type
+
+    const paths: any = Object.entries(this.swagger.paths)
+    for (const [key, path] of paths) {
+      if (!name || (name && key === upperCamel(name))) {
+        this.classname = name || this.classname
+        await this.update('app/schemas/store', app.store)
       }
     }
     await this.injector(true)

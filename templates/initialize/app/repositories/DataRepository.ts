@@ -12,14 +12,6 @@ export default class DataRepository {
     this.store = store
   }
 
-  set observer(value: any) {
-    this.store.commit(new types.Observer(value))
-  }
-
-  get observer(): any {
-    return this.store.state.data.observer
-  }
-
   set loading(value: boolean) {
     this.store.commit(new types.Loading(value))
   }
@@ -44,20 +36,12 @@ export default class DataRepository {
     return this.store.state.data.removing
   }
 
-  set finished(value: boolean | null) {
+  set finished(value: boolean | string | null) {
     this.store.commit(new types.Finished(value))
   }
 
-  get finished(): boolean | null {
+  get finished(): boolean | string | null {
     return this.store.state.data.finished
-  }
-
-  set none(value: boolean | null) {
-    this.store.commit(new types.None(value))
-  }
-
-  get none(): boolean | null {
-    return this.store.state.data.none
   }
 
   set errors(value: any) {
@@ -74,5 +58,13 @@ export default class DataRepository {
 
   get dialog(): boolean | null {
     return this.store.state.data.dialog
+  }
+
+  set none(value: boolean | null) {
+    this.store.commit(new types.None(value))
+  }
+
+  get none(): boolean | null {
+    return this.store.state.data.none
   }
 }
