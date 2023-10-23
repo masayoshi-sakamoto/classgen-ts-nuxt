@@ -6,9 +6,12 @@ export default {
     themes: {
       light: {
         primary: colors.lightBlue.darken1,
-        secondary: colors.grey.lighten1,
-        accent: colors.blueGrey.darken3,
-        grey: colors.grey.base
+        secondary: '#879094',
+        positive: '#485fc7',
+        accent: '#334242',
+        background: '#FCFAF9',
+        grey: colors.grey.base,
+        error: '#F32F35'
       }
     },
     options: {

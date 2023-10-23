@@ -9,193 +9,92 @@ export default class Generator extends Base {
     super(options)
   }
 
-  async usecases() {
-    await this.__swagger()
-    this.swagger = this.load()
-    const models = this.entities()
-    for (const model of models) {
-      await this.usecase(model.ClassName)
-    }
+  /**
+   * injectorのエイリアス
+   */
+  async index() {
+    await this.injector(false)
   }
 
-  async all(name?: string, type?: string) {
-    await this.schema(name)
-    await this.__swagger()
-    this.swagger = this.load()
-    this.type = type
-
-    const paths: any = Object.entries(this.swagger.paths)
-    for (const [key, path] of paths) {
-      if (!name || (name && key === upperCamel(name))) {
-        this.classname = name || this.classname
-        await this.update('app/schemas/gateways/AppName', app.gateways)
-        await this.update('app/schemas/infrastructure', app.infrastructure)
-        await this.update('app/schemas/repositories', app.repositories)
-        await this.update('app/schemas/store', app.store)
-        for (const prop of Object.values(path)) {
-          const operationId: string = (prop as any).operationId
-          const filename = operationId === 'Post' + key ? 'Save' + key : operationId
-          await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
-        }
-      }
-    }
-    await this.injector(true)
-  }
-
-  async gateways() {
-    await this.__swagger()
-    this.swagger = this.load()
-    const models = this.entities()
-    for (const model of models) {
-      await this.gateway(model.ClassName)
-    }
-  }
-
-  async gateway(name?: string, type?: string) {
-    await this.__swagger()
-    this.swagger = this.load()
-    this.type = type
-    const paths: any = Object.entries(this.swagger.paths)
-    for (const [key, _] of paths) {
-      if (!name || (name && key === upperCamel(name))) {
-        this.classname = name || this.classname
-        await this.update('app/schemas/gateways/AppName', app.gateways)
-        await this.update('app/schemas/infrastructure', app.infrastructure)
-      }
-    }
-    await this.injector(true)
-  }
-
-  async usecase(name?: string, type?: string) {
-    await this.__swagger()
-    this.swagger = this.load()
-    this.type = type
-    const paths: any = Object.entries(this.swagger.paths)
-    for (const [key, path] of paths) {
-      if (!name || (name && key === upperCamel(name))) {
-        this.classname = name || this.classname
-        for (const prop of Object.values(path)) {
-          const operationId: string = (prop as any).operationId
-          const filename = operationId === 'Post' + key ? 'Save' + key : operationId
-          await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
-        }
-      }
-    }
-    await this.injector(true)
-  }
-
-  async repositories() {
-    await this.__swagger()
-    this.swagger = this.load()
-    const models = this.entities()
-    for (const model of models) {
-      await this.repository(model.ClassName)
-    }
-  }
-
-  async repository(name?: string, type?: string) {
-    await this.schema(name)
-    await this.__swagger()
-    this.swagger = this.load()
-    this.type = type
-
-    const paths: any = Object.entries(this.swagger.paths)
-    for (const [key, path] of paths) {
-      if (!name || (name && key === upperCamel(name))) {
-        this.classname = name || this.classname
-        await this.update('app/schemas/repositories', app.repositories)
-      }
-    }
-    await this.injector(true)
-  }
-
-  async stores() {
-    await this.__swagger()
-    this.swagger = this.load()
-    const models = this.entities()
-    for (const model of models) {
-      await this.store(model.ClassName)
-    }
-  }
-
-  async store(name?: string, type?: string) {
-    await this.schema(name)
-    await this.__swagger()
-    this.swagger = this.load()
-    this.type = type
-
-    const paths: any = Object.entries(this.swagger.paths)
-    for (const [key, path] of paths) {
-      if (!name || (name && key === upperCamel(name))) {
-        this.classname = name || this.classname
-        await this.update('app/schemas/store', app.store)
-      }
-    }
-    await this.injector(true)
-  }
-
-  async schema(name?: string) {
+  /**
+   * gatewaysとinfrastructureの作成、nameがなければ全部作成する
+   */
+  async usecases(name?: string) {
     this.__swagger()
     this.swagger = this.load()
-    const models = this.entities()
-    for (const model of models) {
-      if (!name || (name && model.ClassName === upperCamel(name))) {
-        await this.entity(model.ClassName)
+    const paths: any = Object.entries(this.swagger.paths)
+
+    for (const [model, path] of paths) {
+      if (!name || (name && model === upperCamel(name))) {
+        this.classname = model
+        for (const prop of Object.values(path)) {
+          const operationId: string = (prop as any).operationId
+          const filename = operationId === 'Post' + model ? 'Save' + model : operationId
+          await this.update('app/schemas/usecases/class_name', app.usecases, filename + 'UseCase.ts')
+        }
       }
     }
-    await this.injector(true)
   }
 
-  async auth(name?: string) {
-    if (!name) {
-      error('name is required.')
+  /**
+   * gatewaysとinfrastructureの作成、nameがなければ全部作成する
+   */
+  async gateways(name?: string) {
+    this.__swagger()
+    this.swagger = this.load()
+    const models = this.schemas()
+    for (const model of models) {
+      if (!name || (name && model.ClassName === upperCamel(name))) {
+        this.classname = model.ClassName
+        await this.update('app/schemas/gateways/AppName', app.gateways)
+        await this.update('app/schemas/infrastructure', app.infrastructure)
+      }
     }
+  }
+
+  /**
+   * repositoriesとstoreの作成、nameがなければ全部作成する
+   */
+  async repositories(name?: string) {
+    this.__swagger()
     this.swagger = this.load()
-    this.classname = name || this.classname
-    await this.update('app/auth', app.root)
-    for (const model of ['auth', 'account']) {
-      await this.entity(model)
+    const models = this.schemas()
+    for (const model of models) {
+      if (!name || (name && model.ClassName === upperCamel(name))) {
+        this.classname = model.ClassName
+        await this.update('app/schemas/repositories', app.repositories)
+        await this.update('app/schemas/store', app.store)
+      }
     }
-    await this.schema(name)
   }
 
-  async csv(name?: string) {
-    if (!name) {
-      error('name is required.')
+  /**
+   * entitiesの作成、nameがなければ全部作成する
+   */
+  async entities(name?: string) {
+    this.__swagger()
+    this.swagger = this.load()
+    const models = this.schemas()
+    for (const model of models) {
+      if (!name || (name && model.ClassName === upperCamel(name))) {
+        this.classname = model.ClassName
+        await this.update('app/schemas/entities', app.entities)
+        await this.update('app/schemas/gateways/AppName/translator', app.translator)
+      }
     }
-    this.swagger = this.load()
-    this.classname = name || this.classname
-    await this.update('app/csv', app.root)
-    await this.schema(name)
   }
 
-  async index() {
-    this.swagger = this.load()
-    await this.injector(false)
-  }
-
-  async config() {
-    await this.update('config', './')
-  }
-
-  async initialize() {
-    await this.update('initialize', './')
-    this.swagger = this.load()
-    await this.injector(false)
-  }
-
+  /**
+   * swaggerの情報からschema生成する
+   */
   private async injector(silent: boolean) {
+    this.__swagger()
+    this.swagger = this.load()
     for (const model of this.swagger.models) {
       this.classname = model.ClassName
       await this.generate('app/models', app.root, silent)
     }
     await this.generate('app/index', app.root, silent)
-  }
-
-  private async entity(name: string) {
-    this.classname = name
-    await this.update('app/schemas/entities', app.entities)
-    await this.update('app/schemas/gateways/AppName/translator', app.translator)
   }
 
   private async __swagger() {

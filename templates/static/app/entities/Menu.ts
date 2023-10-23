@@ -76,7 +76,7 @@ export default class MenuEntity {
   }
 
   get first(): MenuEntity | undefined {
-    return this._props.children && this._props.children[0]
+    return this._props.disabled && this._props.children && this._props.children[0]
       ? new MenuEntity(this._props.children[0])
       : this._props.external && this._props.external[0]
       ? new MenuEntity(this._props.external[0])
@@ -92,6 +92,10 @@ export default class MenuEntity {
     return this.findCurrent(this)?.title
   }
 
+  get parent() {
+    return { name: this._props.route.slice(0, this._props.route.lastIndexOf('-')) }
+  }
+
   test(value: string | null | undefined): boolean {
     return value ? RegExp(`^${this._props.id}`).test(value) : false
   }
@@ -104,7 +108,7 @@ export default class MenuEntity {
   }
 
   private findCurrent(value: MenuEntity): MenuEntity | undefined {
-    if (RegExp(`^${value._props.id}$`).test(this._props.route) && !value.props.disabled) {
+    if (RegExp(`^${value._props.id}`).test(this._props.route) && !value.props.disabled) {
       return value
     }
     let check: MenuEntity | undefined
@@ -116,8 +120,12 @@ export default class MenuEntity {
     return undefined
   }
 
-  route(value: any) {
+  set route(value: any) {
     this._props.route = value
+  }
+
+  get route(): any {
+    return this._props.route
   }
 }
 

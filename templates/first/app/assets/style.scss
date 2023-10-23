@@ -1,0 +1,47 @@
+@import '@/assets/variables.scss';
+
+// global css
+.relative {
+  position: relative;
+}
+.pointer {
+  cursor: pointer;
+}
+.grab {
+  cursor: grab;
+}
+.move {
+  cursor: move;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.prewrap {
+  white-space: pre-wrap;
+}
+
+.w-full {
+  width: 100%;
+}
+.table {
+  background-color: #fff;
+  color: #363636;
+  border-collapse: collapse;
+}
+.table thead {
+  background-color: transparent;
+}
+thead th {
+  border-width: 0 0 2px;
+  color: #363636;
+}
+.table tbody {
+  background-color: transparent;
+}
+.table td,
+.table th {
+  border: 1px solid #dbdbdb;
+  border-width: 1px;
+  padding: 0.5em 0.75em;
+  vertical-align: top;
+}

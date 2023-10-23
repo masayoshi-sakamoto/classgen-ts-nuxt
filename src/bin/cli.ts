@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import Initialize from '../initialize'
 import Generator from '../generator'
 import Component from '../components'
 import Swagger from '../swagger'
@@ -21,6 +22,17 @@ try {
     .option('-f, --force', 'forced command')
     .option('-rm, --remove', 'forced command')
     .option('-i, --info', 'displays a confirmation message')
+  /**
+   * swaggerファイルの生成
+   */
+  commander
+    .command('initialize')
+    .alias('init')
+    .argument('<command>', 'start|all|config|first|static')
+    .action(async (command: string, name: string, options: IGenerateOptions) => {
+      const initialize: any = new Initialize({ ...options, global: { ...commander.opts() } })
+      await initialize[command](name)
+    })
 
   /**
    * swaggerファイルの生成
@@ -28,13 +40,10 @@ try {
   commander
     .command('swagger')
     .alias('swg')
-    .argument('<command>', 'all|schema|path|auth|csv|sql|index')
+    .argument('<command>', 'sql')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(all|schema|path|auth|csv|sql|index)$/)) {
-        error('command must be one of all|schema|path|auth|csv|sql|index|')
-      }
       const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
       await swagger[command](name)
     })
@@ -45,40 +54,15 @@ try {
   commander
     .command('generate')
     .alias('gen')
-    .argument('<command>', 'usecase|repository|gateway|store|schema|auth|csv|index|config|initialize')
+    .argument('<command>', 'entities')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
     .argument('[type]', 'gateway connection type. only usecase')
     .option('-e, --excludes <excludes>', 'excludes column with sqldump', (items) => items.split(','))
     .option('-sw, --swagger', 'create with swagger file')
     .option('-a, --auth', 'added authentication process')
     .action(async (command: string, name: string, type: string, options: IGenerateOptions) => {
-      if (!command.match(/^(usecase|repository|gateway|store|schema|auth|csv|index|config|initialize)$/)) {
-        error('command must be one of usecase|repository|gateway|store|schema|auth|csv|index|config|initialize')
-      }
-
-      if (
-        !name &&
-        !commander.opts().force &&
-        command === 'schema' &&
-        readlineSync.keyInYN(`${chalk.yellow('Warning:')} generate all defined schemas?`) !== true
-      ) {
-        return
-      }
-
-      if (command === 'auth') {
-        options.auth = true
-      }
-
-      if (options.swagger && command.match(/^(usecase|schema|auth|csv|index)$/)) {
-        const swagger: any = new Swagger({ ...options, global: { ...commander.opts() } })
-        await swagger[command === 'schema' || command === 'usecase' ? 'all' : command](name)
-        if (command !== 'index' && commander.opts().sqldump) {
-          await swagger.sql(name)
-        }
-      }
-
       const generator: any = new Generator({ ...options, global: { ...commander.opts() } })
-      await generator[command](name, type)
+      await generator[command](name)
     })
 
   /**
@@ -87,15 +71,9 @@ try {
   commander
     .command('component')
     .alias('com')
-    .argument('<command>', 'page|form|menu|auth|web')
+    .argument('<command>', '')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
-    .action(async (command: string, name: string, options: IGenerateOptions) => {
-      if (!command.match(/^(page|form|menu|auth|web)$/)) {
-        error('command must be one of page|form|menu|auth|web')
-      }
-      const component: any = new Component({ ...options, global: { ...commander.opts() } })
-      await component[command](name)
-    })
+    .action(async (command: string, name: string, options: IGenerateOptions) => {})
 
   commander.parse(process.argv)
 } catch (e) {

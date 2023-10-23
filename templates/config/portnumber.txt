@@ -1,10 +1,7 @@
-api   http://localhost:10010
-pma   http://localhost:10011
+api   http://localhost:xxx10
+pma   http://localhost:xxx11
 
-admin http://localhost:10020
-sb    http://localhost:10021
+admin http://localhost:xxx20
+web   http://localhost:xxx30
 
-web   http://localhost:10030
-sb    http://localhost:10031
-
-
+mailpit http://localhost:xxx40

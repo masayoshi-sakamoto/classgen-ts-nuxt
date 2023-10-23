@@ -12,48 +12,6 @@ export default class Swagger extends Base {
     super(options)
   }
 
-  async all(name?: string) {
-    this.classname = name || this.classname
-    if (!this.options.global.sqldump) {
-      await this.update('swagger/schemas', swagger.schemas)
-      await this.update('swagger/paths', swagger.paths)
-    }
-    await this.generate('swagger/index', swagger.root, true)
-    await this.swagpack()
-  }
-
-  async schema(name?: string) {
-    this.classname = name || this.classname
-    if (!this.options.global.sqldump) {
-      await this.update('swagger/schemas', swagger.schemas)
-    }
-    await this.generate('swagger/index', swagger.root, true)
-    await this.swagpack()
-  }
-
-  async path(name?: string) {
-    this.classname = name || this.classname
-    if (!this.options.global.sqldump) {
-      await this.update('swagger/paths', swagger.paths)
-    }
-    await this.generate('swagger/index', swagger.root, true)
-    await this.swagpack()
-  }
-
-  async auth(name?: string) {
-    this.classname = name || this.classname
-    await this.update('swagger/auth', swagger.root)
-    await this.generate('swagger/index', swagger.root, true)
-    await this.swagpack()
-  }
-
-  async csv(name?: string) {
-    this.classname = name || this.classname
-    await this.update('swagger/csv', swagger.root)
-    await this.generate('swagger/index', swagger.root, true)
-    await this.swagpack()
-  }
-
   async sql(name?: string) {
     if (!this.sqldump) {
       error('sqldump is required. Please specify with --sqldump option.')
@@ -72,20 +30,10 @@ export default class Swagger extends Base {
     await this.swagpack()
   }
 
-  async index(name?: string) {
-    this.classname = name || this.classname
-    await this.update('swagger/index', swagger.root)
-    await this.swagpack()
-  }
-
-  // エラーしないようにからの関数を定期
-  async config() {
-    console.info('done config.')
-  }
-  async initialize() {
-    console.info('done initialize.')
-  }
-
+  /**
+   * sqlのデータをyamlに変換する処理
+   * @param yaml
+   */
   private async sqlToYaml(yaml: any) {
     for (const name of ['index', 'seed']) {
       const dist = resolve(this.dist, swagger.schemas, yaml.class_name)

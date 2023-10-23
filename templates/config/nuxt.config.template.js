@@ -1,12 +1,17 @@
 export default {
   srcDir: 'app',
   server: {
-    port: 10020
+    port: xxx20
   },
+  // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
+  ssr: false,
+
+  // Target: https://go.nuxtjs.dev/config-target
+  target: 'static',
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'your application name',
+    title: process.env.APPLICATION_NAME,
     htmlAttrs: {
       lang: 'ja'
     },
@@ -20,40 +25,34 @@ export default {
     script: [{ src: 'https://polyfill.io/v3/polyfill.min.js?features=es6' }]
   },
 
-  pwa: {
-    manifest: {
-      lang: 'ja'
-    }
-  },
-
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['@/assets/style.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '@/plugins/injector',
-    { src: '@/plugins/veeValidate', ssr: true }
-    // '@/plugins/vuetify'
+    { src: '@/plugins/veeValidate', ssr: true },
+    '@/plugins/vuetify'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: [{ path: '@/components/atoms', extensions: ['vue'] }],
+  components: [
+    { path: '@/components/atoms', extensions: ['vue'], pathPrefix: false }
+  ],
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
-    // https://go.nuxtjs.dev/stylelint
-    '@nuxtjs/stylelint-module',
     // https://go.nuxtjs.dev/vuetify
-    '@nuxtjs/vuetify'
+    '@nuxtjs/vuetify',
+    '@nuxtjs/style-resources'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/pwa',
     ['@nuxtjs/dotenv', { path: './' }],
     ['cookie-universal-nuxt', { parseJSON: false }],
     'portal-vue/nuxt',
@@ -63,19 +62,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
-    proxy: true
-  },
-
-  proxy: {
-    '/admins': {
-      target: process.env.APPLICATION_API + '/admins',
-      pathRewrite: { '^/admins': '' }
-    },
-    '/users': {
-      target: process.env.APPLICATION_API + '/users',
-      pathRewrite: { '^/users': '' }
-    }
+    baseURL: '/'
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -85,9 +72,8 @@ export default {
     treeShake: true
   },
 
-  // storybool module configuration https://storybook.nuxtjs.org/api/options/
-  storybook: {
-    port: 10021
+  styleResources: {
+    scss: ['vuetify/src/styles/settings/_variables.scss']
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

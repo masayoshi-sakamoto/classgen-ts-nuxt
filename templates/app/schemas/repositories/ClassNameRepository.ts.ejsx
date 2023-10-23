@@ -3,7 +3,7 @@ import { Store } from 'vuex'
 import { RootState } from '@/store'
 import * as types from '@/store/<%= class_name %>/types'
 import * as data from '@/store/data/types'
-import { IOptionsProps } from '@/entities/Options'
+import { EmptyOptionsPropsFactory, IOptionsProps } from '@/entities/Options'
 import <%= ClassName %>Entity, { I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
 import { IQueryProps } from '@/entities/Query'
 
@@ -46,11 +46,13 @@ export default class <%= ClassName %>Repository {
   }
 
   set options(value: IOptionsProps) {
+    this.cookies.set(process.env.APP_NAME + '.<%= className %>.itemsPerPage', value.itemsPerPage, { path: '/', maxAge: 60 * 60 * 24 * 365 })
     this.store.commit(new types.Options(value))
   }
 
   get options(): IOptionsProps {
-    return this.store.state.<%= className %>.options
+    const itemsPerPage = this.cookies.get(process.env.APP_NAME + '.<%= className %>.itemsPerPage')
+    return EmptyOptionsPropsFactory({ ...this.store.state.<%= className %>.options, itemsPerPage })
   }
 
   set loading(value: boolean) {
@@ -100,6 +102,10 @@ export default class <%= ClassName %>Repository {
   update(value: I<%= ClassName %>Props) {
     this.store.commit(new types.Update(value))
   }
+
+  clear() {
+    this.store.commit(new types.Clear())
+  }  
 
   response(value: { items: I<%= ClassName %>Props[]; query: IQueryProps; options: IOptionsProps } | null | undefined) {
     if (value) {

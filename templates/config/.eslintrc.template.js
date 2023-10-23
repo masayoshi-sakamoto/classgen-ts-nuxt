@@ -22,6 +22,7 @@ module.exports = {
     'import/no-named-as-default-member': 'off',
     'import/namespace': 'off',
     'vue/no-v-html': 'off',
-    'no-control-regex': 'off'
+    'no-control-regex': 'off',
+    'vue/no-reserved-component-names': 'off'
   }
 }

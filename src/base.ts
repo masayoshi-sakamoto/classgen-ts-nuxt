@@ -218,7 +218,7 @@ export default class Base {
   /**
    * schemaからSeedを抜いたモデル名だけ返す
    */
-  protected entities() {
+  protected schemas() {
     return this.swagger.models.filter((model) => {
       return !model.ClassName.match(/(.+)Seed$/)
     })

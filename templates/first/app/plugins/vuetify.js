@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-pro/css/all.css'
 import Vue from 'vue'
 import Vuetify from 'vuetify/lib'
 import minifyTheme from 'minify-css-string'
+import ja from 'vuetify/src/locale/ja'
 
 const LRU = require('lru-cache')
 const themeCache = new LRU({
@@ -12,6 +13,10 @@ const themeCache = new LRU({
 Vue.use(Vuetify)
 
 export default new Vuetify({
+  lang: {
+    locales: { ja },
+    current: 'ja'
+  },
   icons: {
     iconfont: 'fa'
   },

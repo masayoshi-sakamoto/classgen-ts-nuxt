@@ -1,0 +1,67 @@
+// Ref: https://github.com/nuxt-community/vuetify-module#customvariables
+
+// 外見の設定
+$body-font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+// $font-size-root: 16px;
+// $line-height-root: 1.5;
+$border-radius-root: 8px;
+
+// テキストfield
+// $text-field-filled-full-width-outlined-single-line-slot-min-height: 32px;
+$text-field-outlined-prepend-append-margin-top: 6px;
+
+// カード
+$card-elevation: 4;
+$card-btn-padding: 0 16px;
+$card-btn-margin-x: 12px;
+
+// メニューの設定
+$menu-content-border-radius: 6px;
+$menu-content-elevation: 3;
+
+// グリッドサイズ
+// $grid-breakpoints: (
+//     'xs': 0,
+//     'sm': 600px,
+//     'md': 960px,
+//     'lg': 1280px - 16px,
+//     'xl': 1920px - 16px
+// );
+
+// 影の色
+$shadow-key-umbra-opacity: rgba(75, 75, 74, 0.2);
+$shadow-key-penumbra-opacity: rgba(75, 75, 74, 0.14);
+$shadow-key-ambient-opacity: rgba(75, 75, 74, 0.12);
+
+// ボタンデザイン
+$btn-font-weight: 700;
+$btn-text-transform: none;
+$btn-letter-spacing: 0.07em;
+
+// リストアイテム
+$list-dense-min-height: 36px;
+$list-dense-icon-margin: 6px;
+$list-item-action-icon-margin: 16px;
+$list-group-header-icon-min-width: 20px;
+
+// // コンテナ
+$container-padding-x: 32px;
+
+// ダイアログ
+$dialog-elevation: 16px;
+
+// ページネーション
+$pagination-border-radius: 4px;
+
+// // テーブル
+// $material-light: (
+//   table: (
+//     hover: #85a61c22
+//   )
+// );
+
+@mixin media-breakpoint($breakpoint) {
+  @media #{map-get($display-breakpoints, $breakpoint)} {
+    @content;
+  }
+}

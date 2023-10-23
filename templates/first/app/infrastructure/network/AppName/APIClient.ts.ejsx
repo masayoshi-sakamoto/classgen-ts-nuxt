@@ -77,6 +77,18 @@ export class APIClient {
         const type = Object.prototype.toString.call(value).slice(8, -1).toLowerCase()
         if (type === 'file') {
           params.append(key, value)
+        } else if (value && typeof value === 'object') {
+          // ファイルをアップロードする用の処理
+          Object.entries<any>(value).forEach(([index, values]) => {
+            Object.entries<any>(values).forEach(([name, value]) => {
+              const type = Object.prototype.toString.call(value).slice(8, -1).toLowerCase()
+              if (type === 'file') {
+                params.append(`${key}_${index}_${name}`, value)
+              } else {
+                params.append(`${key}_${index}_${name}`, JSON.stringify(value))
+              }
+            })
+          })
         } else {
           params.append(key, JSON.stringify(value))
         }
