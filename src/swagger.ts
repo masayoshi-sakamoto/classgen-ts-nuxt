@@ -16,8 +16,13 @@ export default class Swagger extends Base {
     if (!this.sqldump) {
       error('sqldump is required. Please specify with --sqldump option.')
     }
-    this.options.excludes = this.options.excludes || []
-    this.options.excludes = this.configs.columns!.excludes!.concat(this.options.excludes)
+    this.options.excludes = {
+      index: this.options.excludes?.index || [],
+      seed: this.options.excludes?.seed || []
+    }
+    this.options.excludes.index = this.configs.columns!.excludes!.index.concat(this.options.excludes.index)
+    this.options.excludes.seed = this.configs.columns!.excludes!.seed.concat(this.options.excludes.seed)
+
     const yamls = new SQLParser(this.sqldump, this.options).parse(this.configs!)
 
     for (const yaml of yamls) {

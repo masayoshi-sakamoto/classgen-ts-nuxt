@@ -39,8 +39,10 @@ export default class SQLParser {
         inflector.plural(table) && // テーブル名が複数形のときで
         definitions.length > 0
       ) {
+        const class_name = snake(inflector.singularize(table))
+
         // カラムのデータを生成
-        const columns: IColumn[] = definitions
+        let columns: IColumn[] = definitions
           .flatMap((prop) => {
             if (prop.column) {
               return {
@@ -51,17 +53,30 @@ export default class SQLParser {
             }
             return []
           })
-          .flatMap((prop) => (!this.options.excludes!.includes(prop.property) ? prop : []))
-
-        const class_name = snake(inflector.singularize(table))
+          .flatMap((prop) => (!this.options.excludes!.index.includes(prop.property) ? prop : []))
         const index = {
           required: columns.map((prop) => prop.property),
           properties: this.properties(columns, 'index')
         }
+
+        // カラムのデータを生成
+        columns = definitions
+          .flatMap((prop) => {
+            if (prop.column) {
+              return {
+                property: prop.column.column as string,
+                definition: prop.definition,
+                comment: prop.comment ? prop.comment.value.value : undefined
+              }
+            }
+            return []
+          })
+          .flatMap((prop) => (!this.options.excludes!.seed.includes(prop.property) ? prop : []))
         const seed = {
           required: columns.flatMap((prop) => (prop.property !== 'id' ? prop.property : [])),
           properties: this.properties(columns, 'seed')
         }
+
         const path = this.path(class_name, index.properties)
         const paths = this.paths(class_name, index.properties)
 

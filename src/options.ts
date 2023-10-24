@@ -14,7 +14,10 @@ export interface IInitializeOptions {
 }
 
 export interface IGenerateOptions {
-  excludes?: string[] // schemaを生成時に除外したいカラム
+  excludes?: {
+    index: string[] // schemaを生成時に除外したいカラム
+    seed: string[] // schemaを生成時に除外したいカラム
+  }
   swagger?: boolean
   auth?: boolean
 }

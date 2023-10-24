@@ -10,7 +10,10 @@
     ]
   },
   "columns": {
-    "excludes": ["password", "created_at", "updated_at", "deleted_at"]
+    "excludes": {
+      "index": ["password", "deleted_at"],
+      "seed": ["created_at", "updated_at", "deleted_at"]
+    }
   },
   "schemas": {
     "excludes": ["Account", "Auth", "Menu", "Query", "Options"]

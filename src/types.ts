@@ -3,7 +3,10 @@ export interface IConfig {
     excludes?: string[]
   }
   columns?: {
-    excludes?: string[]
+    excludes?: {
+      index: string[]
+      seed: string[]
+    }
   }
   schemas?: {
     excludes?: string[]
@@ -15,7 +18,7 @@ export interface IConfig {
 
 export const EmptyConfig = (prop?: Partial<IConfig> | null) => ({
   tables: { excludes: [] },
-  columns: { excludes: [] },
+  columns: { excludes: { index: [], seed: [] } },
   schemas: { excludes: [] },
   menu: { excludes: [] },
   ...prop
