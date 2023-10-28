@@ -20,7 +20,7 @@ export default class Generator extends Base {
    * gatewaysとinfrastructureの作成、nameがなければ全部作成する
    */
   async usecases(name?: string) {
-    this.__swagger()
+    await this.__swagger()
     this.swagger = this.load()
     const paths: any = Object.entries(this.swagger.paths)
 
@@ -40,7 +40,7 @@ export default class Generator extends Base {
    * gatewaysとinfrastructureの作成、nameがなければ全部作成する
    */
   async gateways(name?: string) {
-    this.__swagger()
+    await this.__swagger()
     this.swagger = this.load()
     const models = this.schemas()
     for (const model of models) {
@@ -56,7 +56,7 @@ export default class Generator extends Base {
    * repositoriesとstoreの作成、nameがなければ全部作成する
    */
   async repositories(name?: string) {
-    this.__swagger()
+    await this.__swagger()
     this.swagger = this.load()
     const models = this.schemas()
     for (const model of models) {
@@ -72,7 +72,7 @@ export default class Generator extends Base {
    * entitiesの作成、nameがなければ全部作成する
    */
   async entities(name?: string) {
-    this.__swagger()
+    await this.__swagger()
     this.swagger = this.load()
     const models = this.schemas()
     for (const model of models) {
@@ -88,7 +88,7 @@ export default class Generator extends Base {
    * swaggerの情報からschema生成する
    */
   private async injector(silent: boolean) {
-    this.__swagger()
+    await this.__swagger()
     this.swagger = this.load()
     for (const model of this.swagger.models) {
       this.classname = model.ClassName
@@ -98,7 +98,7 @@ export default class Generator extends Base {
   }
 
   private async __swagger() {
-    await this.generate('swagger/index', swagger.root, true)
+    await this.generate('swagger/index', swagger.root, false)
     await this.swagpack()
   }
 }

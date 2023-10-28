@@ -203,13 +203,13 @@ export default class Base {
     process.exit()
   }
 
-  protected async swagpack() {
+  protected swagpack() {
     const src = resolve(this.dist, 'swagger/src/index.yaml')
     const dist = resolve(this.dist, 'swagger/swagger.yaml')
     if (fs.existsSync(src)) {
-      await new Promise((resolve) => {
-        resolve(swagpack(src, dist))
-      })
+      swagpack(src, dist)
+      const msg = chalk.yellow('Overwrite:')
+      console.info(msg, 'swagger/swagger.yaml')
     } else {
       error('file not found.')
     }

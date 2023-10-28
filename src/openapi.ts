@@ -23,8 +23,8 @@ export default class OpenAPIParser {
       return {
         table: inflector.pluralize(toUnderscoreCase(key)),
         ClassName: key,
-        refs: this.refs(key, schemas![key]),
-        schema: this.schema(key, schemas![key]),
+        refs: schemas ? this.refs(key, schemas[key]) : undefined,
+        schema: schemas ? this.schema(key, schemas[key]) : undefined,
         seed: !!key.match(/.+(Seed)$/)
       }
     })
@@ -35,7 +35,7 @@ export default class OpenAPIParser {
   }
 
   private refs(key: string, value: SchemaObject): IRef[] {
-    if (value.$ref !== undefined) {
+    if (value?.$ref !== undefined) {
       const name = value.$ref.split('/').pop()
       return [{ name: key, schema: name }]
     } else if (value.properties !== undefined) {
@@ -45,7 +45,7 @@ export default class OpenAPIParser {
         }
         if ((value.properties![key] as SchemaObject).type === 'array') {
           const data: SchemaObject = value.properties![key]
-          if (data.items!.$ref !== undefined) {
+          if (data.items?.$ref !== undefined) {
             return this.refs(key, data.items!)
           }
         }
@@ -66,7 +66,7 @@ export default class OpenAPIParser {
       default: value.default === null ? 'null' : value.default,
       format: value.format
     }
-    if (value.$ref !== undefined) {
+    if (value?.$ref !== undefined) {
       const name = value.$ref.split('/').pop()
       schema = {
         ...schema,

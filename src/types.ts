@@ -62,8 +62,8 @@ export const exts = ['css', 'html', 'json', 'scss', 'ts', 'vue', 'yaml']
 export interface IModel {
   table: string
   ClassName: string
-  refs: any
-  schema: ITsSchema
+  refs?: any
+  schema?: ITsSchema
   seed: boolean
 }
 
