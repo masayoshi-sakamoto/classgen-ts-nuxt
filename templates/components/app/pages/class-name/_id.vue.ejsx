@@ -1,0 +1,62 @@
+<template>
+  <TtemplateSave :value="value" :name="value.name.ja" @remove="remove">
+    <a-sheet id="form" form @submit="save">
+      <Form<%= ClassName %> v-model="value"></Form<%= ClassName %>>
+    </a-sheet>
+  </TtemplateSave>
+</template>
+
+<script lang="ts">
+import Vue from 'vue'
+import TtemplateSave from '@/components/templates/Save'
+import Form<%= ClassName %> from '@/components/organisms/Form/<%= ClassName %>'
+import { Empty<%= ClassName %>PropsFactory, I<%= ClassName %>Props } from '@/entities/<%= ClassName %>'
+import Save<%= ClassName %>UseCase from '@/usecases/<%= className %>/Save<%= ClassName %>UseCase'
+import Get<%= ClassName %>UseCase from '@/usecases/<%= className %>/Get<%= ClassName %>UseCase'
+import Delete<%= ClassName %>UseCase from '@/usecases/<%= className %>/Delete<%= ClassName %>UseCase'
+
+interface IData {
+  value: I<%= ClassName %>Props
+}
+
+export default Vue.extend({
+  components: {
+    TtemplateSave,
+    Form<%= ClassName %>
+  },
+  data(): IData {
+    return {
+      value: Empty<%= ClassName %>PropsFactory()
+    }
+  },
+  async fetch() {
+    await this.fetch()
+  },
+  methods: {
+    async fetch() {
+      if (this.$route.params.id !== 'create') {
+        this.App.data.saving = true
+        const value = await new Get<%= ClassName %>UseCase(this.App).execute(this.$route.params.id)
+        this.value = value || Empty<%= ClassName %>PropsFactory()
+        this.App.data.saving = false
+      }
+    },
+    async save() {
+      if (await new Save<%= ClassName %>UseCase(this.App).execute(this.value)) {
+        if (!this.value.id) {
+          this.App.<%= className %>.clear()
+          this.$router.push(this.App.state.current!.parent)
+        }
+        this.App.data.finished = 'データを保存しました。'
+      }
+    },
+    async remove() {
+      if (await new Delete<%= ClassName %>UseCase(this.App).execute(this.value)) {
+        this.App.<%= className %>.clear()
+        this.$router.push(this.App.state.current!.parent)
+        this.App.data.finished = 'データを削除しました。'
+      }
+    }
+  }
+})
+</script>

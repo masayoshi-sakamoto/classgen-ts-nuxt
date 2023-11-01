@@ -11,6 +11,9 @@ export interface IConfig {
   schemas?: {
     excludes?: string[]
   }
+  repositories?: {
+    excludes?: string[]
+  }
   menu?: {
     excludes?: string[]
   }

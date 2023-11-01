@@ -42,7 +42,7 @@ export default class Generator extends Base {
   async gateways(name?: string) {
     await this.__swagger()
     this.swagger = this.load()
-    const models = this.schemas()
+    const models = this.schemas().filter((model) => !this.configs.schemas!.excludes?.includes(model.ClassName))
     for (const model of models) {
       if (!name || (name && model.ClassName === upperCamel(name))) {
         this.classname = model.ClassName
@@ -58,7 +58,7 @@ export default class Generator extends Base {
   async repositories(name?: string) {
     await this.__swagger()
     this.swagger = this.load()
-    const models = this.schemas()
+    const models = this.schemas().filter((model) => !this.configs.repositories!.excludes?.includes(model.ClassName))
     for (const model of models) {
       if (!name || (name && model.ClassName === upperCamel(name))) {
         this.classname = model.ClassName
@@ -74,7 +74,7 @@ export default class Generator extends Base {
   async entities(name?: string) {
     await this.__swagger()
     this.swagger = this.load()
-    const models = this.schemas()
+    const models = this.schemas().filter((model) => !this.configs.schemas!.excludes?.includes(model.ClassName))
     for (const model of models) {
       if (!name || (name && model.ClassName === upperCamel(name))) {
         this.classname = model.ClassName
@@ -82,6 +82,20 @@ export default class Generator extends Base {
         await this.update('app/schemas/gateways/AppName/translator', app.translator)
       }
     }
+  }
+
+  /**
+   * 静的に生成されるスキーマ
+   */
+  async static() {
+    await this.update('static/app', app.root)
+  }
+
+  /**
+   * 認証系のファイル生成
+   */
+  async auth() {
+    await this.update('app/auth', app.root)
   }
 
   /**

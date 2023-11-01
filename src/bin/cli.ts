@@ -73,7 +73,10 @@ try {
     .alias('com')
     .argument('<command>', '')
     .argument('[name]', 'schema name e.g. user, User, users, Users')
-    .action(async (command: string, name: string, options: IGenerateOptions) => {})
+    .action(async (command: string, name: string, options: IGenerateOptions) => {
+      const component: any = new Component({ ...options, global: { ...commander.opts() } })
+      await component[command](name)
+    })
 
   commander.parse(process.argv)
 } catch (e) {

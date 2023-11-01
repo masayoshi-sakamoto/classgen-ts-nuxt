@@ -1,3 +1,0 @@
-import <%= ClassName %> from './<%= ClassName %>.vue'
-
-export default <%= ClassName %>

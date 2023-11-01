@@ -2,7 +2,7 @@ import { <%= AppName %>GatewayBase } from './base'
 import { toAccountSeed } from './translator/account'
 import { toAuthProps } from './translator/auth'
 import { to<%= ClassName %>Props } from './translator/<%= class_name %>'
-import { Refresh, Signup, Login, Logout, Me } from '@/infrastructure/network/<%= AppName %>/requests/auth'
+import { Refresh, Signup, Login, Logout, Me, Forget, Profile, Password } from '@/infrastructure/network/<%= AppName %>/requests/auth'
 import { IAccountProps } from '@/entities/Account'
 
 export default class Auth extends <%= AppName %>GatewayBase {
@@ -29,5 +29,20 @@ export default class Auth extends <%= AppName %>GatewayBase {
   async Me() {
     const { <%= className %> } = await this.apiClient.request(new Me())
     return to<%= ClassName %>Props(<%= class_name %>)
+  }
+
+  async Forget(props: IAccountProps) {
+    const { forget } = await this.apiClient.request(new Forget(toAccountSeed(props)))
+    return forget
+  }
+
+  async Profile(props: IAccountProps) {
+    const { auth } = await this.apiClient.request(new Profile(toAccountSeed(props)))
+    return toAuthProps(auth)
+  }
+
+  async Password(props: IAccountProps) {
+    const { auth } = await this.apiClient.request(new Password(toAccountSeed(props)))
+    return toAuthProps(auth)
   }
 }

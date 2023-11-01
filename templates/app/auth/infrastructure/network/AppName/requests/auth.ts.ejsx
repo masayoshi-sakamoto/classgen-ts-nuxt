@@ -55,3 +55,39 @@ export class Me implements APIRequest<<%= AppName %>.Auth.authMeResponse> {
     this.path = '/me'
   }
 }
+
+export class Forget implements APIRequest<<%= AppName %>.Auth.authForgetResponse> {
+  response: <%= AppName %>.Auth.authForgetResponse
+  path: string
+  contentType = 'application/json'
+  method = HTTPMethod.POST
+  params: <%= AppName %>.Auth.authForgetRequest
+  constructor(params: Account) {
+    this.params = params
+    this.path = '/forget'
+  }
+}
+
+export class Profile implements APIRequest<<%= AppName %>.Auth.authSignupResponse> {
+  response: <%= AppName %>.Auth.authSignupResponse
+  path: string
+  contentType = 'application/json'
+  method = HTTPMethod.POST
+  params: <%= AppName %>.Auth.authSignupRequest
+  constructor(params: Account) {
+    this.params = params
+    this.path = '/profile'
+  }
+}
+
+export class Password implements APIRequest<<%= AppName %>.Auth.authPasswordResponse> {
+  response: <%= AppName %>.Auth.authPasswordResponse
+  path: string
+  contentType = 'application/json'
+  method = HTTPMethod.POST
+  params: <%= AppName %>.Auth.authPasswordRequest
+  constructor(params: Account) {
+    this.params = params
+    this.path = `/password`
+  }
+}

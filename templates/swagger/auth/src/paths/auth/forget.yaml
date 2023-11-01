@@ -1,0 +1,23 @@
+post:
+  tags:
+    - Auth
+  operationId: authForget
+  description: Auth Forget
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/Account'
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            required:
+              - forget
+            type: object
+            properties:
+              forget:
+                type: boolean
+                nullable: true

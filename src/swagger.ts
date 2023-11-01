@@ -12,6 +12,12 @@ export default class Swagger extends Base {
     super(options)
   }
 
+  async initialize(name?: string) {
+    await this.sql()
+    await this.static()
+    await this.auth(name)
+  }
+
   async sql(name?: string) {
     if (!this.sqldump) {
       error('sqldump is required. Please specify with --sqldump option.')
@@ -56,5 +62,18 @@ export default class Swagger extends Base {
         await this.write(path.join(dist, name + '.yaml'), yaml[name], false)
       }
     }
+  }
+
+  async auth(name?: string) {
+    this.classname = name || this.classname
+    await this.update('swagger/auth', swagger.root)
+    await this.generate('swagger/index', swagger.root, true)
+    await this.swagpack()
+  }
+
+  async static() {
+    await this.update('swagger/static', swagger.root)
+    await this.generate('swagger/index', swagger.root, true)
+    await this.swagpack()
   }
 }

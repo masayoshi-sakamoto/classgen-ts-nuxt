@@ -1,6 +1,6 @@
 /* eslint camelcase: 0 */
 export interface IQueryProps {
-  total: number
+  total?: number
   page?: number
   skip?: number
   take?: number
@@ -12,6 +12,5 @@ export interface IQueryProps {
 }
 
 export const EmptyQueryPropsFactory = (props?: Partial<IQueryProps>): IQueryProps => ({
-  total: 1,
   ...props
 })

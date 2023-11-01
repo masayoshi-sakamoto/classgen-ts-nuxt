@@ -1,27 +1,20 @@
 <template>
   <TtemplateList
-    :items="App.<%= className %>.fetched"
+    :items="App.<%= className %>.entities"
     :options.sync="App.<%= className %>.options"
     :query="App.<%= className %>.query"
     :headers="headers"
-    @save="save"
-    @remove="remove"
+    disabled-click
     @fetch="params"
   >
-    <template #form="{ item }">
-      <Form<%= ClassName %> :value="item" type="dialog" @input="value = $event"></Form<%= ClassName %>>
-    </template>
   </TtemplateList>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import TtemplateList from '@/components/templates/List'
-import Form<%= ClassName %> from '@/components/organisms/Form/<%= ClassName %>'
 import { I<%= ClassName %>Props, headers } from '@/entities/<%= ClassName %>'
 import Fetch<%= ClassName %>UseCase from '@/usecases/<%= className %>/Fetch<%= ClassName %>UseCase'
-import Save<%= ClassName %>UseCase from '@/usecases/<%= className %>/Save<%= ClassName %>UseCase'
-import Delete<%= ClassName %>UseCase from '@/usecases/<%= className %>/Delete<%= ClassName %>UseCase'
 
 interface IData {
   headers: { text: string; value: any }[]
@@ -30,8 +23,7 @@ interface IData {
 
 export default Vue.extend({
   components: {
-    TtemplateList,
-    Form<%= ClassName %>
+    TtemplateList
   },
   data(): IData {
     return {
@@ -40,13 +32,10 @@ export default Vue.extend({
     }
   },
   async fetch() {
-    if (this.App.<%= className %>.fetched.length === 0) {
-      this.App.<%= className %>.options = {
-        ...this.App.<%= className %>.options,
-        ...this.$route.query
-      }
-      await this.fetch()
+    this.App.<%= className %>.options = {
+      ...this.$route.query
     }
+    await this.fetch()
   },
   methods: {
     async params() {
@@ -57,17 +46,9 @@ export default Vue.extend({
       await this.fetch()
     },
     async fetch() {
-      await new Fetch<%= ClassName %>UseCase(this.App).execute()
-    },
-    async save() {
-      if (await new Save<%= ClassName %>UseCase(this.App).execute(this.value!)) {
-        await this.fetch()
-        this.App.data.dialog = false
-      }
-    },
-    async remove(value: I<%= ClassName %>Props) {
-      await new Delete<%= ClassName %>UseCase(this.App).execute(value!)
-      await this.fetch()
+      this.App.data.loading = true
+      this.App.<%= className %>.response(await new Fetch<%= ClassName %>UseCase(this.App).execute(this.App.<%= className %>.options))
+      this.App.data.loading = false
     }
   }
 })

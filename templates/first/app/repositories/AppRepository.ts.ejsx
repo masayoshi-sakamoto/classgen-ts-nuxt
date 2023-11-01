@@ -13,6 +13,10 @@ export default class AppRepository {
     this.store = store
   }
 
+  get title(): string {
+    return process.env.APPLICATION_NAME || 'アプリケーション'
+  }
+
   set loading(value: boolean) {
     this.store.commit(new types.Loading(value))
   }
