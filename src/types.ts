@@ -98,6 +98,7 @@ export interface IYAML {
 
 // swagger-type: typescript-type
 export const types: { [key: string]: string } = {
+  any: 'any',
   array: 'Array',
   list: 'Array',
   boolean: 'boolean',

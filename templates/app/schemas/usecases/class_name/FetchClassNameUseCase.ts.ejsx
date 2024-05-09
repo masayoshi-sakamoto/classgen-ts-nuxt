@@ -15,7 +15,7 @@ export default class Fetch<%= ClassName %>UseCase implements BaseUseCase {
       return await this.App.<%= appName %>Gateway.<%= ClassName %>.Fetch<%= ClassName %>(options)
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return null
     }
+    return null
   }
 }

@@ -18,5 +18,8 @@
   "schemas": {
     "excludes": ["Account", "Auth", "Menu", "Query", "Options"]
   },
+  "repositories": {
+    "excludes": ["Auth", "Account", "Query"]
+  },
   "menus": []
 }

@@ -10,15 +10,12 @@ export default class Save<%= ClassName %>UseCase implements BaseUseCase {
   async execute(props: I<%= ClassName %>Props) {
     try {
       this.App.data.finished = false
-      this.App.data.saving = true
       <%_ if (auth) { _%>
       await refresh(this.App)
       <%_ } _%>
       return await this.App.<%= appName %>Gateway.<%= ClassName %>.Save<%= ClassName %>(props)
     } catch (exception: any) {
       this.App.logService.handle(exception)
-    } finally {
-      this.App.data.saving = false
     }
     return null
   }

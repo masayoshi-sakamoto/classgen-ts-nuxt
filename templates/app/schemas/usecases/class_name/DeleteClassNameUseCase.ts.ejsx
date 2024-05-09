@@ -9,7 +9,6 @@ export default class Delete<%= ClassName %>UseCase implements BaseUseCase {
 
   async execute(props: I<%= ClassName %>Props) {
     try {
-      this.App.data.removing = true
       <%_ if (auth) { _%>
       await refresh(this.App)
       <%_ } _%>
@@ -17,9 +16,7 @@ export default class Delete<%= ClassName %>UseCase implements BaseUseCase {
       return true
     } catch (exception: any) {
       this.App.logService.handle(exception)
-      return false
-    } finally {
-      this.App.data.removing = false
     }
+    return false
   }
 }
