@@ -37,10 +37,10 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
 
   const { <%= Object.values(model.schema).flatMap((prop) => (prop.format !== 'json' ? prop.key : [])).join(', ') %> } = props
   <%_ Object.values(model.schema).filter((prop) => prop.format === 'json').forEach((prop) => { _%>
-  const <%= prop.key %> = props.<%= prop.key %> ? JSON.parse(props.<%= prop.key %>).<%= prop.key %> : null
+  const <%= prop.key %> = props.<%= prop.key %> ? JSON.parse(props.<%= prop.key %>).<%= prop.key %> : Empty<%= ClassName %>PropsFactory().<%= prop.key %>
   <%_ }) _%>
   
-  return {
+  return Empty<%= ClassName %>PropsFactory({
     <%- Object.values(model.schema).map((prop) => {
       const camel = lowerCamel(prop.key)
       const model = upperCamel(prop.key)
@@ -48,7 +48,7 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
       if (prop.ref) {
         src = `to${model}Props(${prop.key})`
       } else if (prop.format === 'json') {
-        src = `${prop.key} || {}`
+        src = `${prop.key}`
       } else if (prop.format === 'date') {
         src = `${prop.key} ? moment(${prop.key}).format('YYYY-MM-DD') : null`
       } else if (prop.format === 'date-time') {
@@ -56,7 +56,7 @@ export const to<%= ClassName %>Props = (props: <%= ClassName %> | null | undefin
       }
       return camel === src ? camel : camel + ': ' + src
     }).join(',\n    ') %>
-  }
+  })
 }
 <%_ } _%>
 <%_ if (seed) { _%>

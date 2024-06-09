@@ -28,7 +28,7 @@ export default class <%= ClassName %>Entity {
   }
 
   get clone(): I<%= ClassName %>Props {
-    return JSON.parse(JSON.stringify(this._props))
+    return Empty<%= ClassName %>PropsFactory(JSON.parse(JSON.stringify(this._props)))
   }
 <%_ if (model) { _%>
   <%_ for (const schema of Object.values(model.schema)) { _%>
